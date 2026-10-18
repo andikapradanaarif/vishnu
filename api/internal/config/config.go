@@ -26,6 +26,8 @@ type Config struct {
 	Environment string
 	// Brevo configures transactional email (auth OTP codes).
 	Brevo Brevo
+	// Database carries the Postgres connection settings (DB_* envs).
+	Database Database
 }
 
 // Load reads configuration from environment variables.
@@ -42,6 +44,7 @@ func Load() *Config {
 			FromName:       os.Getenv("BREVO_FROM_NAME"),
 			RequestTimeout: getenv("VISHNU_EMAIL_TIMEOUT", "10s"),
 		},
+		Database: LoadDatabase(),
 	}
 }
 
