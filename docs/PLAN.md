@@ -73,7 +73,8 @@ Detailed plans: [`plan/api.md`](plan/api.md) (API),
 [`plan/projects.md`](plan/projects.md) (multi-project registry +
 per-project crush servers — **decided**),
 [`plan/data.md`](plan/data.md) (persistence — Postgres/GORM, migrations,
-schema — **decided**).
+schema — **decided**),
+[`plan/api-tasks.md`](plan/api-tasks.md) (agent task breakdown — 6 PRs).
 
 ## Project layout
 
