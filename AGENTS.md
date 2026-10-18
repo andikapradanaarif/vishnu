@@ -32,6 +32,7 @@ Monorepo, bun workspaces — style/stack follows valo & nexus-bo-api.
 - `web/`: `bun run dev` (vite, proxies `/v1` → `127.0.0.1:9119`), `bun run lint`, `bun run build`.
 - `api/`: `make dev` (VISHNU_WEB_DIR=../web/dist), `make build` (embeds web/dist → bin/vishnu-api), `make test`, `make lint`.
 - `api/` database: `make db` (compose Postgres on 5432), `make migrate`, `make migratedown`, `make migratestatus`. The server applies pending migrations on boot and exits with the fix-it command when Postgres is unreachable.
+- `api/` docker stack: `make up` (`docker compose -f deploy/docker-compose.yml up -d --build`) brings up postgres + the app image (SPA, api and a pinned `crush` binary baked in); `make logs`; `docker compose -f deploy/docker-compose.yml run --rm vishnu migrate status|down`. Settings live in `api/deploy/.env` (copy `api/deploy/.env.example`) — compose interpolates it for postgres and hands it to the app, so `DB_*` configure both.
 - `api/` tests: repository tests need a real Postgres — set `VISHNU_TEST_DB_DSN="host=127.0.0.1 port=5432 user=vishnu password=vishnu dbname=vishnu sslmode=disable"`, otherwise they skip.
 
 ## Runtime

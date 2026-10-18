@@ -42,7 +42,10 @@ internal/handler/project_handler.go    /api/projects* CRUD + ensure-running/work
 internal/handler/web_handler.go        SPA static + index.html fallback
 internal/webui/webui.go                //go:embed all:dist
 internal/webui/dist/.gitkeep           placeholder so embed compiles pre-build
-docker-compose.yml                     postgres:17-alpine for local dev
+Dockerfile                             bun → go → crush → alpine runtime
+entrypoint.sh                          `migrate` dispatch, else the server
+deploy/docker-compose.yml              postgres + vishnu services
+deploy/.env.example                    compose settings (copy to deploy/.env)
 ```
 
 Config → repositories/services → usecases → handlers → routes in
@@ -168,49 +171,65 @@ embedded SPA is the prod path.
 **Image** (`api/Dockerfile`, build context = repo root — the SPA has
 to build inside the image):
 
-1. `oven/bun` stage — `bun install` + `bun run build` over
-   shared-ui → contract → web → `web/dist`.
+1. `oven/bun` stage — `bun install --frozen-lockfile` + `bun run build`
+   over shared-ui → contract → web → `web/dist`.
 2. `golang:1.26-alpine` stage — copy `api/`, copy `web/dist` into
    `internal/webui/dist`, build `vishnu-api` + `migrate` in one RUN
    (shared build cache, `-trimpath -ldflags="-s -w"`, `GOTOOLCHAIN=local`).
    Vendor `go.mod` deps later if build time becomes annoying (valo
    vendors; we don't yet).
-3. `alpine` runtime — `apk add git openssh-client curl` (cloner +
-   healthcheck), both binaries, `entrypoint.sh` (nexus-style:
-   `migrate` arg dispatches to `./migrate`, default execs the server —
-   which already auto-migrates on boot), crush binary from a
-   `go install github.com/charmbracelet/crush@$CRUSH_VERSION`
-   builder stage (build-arg pinned).
-   Root `.dockerignore`: `node_modules`, `dist`, `bin`, `.git`.
+3. `golang:1.27-alpine` stage — `go install
+   github.com/charmbracelet/crush@$CRUSH_VERSION` (build-arg, default
+   `v0.98.1`). A newer toolchain than the api stage, because crush's own
+   `go.mod` requires one.
+4. `alpine:3.22` runtime — `apk add ca-certificates curl git
+   openssh-client tzdata` (cloner, healthcheck, TLS to Brevo), both
+   binaries, the crush binary on `$PATH`, and `entrypoint.sh`
+   (nexus-style: a `migrate` argv dispatches to `./migrate`, no
+   arguments execs the server — which already auto-migrates on boot,
+   anything else runs as given). `VISHNU_LISTEN_ADDR` becomes
+   `0.0.0.0:8080` and `VISHNU_DATA_DIR` `/data` inside the image; the
+   publish stays host-loopback.
+   Root `.dockerignore`: `.git`, `.crush`, `**/node_modules`, `**/dist`,
+   `api/bin`, `api/tmp`, `docs`, `.env*` (bar `.env.example`).
 
-**Compose** (`api/deploy/docker-compose.yml`):
+**Compose** (`api/deploy/docker-compose.yml`). Settings and credentials
+live in `deploy/.env` (copy `deploy/.env.example`): Compose interpolates
+that file for the Postgres service *and* passes it to the app, so the two
+can't disagree about `DB_*`. It is the project-directory `.env` rather
+than `api/.env` because interpolation only reads that location — with
+`env_file: ../.env`, Postgres would silently keep the default password
+while the app used the file's.
 
 ```yaml
 services:
   vishnu:
-    build: { context: .., dockerfile: api/Dockerfile }
+    build: { context: ../.., dockerfile: api/Dockerfile,
+             args: { CRUSH_VERSION: v0.98.1 } }
     container_name: vishnu
     restart: unless-stopped
-    env_file: ../.env
-    environment: { DB_HOST: vishnu-db }
-    ports: ["127.0.0.1:8080:8080"]   # loopback publish — tunnel/Tailscale in
+    env_file: [.env]                   # deploy/.env — DB_*, BREVO_*, …
+    environment: { DB_HOST: vishnu-db, DB_PORT: "5432" }
+    ports: ["127.0.0.1:${VISHNU_HOST_PORT:-8080}:8080"]  # loopback publish — tunnel/Tailscale in
     volumes:
-      - vishnu-data:/data            # VISHNU_DATA_DIR=/data
-      - ~/.ssh:/root/.ssh:ro         # server-side git auth for clones
+      - vishnu-data:/data              # VISHNU_DATA_DIR=/data
+      - ~/.ssh:/root/.ssh:ro           # server-side git auth for clones
       # - /srv/projects:/srv/projects  # link-mode: mount host dirs at same path
-    healthcheck: curl -f localhost:8080/healthz
+    healthcheck: curl -fsS localhost:8080/healthz
     depends_on: { postgres: { condition: service_healthy } }
   postgres:
     image: postgres:17-alpine
     container_name: vishnu-db
     restart: unless-stopped
-    environment: { POSTGRES_USER/DB/…: from env }
+    environment: { POSTGRES_*: from deploy/.env DB_* (default vishnu) }
+    ports: ["127.0.0.1:5432:5432"]     # so `make migrate` works from the host
     volumes: [postgres_data:/var/lib/postgresql/data]
     healthcheck: pg_isready
 ```
 
-Ops: `docker compose -f api/deploy/docker-compose.yml up -d`;
-`... run --rm vishnu migrate status|down`; logs via `docker logs vishnu`.
+Ops: `docker compose -f api/deploy/docker-compose.yml up -d --build`
+(or `make up`); `... run --rm vishnu migrate status|down` (or `make
+logs` for the app's output).
 
 **Container-scoped caveats** — crush children run *inside* the vishnu
 container (same process tree): clones land in the `vishnu-data` volume;
