@@ -1,0 +1,11 @@
+.git
+.crush
+node_modules
+**/node_modules
+**/dist
+api/bin
+api/tmp
+docs
+**/.env
+**/.env.*
+!**/.env.example

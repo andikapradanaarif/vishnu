@@ -1,0 +1,68 @@
+# Deploy stack for a single-server install: Postgres plus the vishnu app
+# (which spawns one `crush server` child per managed project, in-container).
+#
+# Settings and credentials come from `deploy/.env` (copy `.env.example`) —
+# the same file Compose interpolates for the Postgres service, so the
+# database and the app can never disagree about them.
+#
+#   docker compose -f api/deploy/docker-compose.yml up -d --build
+#   docker compose -f api/deploy/docker-compose.yml run --rm vishnu migrate status
+services:
+  vishnu:
+    build:
+      context: ../..
+      dockerfile: api/Dockerfile
+      args:
+        CRUSH_VERSION: ${CRUSH_VERSION:-v0.98.1}
+    container_name: vishnu
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      # Compose-network name, and the port Postgres listens on inside it —
+      # DB_PORT in the env file is the host publish port.
+      DB_HOST: vishnu-db
+      DB_PORT: "5432"
+    ports:
+      # Host loopback only: reach it through an SSH tunnel or Tailscale.
+      - "127.0.0.1:${VISHNU_HOST_PORT:-8080}:8080"
+    volumes:
+      # Registry clones, and the data dir VISHNU_DATA_DIR points at.
+      - vishnu-data:/data
+      # Clone/ls-remote use the server's own git credentials.
+      - ~/.ssh:/root/.ssh:ro
+      # Link mode needs the host directory mounted at the same path:
+      # - /srv/projects:/srv/projects
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8080/healthz"]
+      interval: 10s
+      timeout: 3s
+      start_period: 15s
+      retries: 3
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: vishnu-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-vishnu}
+      POSTGRES_PASSWORD: ${DB_PASS:-vishnu}
+      POSTGRES_DB: ${DB_NAME:-vishnu}
+    ports:
+      # Loopback publish so `make migrate` can run against it from the host.
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-vishnu} -d ${DB_NAME:-vishnu}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  vishnu-data:
