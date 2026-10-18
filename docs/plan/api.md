@@ -1,5 +1,9 @@
 # api/ work plan — project registry + crush proxy + SPA host
 
+Status: shipped — `api/cmd/server` registers the routes below, applies
+pending migrations on boot, and the end-to-end run described in
+`docs/tasks/api.md` passes against it.
+
 ## Scope
 
 One Go module (`github.com/andikapradanaarif/vishnu`, module root at

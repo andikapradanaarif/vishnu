@@ -8,8 +8,9 @@ Monorepo, bun workspaces — style/stack follows valo & nexus-bo-api.
 - `api/` — Go module `github.com/andikapradanaarif/vishnu`, Fiber v3 +
   Postgres/GORM. `cmd/{server,migrate}` → `internal/{config,domain,
   repository,usecase,dto,handler,service,migrator}` + `migration/`
-  (embedded SQL). Owns the project registry (`/api/projects`, Postgres)
-  and spawns one `crush server` per project; proxies `/p/{pid}/v1/*`
+  (embedded SQL). Owns the project registry (`/api/projects`, Postgres),
+  the user/session tables behind email-OTP sign-in, and spawns one
+  `crush server` per project; proxies `/p/{pid}/v1/*`
   to that project's upstream (SSE via SendStreamWriter, no upstream
   timeout), serves embedded SPA.
 - `web/` — Vite + React 19 + TS strict, TanStack Query, Tailwind v4,
@@ -28,6 +29,8 @@ Monorepo, bun workspaces — style/stack follows valo & nexus-bo-api.
 - `contract/`: `bun run build` (tsc d.ts + bun build per entry), `bun run lint`.
 - `web/`: `bun run dev` (vite, proxies `/v1` → `127.0.0.1:9119`), `bun run lint`, `bun run build`.
 - `api/`: `make dev` (VISHNU_WEB_DIR=../web/dist), `make build` (embeds web/dist → bin/vishnu-api), `make test`, `make lint`.
+- `api/` database: `make db` (compose Postgres on 5432), `make migrate`, `make migratedown`, `make migratestatus`. The server applies pending migrations on boot and exits with the fix-it command when Postgres is unreachable.
+- `api/` tests: repository tests need a real Postgres — set `VISHNU_TEST_DB_DSN="host=127.0.0.1 port=5432 user=vishnu password=vishnu dbname=vishnu sslmode=disable"`, otherwise they skip.
 
 ## Runtime
 
@@ -37,10 +40,27 @@ cd api && make build && ./bin/vishnu-api   # http://127.0.0.1:8080
 ```
 
 Env: `VISHNU_LISTEN_ADDR` (default `127.0.0.1:8080`, loopback only — a
-shell-capable agent must not be LAN-exposed), `VISHNU_DATA_DIR`
-(registry, default `~/.local/share/vishnu`), `VISHNU_CRUSH_BIN`,
+shell-capable agent must not be LAN-exposed), `DB_{HOST,PORT,NAME,USER,PASS}`
+(Postgres, plain values, defaults `127.0.0.1:5432` and db/user `vishnu`),
+`VISHNU_BOOTSTRAP_EMAIL` (upserted as an admin user at startup),
+`VISHNU_SESSION_TTL` (default `720h`), `VISHNU_PROJECTS_DIR` (clone
+destination, default `$VISHNU_DATA_DIR/projects`), `VISHNU_CRUSH_BIN`,
 `VISHNU_PORT_START` (default `9201`), `VISHNU_WEB_DIR` (dev override),
-`BREVO_*` (auth email, later).
+`BREVO_{API_KEY,API_URL,FROM_EMAIL,FROM_NAME}` (sign-in codes; when
+unconfigured the code is logged so local sign-in still works).
+
+## Auth
+
+Sign-in is an email address plus a one-time code — no passwords to store
+or reset. `POST /api/auth/request-otp` answers 200 for known and unknown
+addresses alike, so it cannot be used to enumerate who is allowed in; the
+code is emailed via Brevo, expires in 10 minutes, tolerates 5 wrong
+attempts, and is single-use. `POST /api/auth/verify` sets `vishnu_session`
+(HttpOnly, `SameSite=Lax`, `Secure` over https), `POST /api/auth/logout`
+revokes it, `GET /api/auth/me` returns the user. The middleware gates
+`/api/*` except `/api/auth/*` and every `/p/*` path; the SPA shell stays
+public because it renders the sign-in form. Sessions are stored hashed and
+slide forward on use, so revoking means deleting the row.
 
 ## Crush wire notes
 

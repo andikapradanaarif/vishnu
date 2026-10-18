@@ -1,8 +1,8 @@
 # Vishnu — persistence plan
 
-Status: planned. The DB layer lands with the multi-project milestone —
-the project registry is its first consumer. No JSON-file phase; the
-schema below is the source of truth from day one.
+Status: shipped. `api/migration/` creates exactly this schema, and the
+project registry, the eligibility list, the one-time codes, and the
+sessions all live in it.
 
 Scope: Postgres + GORM + embedded SQL migrations, mirroring the nexus
 `backend` layout (`domain → repository → usecase → handler`). Project

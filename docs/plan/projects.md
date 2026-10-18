@@ -1,6 +1,6 @@
 # projects/ work plan — multi-project isolation
 
-Status: **decided** — supersedes the "one crush server, pick `[0]`"
+Status: **shipped** — supersedes the "one crush server, pick `[0]`"
 assumption in the main plan.
 
 ## Why per-project crush servers
