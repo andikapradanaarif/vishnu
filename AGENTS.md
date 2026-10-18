@@ -5,11 +5,13 @@ Monorepo, bun workspaces — style/stack follows valo & nexus-bo-api.
 
 ## Layout
 
-- `api/` — Go module `github.com/andikapradanaarif/vishnu`, Fiber v3.
-  `cmd/server` → `internal/{config,service,handler}`. Owns the project
-  registry (`/api/projects`, JSON file) and spawns one `crush server`
-  per project; proxies `/p/{pid}/v1/*` to that project's upstream
-  (SSE via SendStreamWriter, no upstream timeout), serves embedded SPA.
+- `api/` — Go module `github.com/andikapradanaarif/vishnu`, Fiber v3 +
+  Postgres/GORM. `cmd/{server,migrate}` → `internal/{config,domain,
+  repository,usecase,dto,handler,service,migrator}` + `migration/`
+  (embedded SQL). Owns the project registry (`/api/projects`, Postgres)
+  and spawns one `crush server` per project; proxies `/p/{pid}/v1/*`
+  to that project's upstream (SSE via SendStreamWriter, no upstream
+  timeout), serves embedded SPA.
 - `web/` — Vite + React 19 + TS strict, TanStack Query, Tailwind v4,
   components from `@vishnu/ui-component` (`shared-ui/`), feature code in
   `src/features/<domain>/`.
@@ -17,7 +19,7 @@ Monorepo, bun workspaces — style/stack follows valo & nexus-bo-api.
   SDK clients (`src/<domain>/{sdk,index.ts}`, nexus-contract style). `ApiClient`
   takes `defaultQuery` carrying `client_id`.
 - `shared-ui/` — vendored copy of nexus `shared-ts` (`@vishnu/ui-component`).
-- `docs/PLAN.md`, `docs/plan/{api,web}.md` — architecture plans.
+- `docs/PLAN.md`, `docs/plan/{api,web,projects,data}.md` — architecture plans.
 
 ## Commands
 

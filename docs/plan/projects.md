@@ -23,26 +23,32 @@ So: **one `crush server` process per project**, managed by vishnu.
 ## Registry
 
 vishnu owns a registry of projects — crush has none (workspaces don't
-survive a restart). v1 storage: JSON file; DB later with the user model.
+survive a restart). Storage is **Postgres** — the `projects` table is
+the first migration; schema and the `domain.ProjectRepository`
+interface are defined in `data.md`. Columns map 1:1 to the record
+below.
 
 ```jsonc
-// $VISHNU_DATA_DIR/projects.json (default ~/.local/share/vishnu/)
-[
-  { "id": "…", "name": "vishnu", "path": "/abs/path",
-    "mode": "managed", "port": 9201, "repo_url": "…", "status": "down",
-    "error": "" },
-  { "id": "…", "name": "other", "mode": "external",
-    "upstream": "http://127.0.0.1:9400" }
-]
-// status: down | starting | up | cloning | error
+// one row per project
+{
+  "id": "…", "name": "vishnu", "path": "/abs/path",
+  "mode": "managed", "port": 9201, "repo_url": "…",
+  "status": "ready", "error": ""
+}
+// persisted status: cloning | ready | error
+// merged runtime status at read time: down | starting | up | cloning | error
 // repo_url: only for github-cloned projects
 ```
 
 - `managed` — api spawned `crush server --host tcp://127.0.0.1:<port>`
-  with `cwd=path`; vishnu owns its lifecycle (pid in memory, not the
-  registry file — re-detect on boot by health-checking the port).
+  with `cwd=path`; vishnu owns its lifecycle. Pid/live state is
+  in-memory in the process manager — the row only persists what
+  survives a restart (no `up`/`starting` writes).
 - `external` — a crush the user runs themselves; vishnu never
   starts/stops it, just routes.
+- Dedupe is enforced by unique partial indexes on `path`, `repo_url`,
+  `upstream` (see `data.md`) — repository surfaces a conflict sentinel
+  the usecase maps to 409.
 
 ## Adding a project — three modes
 
@@ -61,17 +67,17 @@ survive a restart). v1 storage: JSON file; DB later with the user model.
      `VISHNU_PROJECTS_DIR/<name>` (default `$VISHNU_DATA_DIR/projects`),
      `-2` suffix on collision. Reject if a project already claims the
      same `path` or `repo_url`.
-   - Register with `status: cloning` → **async `git clone`** in the
+   - Insert row with `status: cloning` → **async `git clone`** in the
      background (202 returns immediately — a fat clone must not block
-     the request); success → `down` (ready — crush lazy-spawns on
+     the request); success → `ready` (crush lazy-spawns on
      first select); fail → `error` + message (retry/delete offered).
 2. **Link local path** — `{name, path}`: `os.Stat` the dir must exist.
    For repos already on disk — cloning a second copy would fight over
    the same `.crush/` lock anyway.
 3. **External server** — `{name, upstream}`: route-only as before.
 
-**Delete** stays registry-only: stop the managed crush, remove the
-entry — the cloned dir is left on disk (the UI delete-confirm says so;
+**Delete** stays registry-only: stop the managed crush, soft-delete the
+row — the cloned dir is left on disk (the UI delete-confirm says so;
 a "also remove files" option is a later nicety, never default).
 
 ## Process manager (`internal/service/process/`)
@@ -152,18 +158,18 @@ just under `/p/{pid}`: `/p/{pid}/v1/workspaces/{wid}/sessions`, etc.
 
 ## Status model
 
-`up` (health check ok) / `down` (managed not yet spawned or external
-unreachable) / `starting` (spawned, health check pending) /
-`cloning` (git clone in flight) / `error` (clone failed — `error`
-field carries the message). Health =
-`GET {upstream}/v1/health` with a short timeout, cached a few
-seconds — never proxy a dead upstream into a hanging SSE; a dead
-managed project respawns lazily on next use.
+Persisted in the row: `cloning` | `ready` | `error` (clone failed —
+`error` carries the message). Computed by the process manager and
+merged at read time: `up` (health check ok) / `down` (managed not yet
+spawned or external unreachable) / `starting` (spawned, health check
+pending). Health = `GET {upstream}/v1/health` with a short timeout,
+cached a few seconds — never proxy a dead upstream into a hanging SSE;
+a dead managed project respawns lazily on next use.
 
 ## Follow-ups (not v1)
 
 - "Park" action (keep registered, deliberately stopped)
 - Per-project logs view (ring buffer → SSE)
-- DB-backed registry with the user model; per-user project ACLs
+- Per-user project ACLs (with the auth milestone's user model)
 - Attach-mode for a crush TUI's server (same lock constraint — a TUI
   session and a web session on the same project can't coexist anyway)

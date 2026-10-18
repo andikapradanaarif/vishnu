@@ -17,25 +17,34 @@ One Go module (`github.com/andikapradanaarif/vishnu`, module root at
 Brevo email service lives in `internal/service/email` (auth OTP
 later).
 
-## Layering (nexus-style)
+## Layering (nexus-style clean architecture)
 
 ```
 cmd/server/main.go                     wiring + lifecycle
-internal/config/config.go              env → Config
+cmd/migrate/main.go                    up | down | status
+migration/                             //go:embed *.sql + MigrationOrder + *_down.sql pairs
+internal/migrator/                     Runner — EnsureTable/Up/Down/Status, migrations table
+internal/config/config.go              env → Config + ConnectPostgres
+internal/domain/                       entities + repository interfaces (Project…)
+internal/repository/                   GORM impls + Repositories aggregator
+internal/dto/                          request/response contracts
+internal/usecase/                      business logic — add-project modes, dedupe
 internal/service/upstream_service.go   net/http client + request builder
 internal/service/email/                EmailService iface + brevo.go (OTP later)
-internal/service/registry/             projects.json CRUD (id,name,path,mode,port)
 internal/service/process/              crush lazy-spawn/health-check per project
+internal/service/cloner/               git ls-remote eligibility + async clone
 internal/handler/proxy_handler.go      /p/{pid}/v1/* → project upstream (streaming)
 internal/handler/project_handler.go    /api/projects* CRUD + ensure-running/workspace
 internal/handler/web_handler.go        SPA static + index.html fallback
 internal/webui/webui.go                //go:embed all:dist
 internal/webui/dist/.gitkeep           placeholder so embed compiles pre-build
+docker-compose.yml                     postgres:17-alpine for local dev
 ```
 
-Config → services → handlers → routes in `main.go`; dependencies flow
-downward via constructors, unexported impl structs behind exported
-constructors.
+Config → repositories/services → usecases → handlers → routes in
+`main.go`; dependencies flow downward via constructors, unexported impl
+structs behind exported constructors. See `data.md` for schema,
+migrations, and the domain/repository/usecase conventions.
 
 ## Config
 
@@ -43,7 +52,8 @@ constructors.
 | --- | --- | --- |
 | `VISHNU_LISTEN_ADDR` | `127.0.0.1:8080` | bind address (localhost default; LAN/Tailscale is deliberate opt-in) |
 | `VISHNU_WEB_DIR` | unset → embed | serve SPA from disk instead of embedded `dist` |
-| `VISHNU_DATA_DIR` | `~/.local/share/vishnu` | registry `projects.json` lives here |
+| `DB_HOST` / `DB_PORT` / `DB_NAME` / `DB_USER` / `DB_PASS` | `127.0.0.1` / `5432` / `vishnu` / `vishnu` / — | Postgres (registry + auth tables) |
+| `VISHNU_DATA_DIR` | `~/.local/share/vishnu` | runtime data dir (default root for projects dir) |
 | `VISHNU_PROJECTS_DIR` | `$VISHNU_DATA_DIR/projects` | where GitHub clones land |
 | `VISHNU_CRUSH_BIN` | `crush` (`$PATH`) | binary spawned for managed projects |
 | `VISHNU_PORT_START` | `9201` | first port probed upward for managed crushes |

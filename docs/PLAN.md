@@ -56,9 +56,11 @@ Key decisions:
 Bun-workspaces monorepo in the style of valo (`api/` + `backoffice/`)
 and nexus (`backend/` + `backoffice/` + `contract/` + `shared-ts/`):
 
-- **`api/`** — Go + Fiber v3, nexus-style layering (`cmd/` →
-  `internal/{config,service,handler}`). Registry, process manager,
-  `/p/{pid}/v1/*` streaming proxy, embedded SPA, Brevo email service.
+- **`api/`** — Go + Fiber v3 + **Postgres/GORM**, nexus-style clean
+  architecture (`cmd/` → `internal/{domain,repository,usecase,dto,
+  handler,service}` + embedded SQL `migration/`). Registry, process
+  manager, `/p/{pid}/v1/*` streaming proxy, embedded SPA, Brevo email
+  service.
 - **`web/`** — Vite + React 19 + TS strict, TanStack Query, Tailwind
   v4, oxlint/oxfmt. Single screen, `src/features/<domain>/` modules;
   primitives from `@vishnu/ui-component`.
@@ -69,27 +71,34 @@ and nexus (`backend/` + `backoffice/` + `contract/` + `shared-ts/`):
 Detailed plans: [`plan/api.md`](plan/api.md) (API),
 [`plan/web.md`](plan/web.md) (web frontend),
 [`plan/projects.md`](plan/projects.md) (multi-project registry +
-per-project crush servers — **decided**).
+per-project crush servers — **decided**),
+[`plan/data.md`](plan/data.md) (persistence — Postgres/GORM, migrations,
+schema — **decided**).
 
 ## Project layout
 
 ```
 vishnu/
   docs/PLAN.md            this file
-  docs/plan/{api,web,projects}.md
+  docs/plan/{api,web,projects,data}.md
   package.json            bun workspace root (shared-ui + contract + web)
   api/                    Go module (github.com/andikapradanaarif/vishnu)
-    cmd/server/main.go
+    cmd/server/main.go    cmd/migrate/main.go
+    migration/            embedded *.sql (+ _down) + MigrationOrder
+    internal/migrator/    up/down/status runner
     internal/config/config.go
+    internal/domain/      entities + repository interfaces
+    internal/repository/  GORM impls (+ Repositories aggregator)
+    internal/dto/  internal/usecase/
     internal/service/upstream_service.go
     internal/service/email/             Brevo EmailService (auth OTP later)
     internal/service/process/           crush lazy-spawn/health per project
-    internal/service/registry/          projects.json CRUD
+    internal/service/cloner/            git eligibility check + async clone
     internal/handler/proxy_handler.go   /p/{pid}/v1/* streaming proxy
     internal/handler/project_handler.go /api/projects* CRUD + lifecycle
     internal/handler/web_handler.go     SPA + index.html fallback
     internal/webui/                     go:embed dist/
-    Makefile
+    docker-compose.yml  Makefile
   shared-ui/              @vishnu/ui-component — vendored nexus shared-ts
   contract/               @vishnu/api-contract — crush /v1 types + SDK
     src/types.ts          wire types · src/paths.ts route constants
@@ -108,19 +117,23 @@ vishnu/
 ## Roadmap
 
 1. ~~Single-workspace chat UI through the proxy~~ — **shipped**.
-2. **Multi-project** — registry, managed crush spawn, `/p/{pid}`
+2. **Multi-project + DB** — Postgres/GORM + migrations land here
+   (`plan/data.md`); project registry is the first consumer —
+   registry, GitHub-clone add flow, managed crush spawn, `/p/{pid}`
    routing, project picker (`plan/projects.md`).
 3. **Auth** — email + OTP, cookie session, guard `/v1` + shell
-   (Brevo service in place; user model/DB planned separately).
-4. Later — mobile polish/PWA, per-project logs view, DB-backed
-   registry + user model, auto-restart policies.
+   (Brevo service in place; users/OTP/session tables join the same DB).
+4. Later — mobile polish/PWA, per-project logs view, "park" action,
+   auto-restart policies, per-user project ACLs.
 
 ## Run flow
 
 ```bash
 # vishnu spawns crush servers per registered project itself
-cd vishnu/api && make build && ./bin/vishnu-api   # :8080
-# env: VISHNU_LISTEN_ADDR, VISHNU_DATA_DIR, VISHNU_PROJECTS_DIR,
+cd vishnu/api
+make db && make migrate                # postgres (compose) + schema
+make build && ./bin/vishnu-api         # :8080
+# env: VISHNU_LISTEN_ADDR, DB_*, VISHNU_DATA_DIR, VISHNU_PROJECTS_DIR,
 #      VISHNU_CRUSH_BIN, VISHNU_PORT_START, VISHNU_WEB_DIR
 ```
 
