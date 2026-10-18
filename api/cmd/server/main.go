@@ -42,12 +42,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	upstream, err := service.NewUpstream(cfg.CrushUpstream)
-	if err != nil {
-		slog.Error("Invalid upstream", "error", err)
-		os.Exit(1)
-	}
-
 	repositories := repository.NewRepositories(db)
 	manager := process.NewManager(process.LoadOptions())
 	clonerClient := cloner.New(cloner.LoadDir())
@@ -55,7 +49,7 @@ func main() {
 
 	projects := usecase.NewProjectUsecase(repositories.Project, manager, clonerClient, crush)
 	projectHandler := handler.NewProjectHandler(projects)
-	proxy := handler.NewProxyHandler(upstream)
+	proxy := handler.NewProxyHandler(repositories.Project, manager, service.NewProxy())
 	web, err := handler.NewWebHandler(cfg.WebDir)
 	if err != nil {
 		slog.Error("Failed to init web handler", "error", err)
@@ -68,21 +62,20 @@ func main() {
 	})
 
 	app.Get("/healthz", func(c fiber.Ctx) error {
-		return c.JSON(fiber.Map{"status": "ok", "upstream": upstream.Base()})
+		return c.JSON(fiber.Map{"status": "ok"})
 	})
 
 	projectHandler.Register(app)
 
-	// Everything under /v1 goes to crush — including the SSE stream at
-	// /v1/workspaces/{id}/events.
-	app.All("/v1/*", proxy.Forward)
+	// Per-project crush traffic — including the SSE stream at
+	// /p/{pid}/v1/workspaces/{id}/events.
+	app.All("/p/:pid/v1/*", proxy.Forward)
 
 	// The SPA and its assets.
 	app.Use("/", web.Handle)
 
 	slog.Info("Vishnu listening",
 		"addr", cfg.ListenAddr,
-		"crush", cfg.CrushUpstream,
 		"db", cfg.Database.Address(),
 	)
 
