@@ -120,11 +120,12 @@ vishnu/
 ```bash
 # vishnu spawns crush servers per registered project itself
 cd vishnu/api && make build && ./bin/vishnu-api   # :8080
-# env: VISHNU_LISTEN_ADDR, VISHNU_DATA_DIR, VISHNU_CRUSH_BIN,
-#      VISHNU_PORT_START, VISHNU_WEB_DIR
+# env: VISHNU_LISTEN_ADDR, VISHNU_DATA_DIR, VISHNU_PROJECTS_DIR,
+#      VISHNU_CRUSH_BIN, VISHNU_PORT_START, VISHNU_WEB_DIR
 ```
 
-Browser opens `http://127.0.0.1:8080` → Add project (path) → select →
+Browser opens `http://127.0.0.1:8080` → Add project (GitHub link —
+access-checked + cloned, or an existing local path) → select →
 sessions. Selecting a project spawns its crush if it isn't running
 (lazy start — covers restarts and crashes too); deleting stops it.
 Managed crushes die with vishnu; `mode: external` projects (crushes

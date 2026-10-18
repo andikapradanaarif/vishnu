@@ -44,6 +44,7 @@ constructors.
 | `VISHNU_LISTEN_ADDR` | `127.0.0.1:8080` | bind address (localhost default; LAN/Tailscale is deliberate opt-in) |
 | `VISHNU_WEB_DIR` | unset → embed | serve SPA from disk instead of embedded `dist` |
 | `VISHNU_DATA_DIR` | `~/.local/share/vishnu` | registry `projects.json` lives here |
+| `VISHNU_PROJECTS_DIR` | `$VISHNU_DATA_DIR/projects` | where GitHub clones land |
 | `VISHNU_CRUSH_BIN` | `crush` (`$PATH`) | binary spawned for managed projects |
 | `VISHNU_PORT_START` | `9201` | first port probed upward for managed crushes |
 | `BREVO_API_KEY` / `BREVO_API_URL` / `BREVO_FROM_EMAIL` / `BREVO_FROM_NAME` | — / `https://api.brevo.com` / — / — | transactional email (auth OTP, later) |
@@ -85,7 +86,7 @@ constructors.
 
 | Feature | Endpoint |
 | --- | --- |
-| List/add/remove projects | `GET/POST/DELETE /api/projects` |
+| List/add/remove projects | `GET/POST/DELETE /api/projects` — add: `{repo_url}` (clone via `git ls-remote` check + async clone), `{name,path}` link local, `{name,upstream}` external |
 | Select project → workspace | `GET /api/projects/{id}/workspace` (lazy-start managed crush + ensure workspace) |
 | All crush calls below | under `/p/{pid}` — e.g. `/p/{pid}/v1/workspaces/{id}/sessions` |
 | List sessions (title, busy, cost, updated) | `GET /v1/workspaces/{id}/sessions` |

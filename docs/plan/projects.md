@@ -29,10 +29,13 @@ survive a restart). v1 storage: JSON file; DB later with the user model.
 // $VISHNU_DATA_DIR/projects.json (default ~/.local/share/vishnu/)
 [
   { "id": "…", "name": "vishnu", "path": "/abs/path",
-    "mode": "managed", "port": 9201 },
+    "mode": "managed", "port": 9201, "repo_url": "…", "status": "down",
+    "error": "" },
   { "id": "…", "name": "other", "mode": "external",
     "upstream": "http://127.0.0.1:9400" }
 ]
+// status: down | starting | up | cloning | error
+// repo_url: only for github-cloned projects
 ```
 
 - `managed` — api spawned `crush server --host tcp://127.0.0.1:<port>`
@@ -41,6 +44,36 @@ survive a restart). v1 storage: JSON file; DB later with the user model.
 - `external` — a crush the user runs themselves; vishnu never
   starts/stops it, just routes.
 
+## Adding a project — three modes
+
+`POST /api/projects` accepts:
+
+1. **Clone from GitHub** — `{name?, repo_url}`:
+   - Normalize (`owner/repo`, `https://github.com/o/r(.git)?`,
+     `git@github.com:o/r(.git)?` all accepted).
+   - **Eligibility**: `git ls-remote <url> HEAD` (short timeout) —
+     uses the machine's real git auth (ssh agent, credential helper,
+     `gh auth`), so private repos the user can access pass, others
+     fail fast → `403 {message:"repository unreachable — check access"}`.
+     (`git ls-remote` over `gh repo view`: `gh` may not be installed;
+     `ls-remote` is the portable minimum.)
+   - Name: repo slug last segment unless provided; dir =
+     `VISHNU_PROJECTS_DIR/<name>` (default `$VISHNU_DATA_DIR/projects`),
+     `-2` suffix on collision. Reject if a project already claims the
+     same `path` or `repo_url`.
+   - Register with `status: cloning` → **async `git clone`** in the
+     background (202 returns immediately — a fat clone must not block
+     the request); success → `down` (ready — crush lazy-spawns on
+     first select); fail → `error` + message (retry/delete offered).
+2. **Link local path** — `{name, path}`: `os.Stat` the dir must exist.
+   For repos already on disk — cloning a second copy would fight over
+   the same `.crush/` lock anyway.
+3. **External server** — `{name, upstream}`: route-only as before.
+
+**Delete** stays registry-only: stop the managed crush, remove the
+entry — the cloned dir is left on disk (the UI delete-confirm says so;
+a "also remove files" option is a later nicety, never default).
+
 ## Process manager (`internal/service/process/`)
 
 Lifecycle is deliberately minimal — **create, delete, lazy-start**:
@@ -48,7 +81,8 @@ Lifecycle is deliberately minimal — **create, delete, lazy-start**:
 - `Add`: `os.Stat` the path (must be an existing dir — `POST
   /workspaces` gives crush a foothold there), allocate a port
   (`VISHNU_PORT_START`, default `9201`, probe upward until free),
-  register the project. Nothing spawns yet.
+  register the project. Nothing spawns yet. (GitHub-cloned projects
+  get `path` + port assigned after the clone finishes.)
 - **Lazy start on select**: `GET /api/projects/{id}/workspace` (or any
   `/p/{pid}` proxy hit) first ensures the managed crush is alive —
   health-check the port, `exec.Command(crushBin, "server", "--host",
@@ -88,7 +122,7 @@ flush-per-read) are unchanged — only upstream lookup is per-request.
 | Route | Purpose |
 | --- | --- |
 | `GET /api/projects` | list registry + live status (up/down, port) |
-| `POST /api/projects` | `{name, path}` managed | `{name, upstream}` external |
+| `POST /api/projects` | `{name?, repo_url}` clone | `{name, path}` link local | `{name, upstream}` external |
 | `DELETE /api/projects/{id}` | stop (managed) + remove |
 | `GET /api/projects/{id}/workspace` | ensure-running (lazy start) + ensure-workspace: list upstream workspaces, match `path`, `POST /v1/workspaces` if missing → returns the `wid` the SPA needs |
 
@@ -106,8 +140,9 @@ just under `/p/{pid}`: `/p/{pid}/v1/workspaces/{wid}/sessions`, etc.
 ## web/ changes
 
 - `features/projects/` — `ProjectPicker` (cards/table of registered
-  projects + status dot + delete), `AddProjectDialog` (name+path,
-  or external URL tab).
+  projects + status dot + delete), `AddProjectDialog` with three tabs:
+  **Clone from GitHub** (repo URL + optional name), **Link local
+  path**, **External server** (upstream URL).
 - `App.tsx` — `useProjects()` gate: no project selected → picker;
   selected → `ensureWorkspace(pid)` → set `apiClient` baseUrl →
   existing session shell (all hooks already take `wid`).
@@ -118,7 +153,9 @@ just under `/p/{pid}`: `/p/{pid}/v1/workspaces/{wid}/sessions`, etc.
 ## Status model
 
 `up` (health check ok) / `down` (managed not yet spawned or external
-unreachable) / `starting` (spawned, health check pending). Health =
+unreachable) / `starting` (spawned, health check pending) /
+`cloning` (git clone in flight) / `error` (clone failed — `error`
+field carries the message). Health =
 `GET {upstream}/v1/health` with a short timeout, cached a few
 seconds — never proxy a dead upstream into a hanging SSE; a dead
 managed project respawns lazily on next use.
