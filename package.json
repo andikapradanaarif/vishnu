@@ -4,11 +4,12 @@
 	"private": true,
 	"workspaces": [
 		"shared-ui",
+		"contract",
 		"web"
 	],
 	"scripts": {
-		"build": "cd shared-ui && bun run build && cd ../web && bun run build",
-		"lint": "cd shared-ui && bun run lint && cd ../web && bun run lint",
+		"build": "cd shared-ui && bun run build && cd ../contract && bun run build && cd ../web && bun run build",
+		"lint": "cd shared-ui && bun run lint && cd ../contract && bun run lint && cd ../web && bun run lint",
 		"clean": "rm -rf */dist */node_modules",
 		"syncpack:check": "syncpack lint",
 		"syncpack:fix": "syncpack fix"

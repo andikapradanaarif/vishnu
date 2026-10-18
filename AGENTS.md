@@ -11,13 +11,17 @@ Monorepo, bun workspaces — style/stack follows valo & nexus-bo-api.
 - `web/` — Vite + React 19 + TS strict, TanStack Query, Tailwind v4,
   components from `@vishnu/ui-component` (`shared-ui/`), feature code in
   `src/features/<domain>/`.
+- `contract/` — `@vishnu/api-contract`: crush `/v1` wire types + per-domain
+  SDK clients (`src/<domain>/{sdk,index.ts}`, nexus-contract style). `ApiClient`
+  takes `defaultQuery` carrying `client_id`.
 - `shared-ui/` — vendored copy of nexus `shared-ts` (`@vishnu/ui-component`).
 - `docs/PLAN.md`, `docs/plan/{api,web}.md` — architecture plans.
 
 ## Commands
 
 - `bun install` — install all workspaces.
-- `bun run build` (root) — builds shared-ui then web.
+- `bun run build` (root) — builds shared-ui, then contract, then web.
+- `contract/`: `bun run build` (tsc d.ts + bun build per entry), `bun run lint`.
 - `web/`: `bun run dev` (vite, proxies `/v1` → `127.0.0.1:9119`), `bun run lint`, `bun run build`.
 - `api/`: `make dev` (VISHNU_WEB_DIR=../web/dist), `make build` (embeds web/dist → bin/vishnu-api), `make test`, `make lint`.
 

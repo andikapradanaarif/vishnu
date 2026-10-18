@@ -47,11 +47,18 @@ monorepos:
 - **`web/`**: Vite + React 19 + TypeScript (strict). TanStack Query
   for server state, Tailwind v4 (`@tailwindcss/vite`), oxlint/oxfmt.
   Single page, no router — one screen is enough (sidebar = sessions,
-  main = conversation). Hand-mirrored crush wire types in
-  `src/types/crush.ts` (no contract package: the api owns no routes of
-  its own, so there is nothing to generate a contract from). UI code is
+  main = conversation). Crush wire types + endpoint knowledge live in
+  the `contract/` package (consumed as `@vishnu/api-contract`). UI code is
   organized like valo's backoffice: `src/features/<domain>/` holds
   feature components; generic primitives come from `shared-ui`.
+- **`contract/`**: `@vishnu/api-contract` — nexus-contract-style package
+  for the crush `/v1` API (there is no OpenAPI spec to generate from —
+  crush is upstream — so `src/types.ts` hand-mirrors `internal/proto`
+  and `src/paths.ts` mirrors its routes). `src/client.ts` provides
+  `ApiClient`/`ApiError`/`buildPath`/`withQuery` adapted to crush (raw
+  JSON, no envelope, `defaultQuery` carries `client_id`). Per-domain SDK
+  classes under `src/<domain>/{sdk,index.ts}`: workspaces, sessions,
+  agent, config, permissions, questions, events (SSE URL builder).
 - **`shared-ui/`**: `@vishnu/ui-component` — vendored copy of nexus's
   `shared-ts` package (full component set, same layout and build
   conventions). Consumed via subpath imports
@@ -77,7 +84,7 @@ vishnu/
   docs/PLAN.md            this file
   docs/plan/api.md        API work plan
   docs/plan/web.md        web frontend work plan
-  package.json            bun workspace root (web + shared-ui)
+  package.json            bun workspace root (shared-ui + contract + web)
   api/                    Go module (github.com/andikapradanaarif/vishnu)
     cmd/server/main.go
     internal/config/config.go
@@ -90,12 +97,17 @@ vishnu/
     ui-component/         one dir per component (<C>.tsx + type.ts)
     hooks/ utils/ types/ constants/
     index.ts styles.css scripts/build.sh
+  contract/               @vishnu/api-contract — crush /v1 types + SDK
+    src/types.ts          wire types mirrored from crush proto
+    src/paths.ts          route constants ({id} templates)
+    src/client.ts         ApiClient, ApiError, buildPath, withQuery
+    src/<domain>/         sdk.ts + index.ts per domain
+    scripts/build.sh      tsc d.ts + bun build per entry
   web/                    Vite + React + TS
     index.html
     vite.config.ts        dev proxy: /v1 -> crush server
     src/App.tsx           shell: workspace pick, drawer, current-session
-    src/types/crush.ts    wire types mirrored from crush proto
-    src/services/         crushClient, queryClient, clientId, pendingStore
+    src/services/         api (domain SDK wiring), queryClient, clientId, pendingStore
     src/hooks/            useCrushEvents (SSE dispatch), queries
     src/features/         sessions/ (sidebar), chat/ (pane, composer),
                           prompts/ (permission + question cards),

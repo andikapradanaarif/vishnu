@@ -1,0 +1,77 @@
+{
+	"name": "@vishnu/api-contract",
+	"version": "1.0.0",
+	"private": true,
+	"description": "Typed contract + SDK for the crush server /v1 API — hand-mirrored from crush internal/proto",
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"default": "./dist/index.js"
+		},
+		"./client": {
+			"types": "./dist/client.d.ts",
+			"import": "./dist/client.js",
+			"default": "./dist/client.js"
+		},
+		"./paths": {
+			"types": "./dist/paths.d.ts",
+			"import": "./dist/paths.js",
+			"default": "./dist/paths.js"
+		},
+		"./types": {
+			"types": "./dist/types.d.ts",
+			"import": "./dist/types.js",
+			"default": "./dist/types.js"
+		},
+		"./workspaces": {
+			"types": "./dist/workspaces/index.d.ts",
+			"import": "./dist/workspaces/index.js",
+			"default": "./dist/workspaces/index.js"
+		},
+		"./sessions": {
+			"types": "./dist/sessions/index.d.ts",
+			"import": "./dist/sessions/index.js",
+			"default": "./dist/sessions/index.js"
+		},
+		"./agent": {
+			"types": "./dist/agent/index.d.ts",
+			"import": "./dist/agent/index.js",
+			"default": "./dist/agent/index.js"
+		},
+		"./config": {
+			"types": "./dist/config/index.d.ts",
+			"import": "./dist/config/index.js",
+			"default": "./dist/config/index.js"
+		},
+		"./permissions": {
+			"types": "./dist/permissions/index.d.ts",
+			"import": "./dist/permissions/index.js",
+			"default": "./dist/permissions/index.js"
+		},
+		"./questions": {
+			"types": "./dist/questions/index.d.ts",
+			"import": "./dist/questions/index.js",
+			"default": "./dist/questions/index.js"
+		},
+		"./events": {
+			"types": "./dist/events/index.d.ts",
+			"import": "./dist/events/index.js",
+			"default": "./dist/events/index.js"
+		}
+	},
+	"scripts": {
+		"build": "./scripts/build.sh",
+		"lint": "oxlint .",
+		"typecheck": "tsc -b",
+		"prepare": "bun run build"
+	},
+	"devDependencies": {
+		"@types/react": "^19.3.0",
+		"oxlint": "^1.88.0",
+		"typescript": "^7.0.2"
+	}
+}
