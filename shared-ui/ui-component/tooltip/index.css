@@ -1,0 +1,169 @@
+/* Tooltip animations */
+:root {
+	--shared-tooltip-duration: 150ms;
+}
+
+/* Entrance animations */
+@keyframes sharedTooltipInTop {
+	from {
+		opacity: 0;
+		transform: translateY(4px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes sharedTooltipInBottom {
+	from {
+		opacity: 0;
+		transform: translateY(-4px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes sharedTooltipInLeft {
+	from {
+		opacity: 0;
+		transform: translateX(4px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+
+@keyframes sharedTooltipInRight {
+	from {
+		opacity: 0;
+		transform: translateX(-4px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+
+/* Exit animations */
+@keyframes sharedTooltipOutTop {
+	from {
+		opacity: 1;
+		transform: translateY(0);
+	}
+	to {
+		opacity: 0;
+		transform: translateY(4px);
+	}
+}
+
+@keyframes sharedTooltipOutBottom {
+	from {
+		opacity: 1;
+		transform: translateY(0);
+	}
+	to {
+		opacity: 0;
+		transform: translateY(-4px);
+	}
+}
+
+@keyframes sharedTooltipOutLeft {
+	from {
+		opacity: 1;
+		transform: translateX(0);
+	}
+	to {
+		opacity: 0;
+		transform: translateX(4px);
+	}
+}
+
+@keyframes sharedTooltipOutRight {
+	from {
+		opacity: 1;
+		transform: translateX(0);
+	}
+	to {
+		opacity: 0;
+		transform: translateX(-4px);
+	}
+}
+
+/* Base tooltip class */
+.shared-tooltip-base {
+	opacity: 0;
+	will-change: opacity, transform;
+	animation-duration: var(--shared-tooltip-duration, 150ms);
+	animation-timing-function: ease-out;
+	animation-fill-mode: forwards;
+}
+
+/* Entrance animation classes */
+.shared-tooltip-enter-top {
+	animation-name: sharedTooltipInTop;
+}
+
+.shared-tooltip-enter-bottom {
+	animation-name: sharedTooltipInBottom;
+}
+
+.shared-tooltip-enter-left {
+	animation-name: sharedTooltipInLeft;
+}
+
+.shared-tooltip-enter-right {
+	animation-name: sharedTooltipInRight;
+}
+
+.shared-tooltip-enter-top-left {
+	animation-name: sharedTooltipInTop;
+}
+
+.shared-tooltip-enter-top-right {
+	animation-name: sharedTooltipInTop;
+}
+
+.shared-tooltip-enter-bottom-left {
+	animation-name: sharedTooltipInBottom;
+}
+
+.shared-tooltip-enter-bottom-right {
+	animation-name: sharedTooltipInBottom;
+}
+
+/* Exit animation classes */
+.shared-tooltip-exit-top {
+	animation-name: sharedTooltipOutTop;
+}
+
+.shared-tooltip-exit-bottom {
+	animation-name: sharedTooltipOutBottom;
+}
+
+.shared-tooltip-exit-left {
+	animation-name: sharedTooltipOutLeft;
+}
+
+.shared-tooltip-exit-right {
+	animation-name: sharedTooltipOutRight;
+}
+
+.shared-tooltip-exit-top-left {
+	animation-name: sharedTooltipOutTop;
+}
+
+.shared-tooltip-exit-top-right {
+	animation-name: sharedTooltipOutTop;
+}
+
+.shared-tooltip-exit-bottom-left {
+	animation-name: sharedTooltipOutBottom;
+}
+
+.shared-tooltip-exit-bottom-right {
+	animation-name: sharedTooltipOutBottom;
+}

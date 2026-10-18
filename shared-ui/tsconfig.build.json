@@ -1,0 +1,12 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"outDir": "./dist",
+		"rootDir": ".",
+		"declaration": true,
+		"declarationMap": true,
+		"emitDeclarationOnly": true
+	},
+	"include": ["index.ts", "types/*.d.ts", "ui-component/*/index.ts", "ui-component/input/timePicker/index.ts", "utils/index.ts", "hooks/index.ts"],
+	"exclude": ["node_modules", "dist", "**/__tests__", "**/*.test.ts", "**/*.spec.ts"]
+}

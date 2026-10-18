@@ -1,0 +1,99 @@
+/* Drawer animations */
+:root {
+	--shared-drawer-duration: 200ms;
+}
+
+/* Backdrop animations */
+@keyframes sharedDrawerBackdropIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes sharedDrawerBackdropOut {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+/* Drawer slide animations */
+@keyframes sharedDrawerSlideInRight {
+	from {
+		transform: translateX(100%);
+	}
+	to {
+		transform: translateX(0);
+	}
+}
+
+@keyframes sharedDrawerSlideOutRight {
+	from {
+		transform: translateX(0);
+	}
+	to {
+		transform: translateX(100%);
+	}
+}
+
+@keyframes sharedDrawerSlideInLeft {
+	from {
+		transform: translateX(-100%);
+	}
+	to {
+		transform: translateX(0);
+	}
+}
+
+@keyframes sharedDrawerSlideOutLeft {
+	from {
+		transform: translateX(0);
+	}
+	to {
+		transform: translateX(-100%);
+	}
+}
+
+/* Animation classes */
+.shared-drawer-backdrop {
+	will-change: opacity;
+	animation-duration: var(--shared-drawer-duration, 300ms);
+	animation-timing-function: ease-out;
+	animation-fill-mode: forwards;
+}
+
+.shared-drawer-backdrop-enter {
+	animation-name: sharedDrawerBackdropIn;
+}
+
+.shared-drawer-backdrop-exit {
+	animation-name: sharedDrawerBackdropOut;
+}
+
+.shared-drawer-panel {
+	will-change: transform;
+	animation-duration: var(--shared-drawer-duration, 300ms);
+	animation-timing-function: ease-out;
+	animation-fill-mode: forwards;
+}
+
+.shared-drawer-panel-enter-right {
+	animation-name: sharedDrawerSlideInRight;
+}
+
+.shared-drawer-panel-exit-right {
+	animation-name: sharedDrawerSlideOutRight;
+}
+
+.shared-drawer-panel-enter-left {
+	animation-name: sharedDrawerSlideInLeft;
+}
+
+.shared-drawer-panel-exit-left {
+	animation-name: sharedDrawerSlideOutLeft;
+}

@@ -1,0 +1,257 @@
+/* Popover animations */
+:root {
+	--shared-popover-duration: 80ms;
+}
+
+/* Entrance animations for different positions */
+@keyframes sharedPopoverInTop {
+	from {
+		opacity: 0;
+		transform: translateY(8px) scale(0.95);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+@keyframes sharedPopoverInBottom {
+	from {
+		opacity: 0;
+		transform: translateY(-8px) scale(0.95);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+@keyframes sharedPopoverInLeft {
+	from {
+		opacity: 0;
+		transform: translateX(8px) scale(0.95);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0) scale(1);
+	}
+}
+
+@keyframes sharedPopoverInRight {
+	from {
+		opacity: 0;
+		transform: translateX(-8px) scale(0.95);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0) scale(1);
+	}
+}
+
+@keyframes sharedPopoverInTopRight {
+	from {
+		opacity: 0;
+		transform: translate(8px, 8px) scale(0.95);
+	}
+	to {
+		opacity: 1;
+		transform: translate(0, 0) scale(1);
+	}
+}
+
+@keyframes sharedPopoverInTopLeft {
+	from {
+		opacity: 0;
+		transform: translate(-8px, 8px) scale(0.95);
+	}
+	to {
+		opacity: 1;
+		transform: translate(0, 0) scale(1);
+	}
+}
+
+@keyframes sharedPopoverInBottomRight {
+	from {
+		opacity: 0;
+		transform: translate(8px, -8px) scale(0.95);
+	}
+	to {
+		opacity: 1;
+		transform: translate(0, 0) scale(1);
+	}
+}
+
+@keyframes sharedPopoverInBottomLeft {
+	from {
+		opacity: 0;
+		transform: translate(-8px, -8px) scale(0.95);
+	}
+	to {
+		opacity: 1;
+		transform: translate(0, 0) scale(1);
+	}
+}
+
+/* Exit animations for different positions */
+@keyframes sharedPopoverOutTop {
+	from {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+	to {
+		opacity: 0;
+		transform: translateY(8px) scale(0.95);
+	}
+}
+
+@keyframes sharedPopoverOutBottom {
+	from {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+	to {
+		opacity: 0;
+		transform: translateY(-8px) scale(0.95);
+	}
+}
+
+@keyframes sharedPopoverOutLeft {
+	from {
+		opacity: 1;
+		transform: translateX(0) scale(1);
+	}
+	to {
+		opacity: 0;
+		transform: translateX(8px) scale(0.95);
+	}
+}
+
+@keyframes sharedPopoverOutRight {
+	from {
+		opacity: 1;
+		transform: translateX(0) scale(1);
+	}
+	to {
+		opacity: 0;
+		transform: translateX(-8px) scale(0.95);
+	}
+}
+
+@keyframes sharedPopoverOutTopRight {
+	from {
+		opacity: 1;
+		transform: translate(0, 0) scale(1);
+	}
+	to {
+		opacity: 0;
+		transform: translate(8px, 8px) scale(0.95);
+	}
+}
+
+@keyframes sharedPopoverOutTopLeft {
+	from {
+		opacity: 1;
+		transform: translate(0, 0) scale(1);
+	}
+	to {
+		opacity: 0;
+		transform: translate(-8px, 8px) scale(0.95);
+	}
+}
+
+@keyframes sharedPopoverOutBottomRight {
+	from {
+		opacity: 1;
+		transform: translate(0, 0) scale(1);
+	}
+	to {
+		opacity: 0;
+		transform: translate(8px, -8px) scale(0.95);
+	}
+}
+
+@keyframes sharedPopoverOutBottomLeft {
+	from {
+		opacity: 1;
+		transform: translate(0, 0) scale(1);
+	}
+	to {
+		opacity: 0;
+		transform: translate(-8px, -8px) scale(0.95);
+	}
+}
+
+/* Base popover classes */
+.shared-popover-base {
+	opacity: 0;
+	will-change: opacity, transform;
+	animation-duration: var(--shared-popover-duration, 100ms);
+	animation-timing-function: ease-out;
+	animation-fill-mode: forwards;
+}
+
+/* Entrance animations */
+.shared-popover-enter-top {
+	animation-name: sharedPopoverInTop;
+}
+
+.shared-popover-enter-top-right {
+	animation-name: sharedPopoverInTopRight;
+}
+
+.shared-popover-enter-top-left {
+	animation-name: sharedPopoverInTopLeft;
+}
+
+.shared-popover-enter-bottom {
+	animation-name: sharedPopoverInBottom;
+}
+
+.shared-popover-enter-bottom-right {
+	animation-name: sharedPopoverInBottomRight;
+}
+
+.shared-popover-enter-bottom-left {
+	animation-name: sharedPopoverInBottomLeft;
+}
+
+.shared-popover-enter-left {
+	animation-name: sharedPopoverInLeft;
+}
+
+.shared-popover-enter-right {
+	animation-name: sharedPopoverInRight;
+}
+
+/* Exit animations */
+.shared-popover-exit-top {
+	animation-name: sharedPopoverOutTop;
+}
+
+.shared-popover-exit-top-right {
+	animation-name: sharedPopoverOutTopRight;
+}
+
+.shared-popover-exit-top-left {
+	animation-name: sharedPopoverOutTopLeft;
+}
+
+.shared-popover-exit-bottom {
+	animation-name: sharedPopoverOutBottom;
+}
+
+.shared-popover-exit-bottom-right {
+	animation-name: sharedPopoverOutBottomRight;
+}
+
+.shared-popover-exit-bottom-left {
+	animation-name: sharedPopoverOutBottomLeft;
+}
+
+.shared-popover-exit-left {
+	animation-name: sharedPopoverOutLeft;
+}
+
+.shared-popover-exit-right {
+	animation-name: sharedPopoverOutRight;
+}

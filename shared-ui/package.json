@@ -1,0 +1,239 @@
+{
+	"name": "@vishnu/ui-component",
+	"version": "1.0.0",
+	"description": "Shared UI component library for Vishnu frontend projects",
+	"type": "module",
+	"main": "dist/index.js",
+	"module": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"default": "./dist/index.js"
+		},
+		"./styles.css": {
+			"default": "./styles.css"
+		},
+		"./actionBar": {
+			"types": "./dist/ui-component/actionBar/index.d.ts",
+			"import": "./dist/ui-component/actionBar/index.js",
+			"default": "./dist/ui-component/actionBar/index.js"
+		},
+		"./breadcrumb": {
+			"types": "./dist/ui-component/breadcrumb/index.d.ts",
+			"import": "./dist/ui-component/breadcrumb/index.js",
+			"default": "./dist/ui-component/breadcrumb/index.js"
+		},
+		"./browserWarning": {
+			"types": "./dist/ui-component/browserWarning/index.d.ts",
+			"import": "./dist/ui-component/browserWarning/index.js",
+			"default": "./dist/ui-component/browserWarning/index.js"
+		},
+		"./button": {
+			"types": "./dist/ui-component/button/index.d.ts",
+			"import": "./dist/ui-component/button/index.js",
+			"default": "./dist/ui-component/button/index.js"
+		},
+		"./calendar": {
+			"types": "./dist/ui-component/calendar/index.d.ts",
+			"import": "./dist/ui-component/calendar/index.js",
+			"default": "./dist/ui-component/calendar/index.js"
+		},
+		"./chip": {
+			"types": "./dist/ui-component/chip/index.d.ts",
+			"import": "./dist/ui-component/chip/index.js",
+			"default": "./dist/ui-component/chip/index.js"
+		},
+		"./dataList": {
+			"types": "./dist/ui-component/dataList/index.d.ts",
+			"import": "./dist/ui-component/dataList/index.js",
+			"default": "./dist/ui-component/dataList/index.js"
+		},
+		"./dialog": {
+			"types": "./dist/ui-component/dialog/index.d.ts",
+			"import": "./dist/ui-component/dialog/index.js",
+			"default": "./dist/ui-component/dialog/index.js"
+		},
+		"./drawer": {
+			"types": "./dist/ui-component/drawer/index.d.ts",
+			"import": "./dist/ui-component/drawer/index.js",
+			"default": "./dist/ui-component/drawer/index.js"
+		},
+		"./input": {
+			"types": "./dist/ui-component/input/index.d.ts",
+			"import": "./dist/ui-component/input/index.js",
+			"default": "./dist/ui-component/input/index.js"
+		},
+		"./loadingAnimation": {
+			"types": "./dist/ui-component/loadingAnimation/index.d.ts",
+			"import": "./dist/ui-component/loadingAnimation/index.js",
+			"default": "./dist/ui-component/loadingAnimation/index.js"
+		},
+		"./message": {
+			"types": "./dist/ui-component/message/index.d.ts",
+			"import": "./dist/ui-component/message/index.js",
+			"default": "./dist/ui-component/message/index.js"
+		},
+		"./pagination": {
+			"types": "./dist/ui-component/pagination/index.d.ts",
+			"import": "./dist/ui-component/pagination/index.js",
+			"default": "./dist/ui-component/pagination/index.js"
+		},
+		"./popover": {
+			"types": "./dist/ui-component/popover/index.d.ts",
+			"import": "./dist/ui-component/popover/index.js",
+			"default": "./dist/ui-component/popover/index.js"
+		},
+		"./progressBar": {
+			"types": "./dist/ui-component/progressBar/index.d.ts",
+			"import": "./dist/ui-component/progressBar/index.js",
+			"default": "./dist/ui-component/progressBar/index.js"
+		},
+		"./rating": {
+			"types": "./dist/ui-component/rating/index.d.ts",
+			"import": "./dist/ui-component/rating/index.js",
+			"default": "./dist/ui-component/rating/index.js"
+		},
+		"./table": {
+			"types": "./dist/ui-component/table/index.d.ts",
+			"import": "./dist/ui-component/table/index.js",
+			"default": "./dist/ui-component/table/index.js"
+		},
+		"./tabs": {
+			"types": "./dist/ui-component/tabs/index.d.ts",
+			"import": "./dist/ui-component/tabs/index.js",
+			"default": "./dist/ui-component/tabs/index.js"
+		},
+		"./text": {
+			"types": "./dist/ui-component/text/index.d.ts",
+			"import": "./dist/ui-component/text/index.js",
+			"default": "./dist/ui-component/text/index.js"
+		},
+		"./tooltip": {
+			"types": "./dist/ui-component/tooltip/index.d.ts",
+			"import": "./dist/ui-component/tooltip/index.js",
+			"default": "./dist/ui-component/tooltip/index.js"
+		},
+		"./alert": {
+			"types": "./dist/ui-component/alert/index.d.ts",
+			"import": "./dist/ui-component/alert/index.js",
+			"default": "./dist/ui-component/alert/index.js"
+		},
+		"./clickOutside": {
+			"types": "./dist/ui-component/clickOutside/index.d.ts",
+			"import": "./dist/ui-component/clickOutside/index.js",
+			"default": "./dist/ui-component/clickOutside/index.js"
+		},
+		"./form": {
+			"types": "./dist/ui-component/form/index.d.ts",
+			"import": "./dist/ui-component/form/index.js",
+			"default": "./dist/ui-component/form/index.js"
+		},
+		"./menu": {
+			"types": "./dist/ui-component/menu/index.d.ts",
+			"import": "./dist/ui-component/menu/index.js",
+			"default": "./dist/ui-component/menu/index.js"
+		},
+		"./userImageIcon": {
+			"types": "./dist/ui-component/userImageIcon/index.d.ts",
+			"import": "./dist/ui-component/userImageIcon/index.js",
+			"default": "./dist/ui-component/userImageIcon/index.js"
+		},
+		"./wrapper": {
+			"types": "./dist/ui-component/wrapper/index.d.ts",
+			"import": "./dist/ui-component/wrapper/index.js",
+			"default": "./dist/ui-component/wrapper/index.js"
+		},
+		"./timePicker": {
+			"types": "./dist/ui-component/input/timePicker/index.d.ts",
+			"import": "./dist/ui-component/input/timePicker/index.js",
+			"default": "./dist/ui-component/input/timePicker/index.js"
+		},
+		"./accordion": {
+			"types": "./dist/ui-component/accordion/index.d.ts",
+			"import": "./dist/ui-component/accordion/index.js",
+			"default": "./dist/ui-component/accordion/index.js"
+		},
+		"./emptyData": {
+			"types": "./dist/ui-component/emptyData/index.d.ts",
+			"import": "./dist/ui-component/emptyData/index.js",
+			"default": "./dist/ui-component/emptyData/index.js"
+		},
+		"./qrCode": {
+			"types": "./dist/ui-component/qrCode/index.d.ts",
+			"import": "./dist/ui-component/qrCode/index.js",
+			"default": "./dist/ui-component/qrCode/index.js"
+		},
+		"./stepper": {
+			"types": "./dist/ui-component/stepper/index.d.ts",
+			"import": "./dist/ui-component/stepper/index.js",
+			"default": "./dist/ui-component/stepper/index.js"
+		},
+		"./slider": {
+			"types": "./dist/ui-component/slider/index.d.ts",
+			"import": "./dist/ui-component/slider/index.js",
+			"default": "./dist/ui-component/slider/index.js"
+		},
+		"./richTextEditor": {
+			"types": "./dist/ui-component/richTextEditor/index.d.ts",
+			"import": "./dist/ui-component/richTextEditor/index.js",
+			"default": "./dist/ui-component/richTextEditor/index.js"
+		},
+		"./emptyState": {
+			"types": "./dist/ui-component/emptyState/index.d.ts",
+			"import": "./dist/ui-component/emptyState/index.js",
+			"default": "./dist/ui-component/emptyState/index.js"
+		},
+		"./hooks": {
+			"types": "./dist/hooks/index.d.ts",
+			"import": "./dist/hooks/index.js",
+			"default": "./dist/hooks/index.js"
+		},
+		"./utils": {
+			"types": "./dist/utils/index.d.ts",
+			"import": "./dist/utils/index.js",
+			"default": "./dist/utils/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"styles.css"
+	],
+	"scripts": {
+		"build": "./scripts/build.sh",
+		"dev": "./scripts/dev.sh",
+		"lint": "oxlint .",
+		"check": "bun check",
+		"test": "bun test",
+		"test:watch": "bun test --watch",
+		"playground": "bun run scripts/playground.ts"
+	},
+	"peerDependencies": {
+		"@tanstack/react-form": "^1.33.5",
+		"react": "^19.3.1",
+		"react-dom": "^19.3.1",
+		"tailwindcss": "^4.3.3"
+	},
+	"dependencies": {
+		"@iconify/react": "^6.0.2",
+		"classnames": "^2.5.1",
+		"dompurify": "^3.4.17",
+		"qrcode.react": "^4.2.0",
+		"slate": "^0.142.1",
+		"slate-dom": "^0.142.0",
+		"slate-history": "^0.140.0",
+		"slate-react": "^0.142.0"
+	},
+	"devDependencies": {
+		"@tailwindcss/cli": "^4.3.3",
+		"@testing-library/react": "^16.3.3",
+		"@types/react": "^19.3.0",
+		"@types/react-dom": "^19.3.0",
+		"bun-types": "^1.4.3",
+		"happy-dom": "^20.12.0",
+		"oxlint": "^1.88.0",
+		"tailwindcss": "^4.3.3",
+		"typescript": "^7.0.2"
+	}
+}

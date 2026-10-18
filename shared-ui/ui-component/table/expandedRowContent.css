@@ -1,0 +1,42 @@
+:root {
+	--shared-expanded-row-duration: 150ms;
+}
+
+@keyframes sharedExpandedRowIn {
+	from {
+		opacity: 0;
+		transform: translateY(-4px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes sharedExpandedRowOut {
+	from {
+		opacity: 1;
+		transform: translateY(0);
+	}
+	to {
+		opacity: 0;
+		transform: translateY(-4px);
+	}
+}
+
+.shared-expanded-row-panel {
+	opacity: 0;
+	transform: translateY(-4px);
+	will-change: opacity, transform;
+	animation-name: sharedExpandedRowIn;
+	animation-duration: var(--shared-expanded-row-duration, 150ms);
+	animation-timing-function: ease-out;
+	animation-fill-mode: forwards;
+}
+
+.shared-expanded-row-panel-out {
+	animation-name: sharedExpandedRowOut;
+	animation-duration: var(--shared-expanded-row-duration, 150ms);
+	animation-timing-function: ease-out;
+	animation-fill-mode: forwards;
+}

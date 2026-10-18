@@ -1,0 +1,65 @@
+/* ProgressBar animations */
+
+/* Striped background pattern */
+.bg-stripes {
+	background-image: linear-gradient(
+		45deg,
+		rgba(255, 255, 255, 0.2) 25%,
+		transparent 25%,
+		transparent 50%,
+		rgba(255, 255, 255, 0.2) 50%,
+		rgba(255, 255, 255, 0.2) 75%,
+		transparent 75%,
+		transparent
+	);
+	background-size: 1rem 1rem;
+}
+
+/* Moving stripes */
+@keyframes stripes-move {
+	0% {
+		background-position: 0 0;
+	}
+	100% {
+		background-position: 1rem 0;
+	}
+}
+
+.animate-stripes-move {
+	animation: stripes-move 0.6s linear infinite;
+}
+
+/* Indeterminate bar: slides from left to right and grows/shrinks */
+@keyframes indeterminate-bar {
+	0% {
+		width: 0%;
+		left: 0%;
+	}
+	50% {
+		width: 40%;
+		left: 30%;
+	}
+	100% {
+		width: 0%;
+		left: 100%;
+	}
+}
+
+.animate-indeterminate-bar {
+	animation: indeterminate-bar 1.4s ease-in-out infinite;
+}
+
+/* Indeterminate stripes (subtle pulse on the stripe opacity) */
+@keyframes indeterminate-stripes {
+	0%,
+	100% {
+		opacity: 0.6;
+	}
+	50% {
+		opacity: 1;
+	}
+}
+
+.animate-indeterminate-stripes {
+	animation: indeterminate-stripes 1.4s ease-in-out infinite;
+}

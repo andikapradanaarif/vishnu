@@ -1,0 +1,167 @@
+/* Nexus UI Component Library Styles */
+/* Import all component styles */
+
+@import "./ui-component/actionBar/index.css";
+@import "./ui-component/dialog/index.css";
+@import "./ui-component/drawer/index.css";
+@import "./ui-component/popover/index.css";
+@import "./ui-component/table/expandedRowContent.css";
+@import "./ui-component/tooltip/index.css";
+
+/* ─── Semantic theme tokens ───────────────────────────────────────────
+   Tailwind v4 CSS-first theme. Consumers that load the `styles.css`
+   entrypoint pick these up automatically; overriding any variable (e.g. in
+   their own `@theme` block) rethemes the whole library without touching
+   component code. Semantic families deliberately consolidate the previous
+   hardcoded palette: primary = indigo, secondary/info/danger/success/
+   warning/gray map to their closest Tailwind ramps. Most sites are a
+   visual no-op, but components that previously used emerald, orange, or
+   yellow utilities (e.g. Switch checked, Alert success toasts, success
+   Rating/Progress, Chip orange/yellow, Message warning) shift to the
+   consolidated green/amber hues, and info severity in Alert/Message moves
+   from the indigo ramp to the blue info-* tokens — those consolidations
+   are intentional and can be rethemed by overriding the token values below.
+
+   Tailwind v4.3.3+ is required — `@theme` is a v4 directive and this
+   stylesheet only registers correctly when processed by a Tailwind v4.3.3
+   (or newer) pipeline.
+   ──────────────────────────────────────────────────────────────────── */
+@theme {
+	/* Brand */
+	--color-primary-50: #eef2ff;
+	--color-primary-100: #e0e7ff;
+	--color-primary-200: #c7d2fe;
+	--color-primary-300: #a5b4fc;
+	--color-primary-400: #818cf8;
+	--color-primary-500: #6366f1;
+	--color-primary-600: #4f46e5;
+	--color-primary-700: #4338ca;
+	--color-primary-800: #3730a3;
+	--color-primary-900: #312e81;
+	--color-primary-950: #1e1b4b;
+
+	--color-secondary-50: #f8fafc;
+	--color-secondary-100: #f1f5f9;
+	--color-secondary-200: #e2e8f0;
+	--color-secondary-300: #cbd5e1;
+	--color-secondary-400: #94a3b8;
+	--color-secondary-500: #64748b;
+	--color-secondary-600: #475569;
+	--color-secondary-700: #334155;
+	--color-secondary-800: #1e293b;
+	--color-secondary-900: #0f172a;
+	--color-secondary-950: #020617;
+
+	/* Neutral — unifies the former gray + zinc + slate usage */
+	--color-neutral-50: #f9fafb;
+	--color-neutral-100: #f3f4f6;
+	--color-neutral-200: #e5e7eb;
+	--color-neutral-300: #d1d5db;
+	--color-neutral-400: #9ca3af;
+	--color-neutral-500: #6b7280;
+	--color-neutral-600: #4b5563;
+	--color-neutral-700: #374151;
+	--color-neutral-800: #1f2937;
+	--color-neutral-900: #111827;
+	--color-neutral-950: #030712;
+
+	/* Status */
+	--color-danger-50: #fef2f2;
+	--color-danger-100: #fee2e2;
+	--color-danger-200: #fecaca;
+	--color-danger-300: #fca5a5;
+	--color-danger-400: #f87171;
+	--color-danger-500: #ef4444;
+	--color-danger-600: #dc2626;
+	--color-danger-700: #b91c1c;
+	--color-danger-800: #991b1b;
+	--color-danger-900: #7f1d1d;
+	--color-danger-950: #450a0a;
+
+	--color-success-50: #f0fdf4;
+	--color-success-100: #dcfce7;
+	--color-success-200: #bbf7d0;
+	--color-success-300: #86efac;
+	--color-success-400: #4ade80;
+	--color-success-500: #22c55e;
+	--color-success-600: #16a34a;
+	--color-success-700: #15803d;
+	--color-success-800: #166534;
+	--color-success-900: #14532d;
+	--color-success-950: #052e16;
+
+	--color-warning-50: #fffbeb;
+	--color-warning-100: #fef3c7;
+	--color-warning-200: #fde68a;
+	--color-warning-300: #fcd34d;
+	--color-warning-400: #fbbf24;
+	--color-warning-500: #f59e0b;
+	--color-warning-600: #d97706;
+	--color-warning-700: #b45309;
+	--color-warning-800: #92400e;
+	--color-warning-900: #78350f;
+	--color-warning-950: #451a03;
+
+	--color-info-50: #eff6ff;
+	--color-info-100: #dbeafe;
+	--color-info-200: #bfdbfe;
+	--color-info-300: #93c5fd;
+	--color-info-400: #60a5fa;
+	--color-info-500: #3b82f6;
+	--color-info-600: #2563eb;
+	--color-info-700: #1d4ed8;
+	--color-info-800: #1e40af;
+	--color-info-900: #1e3a8a;
+	--color-info-950: #172554;
+
+	/* Pink stays its own family — Chip uses it for a palette slot that has
+	   no semantic role equivalent. */
+	--color-pink-50: #fdf2f8;
+	--color-pink-100: #fce7f3;
+	--color-pink-200: #fbcfe8;
+	--color-pink-300: #f9a8d4;
+	--color-pink-400: #f472b6;
+	--color-pink-500: #ec4899;
+	--color-pink-600: #db2777;
+	--color-pink-700: #be185d;
+	--color-pink-800: #9d174d;
+	--color-pink-900: #831843;
+	--color-pink-950: #500724;
+
+	/* Surface / line / text roles (for page- and text-level styling
+	   rather than a specific shade) */
+	--color-primary: var(--color-primary-500);
+	--color-surface: #ffffff;
+	--color-surface-alt: #f9fafb;
+	--color-line: #e5e7eb;
+	--color-line-strong: #d1d5db;
+	--color-ink: #111827;
+	--color-ink-2: #4b5563;
+	--color-on-primary: #ffffff;
+}
+
+/* Ripple Effect */
+@keyframes shared-ripple {
+	from {
+		transform: translate(-50%, -50%) scale(0);
+		opacity: 0.25;
+	}
+	to {
+		transform: translate(-50%, -50%) scale(1);
+		opacity: 0;
+	}
+}
+
+.shared-ripple {
+	position: absolute;
+	pointer-events: none;
+	border-radius: 9999px;
+	background-color: currentColor;
+	opacity: 0.25;
+	width: var(--shared-ripple-size, 0px);
+	height: var(--shared-ripple-size, 0px);
+	left: var(--shared-ripple-x, 0px);
+	top: var(--shared-ripple-y, 0px);
+	transform: translate(-50%, -50%) scale(0);
+	animation: shared-ripple 750ms ease-out;
+}

@@ -1,0 +1,43 @@
+/* ActionBar animations */
+:root {
+	--shared-action-bar-duration: 150ms;
+}
+
+@keyframes sharedActionBarIn {
+	from {
+		opacity: 0;
+		transform: translateY(100%);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes sharedActionBarOut {
+	from {
+		opacity: 1;
+		transform: translateY(0);
+	}
+	to {
+		opacity: 0;
+		transform: translateY(100%);
+	}
+}
+
+.shared-action-bar-panel {
+	opacity: 0;
+	transform: translateY(100%);
+	will-change: opacity, transform;
+	animation-name: sharedActionBarIn;
+	animation-duration: var(--shared-action-bar-duration, 300ms);
+	animation-timing-function: ease-out;
+	animation-fill-mode: forwards;
+}
+
+.shared-action-bar-panel-out {
+	animation-name: sharedActionBarOut;
+	animation-duration: var(--shared-action-bar-duration, 300ms);
+	animation-timing-function: ease-out;
+	animation-fill-mode: forwards;
+}
