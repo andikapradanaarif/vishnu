@@ -1,0 +1,19 @@
+node_modules/
+dist/
+# the go:embed placeholder must stay tracked: the dist/ rule above excludes the
+# directory itself (git won't descend into it), so re-include the directory and
+# re-ignore its build output instead
+!api/internal/webui/dist/
+api/internal/webui/dist/*
+!api/internal/webui/dist/.gitkeep
+*.local
+.env
+.env.*
+!.env.example
+
+# Go
+api/bin/
+api/tmp/
+
+# macOS
+.DS_Store
