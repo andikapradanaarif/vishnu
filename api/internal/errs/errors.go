@@ -12,4 +12,12 @@ var (
 	ErrInvalidProject  = errors.New("exactly one of repo_url, path or upstream is required")
 	ErrInvalidPath     = errors.New("path must be an existing directory")
 	ErrInvalidUpstream = errors.New("upstream must be an http(s) URL")
+
+	ErrUserNotFound         = errors.New("user not found")
+	ErrInvalidEmail         = errors.New("a valid email address is required")
+	ErrSessionNotFound      = errors.New("session not found")
+	ErrOTPNotFound          = errors.New("no pending code for that address")
+	ErrOTPExpired           = errors.New("the code has expired")
+	ErrOTPInvalid           = errors.New("invalid code")
+	ErrOTPAttemptsExhausted = errors.New("too many incorrect attempts")
 )
