@@ -13,25 +13,16 @@ import (
 	"time"
 )
 
-// Upstream proxies requests to the `crush server` HTTP API. The
-// transport has no overall timeout so SSE streams stay open; dialing
-// keeps a short timeout so a dead upstream fails fast.
-type Upstream struct {
-	base   *url.URL
+// Proxy forwards requests to a `crush server` whose address is resolved
+// per request from the project registry. The transport has no overall
+// timeout so SSE streams stay open; dialing keeps a short timeout so a
+// dead upstream fails fast.
+type Proxy struct {
 	client *http.Client
 }
 
-// NewUpstream builds an Upstream targeting base (e.g. http://127.0.0.1:9119).
-func NewUpstream(base string) (*Upstream, error) {
-	u, err := url.Parse(base)
-	if err != nil {
-		return nil, fmt.Errorf("parse upstream %q: %w", base, err)
-	}
-	if u.Scheme != "http" && u.Scheme != "https" {
-		return nil, fmt.Errorf("upstream %q: only http/https are supported", base)
-	}
-	return &Upstream{
-		base: u,
+func NewProxy() *Proxy {
+	return &Proxy{
 		client: &http.Client{
 			Transport: &http.Transport{
 				Proxy:               http.ProxyFromEnvironment,
@@ -42,19 +33,22 @@ func NewUpstream(base string) (*Upstream, error) {
 				}).DialContext,
 			},
 		},
-	}, nil
+	}
 }
 
-// Base returns the upstream base URL.
-func (u *Upstream) Base() string {
-	return u.base.String()
-}
+// Forward dispatches a copy of the incoming request to base (e.g.
+// http://127.0.0.1:9201) and returns its response. The caller owns the
+// returned body.
+func (p *Proxy) Forward(ctx context.Context, base, method, requestURI string, header http.Header, body []byte) (*http.Response, error) {
+	target, err := url.Parse(base)
+	if err != nil {
+		return nil, fmt.Errorf("parse upstream %q: %w", base, err)
+	}
+	if target.Scheme != "http" && target.Scheme != "https" {
+		return nil, fmt.Errorf("upstream %q: only http/https are supported", base)
+	}
 
-// Forward dispatches a copy of the incoming request to the upstream and
-// returns its response. The caller owns the returned body.
-func (u *Upstream) Forward(ctx context.Context, method, requestURI string, header http.Header, body []byte) (*http.Response, error) {
-	target := *u.base
-	target.Path = strings.TrimSuffix(u.base.Path, "/") + requestURIPath(requestURI)
+	target.Path = strings.TrimSuffix(target.Path, "/") + requestURIPath(requestURI)
 	target.RawPath = ""
 	target.RawQuery = requestURIQuery(requestURI)
 
@@ -67,7 +61,7 @@ func (u *Upstream) Forward(ctx context.Context, method, requestURI string, heade
 		return nil, fmt.Errorf("build upstream request: %w", err)
 	}
 	copyHeader(req.Header, header)
-	return u.client.Do(req)
+	return p.client.Do(req)
 }
 
 // requestURIPath splits the path portion off a RequestURI.
