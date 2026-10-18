@@ -154,7 +154,7 @@ make build    # bun build web → copy dist into webui → CGO_ENABLED=0 go buil
 make test / lint / format / tidy
 ```
 
-## Deployment — Debian server (docker, valo-style)
+## Deployment — Debian server (docker)
 
 Production runs fully containerized: `api/deploy/docker-compose.yml`
 brings up `postgres` + `vishnu` (`restart: unless-stopped` — docker's

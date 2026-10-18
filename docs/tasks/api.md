@@ -208,7 +208,7 @@ cd api && gofmt -l . && go vet ./... && go build ./... && go test ./...
   create/lookup/sliding expiry; middleware 401 vs pass-through;
   request-otp non-enumeration (unknown email still 200).
 
-## PR 7 — containerization (valo-style docker deploy)
+## PR 7 — containerization (docker deploy)
 
 **Goal:** the whole stack runs via compose on the Debian server.
 

@@ -70,7 +70,7 @@ vishnu/
 
 ## Quick start
 
-**Production — everything in Docker** (valo-style):
+**Production — everything in Docker**:
 
 ```bash
 # Builds the SPA + api + crush into one image, runs postgres + vishnu
