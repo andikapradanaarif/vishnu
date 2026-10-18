@@ -10,7 +10,8 @@ Vishnu runs a single Go binary that owns a **project registry**
 reverse-proxies each project's `/v1` HTTP + SSE API — so an agent run
 continues server-side even after you close the tab.
 
-Built for deployment on a Debian server (systemd), reachable over SSH
+Built for deployment on a Debian server via Docker Compose (the image
+builds the SPA, api, and a `crush` binary together), reachable over SSH
 tunnel or Tailscale.
 
 ## Architecture
@@ -69,29 +70,24 @@ vishnu/
 
 ## Quick start
 
+**Production — everything in Docker**:
+
 ```bash
-# 1. Install JS deps + build the SPA pieces (order matters)
-bun install
-bun run build          # shared-ui → contract → web
-
-# 2. Postgres + schema
-cd api
-make db                # docker compose up -d postgres
-make migrate           # apply migrations
-
-# 3. Run
-make build             # embeds web/dist → bin/vishnu-api
-./bin/vishnu-api       # http://127.0.0.1:8080
+# Builds the SPA + api + crush into one image, runs postgres + vishnu
+docker compose -f api/deploy/docker-compose.yml up -d --build
+# → http://127.0.0.1:8080 (loopback — tunnel/Tailscale for remote)
 ```
 
-Dev loop (no embed): `make web` once, then `make dev` serves the SPA
-from `web/dist` via `VISHNU_WEB_DIR`; `cd web && bun run dev` gives
-Vite HMR on :5173.
+**Development** (postgres in docker, api + crush on the host):
 
-On the server, run it as a systemd user service
-(`~/.config/systemd/user/vishnu.service`, `Restart=on-failure` +
-`loginctl enable-linger`) — sample unit in `docs/plan/api.md`. Reach
-it via `ssh -L 8080:127.0.0.1:8080 <server>` or Tailscale.
+```bash
+bun install && bun run build   # shared-ui → contract → web
+cd api
+make db && make migrate        # postgres + schema
+make dev                       # http://127.0.0.1:8080 (VISHNU_WEB_DIR=../web/dist)
+```
+
+`cd web && bun run dev` gives Vite HMR on :5173 during UI work.
 
 ## Adding a project
 

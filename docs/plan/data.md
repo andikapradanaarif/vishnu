@@ -158,11 +158,15 @@ single-user server, and `deleted_at`/`expires_at` keep cleanup trivial.
 ## Commands
 
 ```bash
-make db              # docker compose up -d postgres
+make db              # docker compose -f deploy/docker-compose.yml up -d postgres
 make migrate         # go run ./cmd/migrate (up)
 make migratedown     # rollback last
 make migratestatus   # applied vs pending
 ```
+
+(The same compose file carries the `vishnu` app service — see the
+deployment section of `api.md`; `make db` brings up only postgres for
+host-native dev.)
 
 `make dev` should fail fast with a clear "postgres unreachable — run
 `make db && make migrate`" when the DB is down, since `/api/projects`

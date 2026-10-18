@@ -12,7 +12,9 @@ Monorepo, bun workspaces — style/stack follows valo & nexus-bo-api.
   the user/session tables behind email-OTP sign-in, and spawns one
   `crush server` per project; proxies `/p/{pid}/v1/*`
   to that project's upstream (SSE via SendStreamWriter, no upstream
-  timeout), serves embedded SPA.
+  timeout), serves embedded SPA. `api/Dockerfile` (root context) +
+  `api/deploy/docker-compose.yml` run the whole stack in docker —
+  postgres + app incl. a baked-in `crush` binary.
 - `web/` — Vite + React 19 + TS strict, TanStack Query, Tailwind v4,
   components from `@vishnu/ui-component` (`shared-ui/`), feature code in
   `src/features/<domain>/`.

@@ -41,9 +41,11 @@ cd api && gofmt -l . && go vet ./... && go build ./... && go test ./...
 
 **Goal:** Postgres up, migrations running, zero domain code yet.
 
-- `docker-compose.yml` (api/ root): `postgres:17-alpine`,
-  `POSTGRES_*` from `DB_*` envs (`vishnu`/`vishnu`/`vishnu`), port
-  5432, named volume, `pg_isready` healthcheck. (Copy nexus's shape.)
+- `deploy/docker-compose.yml`: `postgres:17-alpine` service named
+  `postgres` (container `vishnu-db`), `POSTGRES_*` from `DB_*` envs
+  (`vishnu`/`vishnu`/`vishnu`), port 5432, named volume, `pg_isready`
+  healthcheck. The same file will carry the `vishnu` app service in
+  PR 7 — keep service names/network stable. (Copy nexus's shape.)
 - `internal/config/db.go`: `ConnectPostgres() (*gorm.DB, error)` —
   DSN from `DB_HOST/DB_PORT/DB_NAME/DB_USER/DB_PASS` (defaults
   `127.0.0.1:5432`, db `vishnu`, user `vishnu`; `DB_PASS` required in
@@ -64,8 +66,8 @@ cd api && gofmt -l . && go vet ./... && go build ./... && go test ./...
   `.sql`; every embedded `<name>.sql` is in the order; downs exist.
 - `cmd/migrate/main.go`: `up` (default) / `down` / `status` —
   port nexus `cmd/migrate`.
-- `Makefile`: `db` (`docker compose up -d postgres`), `migrate`,
-  `migratedown`, `migratestatus`.
+- `Makefile`: `db` (`docker compose -f deploy/docker-compose.yml up -d
+  postgres`), `migrate`, `migratedown`, `migratestatus`.
 - Acceptance: `make db && make migrate` applies `migrations` table +
   reports clean status on a fresh DB; `make migratedown` rolls back.
 
@@ -205,6 +207,40 @@ cd api && gofmt -l . && go vet ./... && go build ./... && go test ./...
 - Tests: OTP issue/verify/expiry/attempts/consume-once; session
   create/lookup/sliding expiry; middleware 401 vs pass-through;
   request-otp non-enumeration (unknown email still 200).
+
+## PR 7 — containerization (docker deploy)
+
+**Goal:** the whole stack runs via compose on the Debian server.
+
+- `api/Dockerfile` — build context is the **repo root** (the SPA must
+  build inside the image):
+  1. `oven/bun` stage — copy workspace manifests + sources,
+     `bun install`, `bun run build` → `web/dist`.
+  2. `golang:1.26-alpine` — `GOTOOLCHAIN=local`, `CGO_ENABLED=0`;
+     copy `api/`, copy `web/dist` → `internal/webui/dist`;
+     one RUN builds `./cmd/server` → `vishnu-api` and
+     `./cmd/migrate` → `migrate` (`-trimpath -ldflags="-s -w"`).
+  3. crush stage — `go install
+     github.com/charmbracelet/crush@$CRUSH_VERSION` (build-arg, pin a
+     tag; crush's main pkg is repo-root).
+  4. `alpine` runtime — `apk add --no-cache git openssh-client curl`
+     (git+ssh for the cloner, curl for healthcheck); copy both binaries
+     + crush + `entrypoint.sh`; `HEALTHCHECK curl -f …/healthz`.
+- `api/entrypoint.sh` — nexus dispatch: `migrate` → `./migrate "$@"`,
+  default → `./vishnu-api` (server already migrates on boot; the
+  binary is for `down`/`status` ops).
+- Root `.dockerignore`: `**/node_modules`, `**/dist`, `api/bin`,
+  `.git`, `docs`.
+- `api/deploy/docker-compose.yml` — add `vishnu` service per
+  `api.md` deployment section: `env_file: ../.env`,
+  `DB_HOST: vishnu-db`, loopback publish `127.0.0.1:8080:8080`,
+  `vishnu-data:/data` (set `VISHNU_DATA_DIR=/data`), `~/.ssh` ro mount,
+  healthcheck, `depends_on` postgres healthy; `restart: unless-stopped`
+  on both services.
+- Acceptance: `docker compose -f api/deploy/docker-compose.yml up -d
+  --build` on a clean checkout → `/healthz` green, SPA served,
+  `docker compose … run --rm vishnu migrate status` works, clone-mode
+  add works inside the container, crush spawns (binary + git present).
 
 ## Definition of done (whole epic)
 
