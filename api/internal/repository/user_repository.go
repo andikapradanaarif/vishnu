@@ -21,6 +21,10 @@ func NewUserRepository(db *gorm.DB) domain.UserRepository {
 }
 
 func (r *userRepository) GetByID(ctx context.Context, id string) (*domain.User, error) {
+	if !isUUID(id) {
+		return nil, errs.ErrUserNotFound
+	}
+
 	var user domain.User
 	if err := r.db.WithContext(ctx).First(&user, "id = ?", id).Error; err != nil {
 		return nil, mapUserError(err)
