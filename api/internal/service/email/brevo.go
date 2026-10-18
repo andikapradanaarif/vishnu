@@ -117,7 +117,7 @@ func (s *brevoService) SendEmail(ctx context.Context, payload *EmailPayload) err
 		slog.Error("Brevo API request failed", "endpoint", endpoint, "err", err)
 		return fmt.Errorf("failed to send brevo email: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		respBody, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
