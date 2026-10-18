@@ -121,8 +121,10 @@ vishnu/
    (`plan/data.md`); project registry is the first consumer —
    registry, GitHub-clone add flow, managed crush spawn, `/p/{pid}`
    routing, project picker (`plan/projects.md`).
-3. **Auth** — email + OTP, cookie session, guard `/v1` + shell
-   (Brevo service in place; users/OTP/session tables join the same DB).
+3. **Auth** — email + OTP against a DB-backed `users` allowlist
+   (bootstrap via `VISHNU_BOOTSTRAP_EMAIL`), cookie session from
+   `auth_sessions`, guard `/api` + `/p/*` (Brevo service in place;
+   schema in `plan/data.md`).
 4. Later — mobile polish/PWA, per-project logs view, "park" action,
    auto-restart policies, per-user project ACLs.
 

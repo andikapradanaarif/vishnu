@@ -81,16 +81,79 @@ to the row. API responses expose the merged effective status
 (`cloning | down | starting | up | error`). This removes the
 boot-reconciliation edge case entirely.
 
-### Auth tables (auth milestone — sketch, detailed when planned)
+### `users` — allowlist (auth milestone)
 
-- `users` — `id`, `email` (unique), `name`, `created_at`, `deleted_at`
-- `otp_codes` — `id`, `email`, `code_hash`, `expires_at`, `consumed_at`,
-  `attempts` — replaces the in-memory OTP store
-- `auth_sessions` — `id`, `user_id`, `token_hash`, `expires_at` —
-  cookie-session backing store
+No open registration: OTP is only sent to emails already in `users`.
+First user is bootstrapped from `VISHNU_BOOTSTRAP_EMAIL` at server
+start (upsert, role `admin`); further users via `POST /api/users`
+(admin-only) once the auth milestone lands.
+
+```sql
+CREATE EXTENSION IF NOT EXISTS citext;
+
+CREATE TABLE users (
+    id         uuid PRIMARY KEY,
+    email      citext      NOT NULL,
+    name       text,
+    role       text        NOT NULL DEFAULT 'member',  -- 'admin' | 'member'
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now(),
+    deleted_at timestamptz
+);
+CREATE UNIQUE INDEX users_email_unique
+    ON users (email) WHERE deleted_at IS NULL;
+```
+
+### `otp_codes`
+
+```sql
+CREATE TABLE otp_codes (
+    id          uuid PRIMARY KEY,
+    email       citext      NOT NULL,
+    code_hash   text        NOT NULL,   -- sha256; plaintext never stored
+    attempts    int         NOT NULL DEFAULT 0,
+    expires_at  timestamptz NOT NULL,
+    consumed_at timestamptz,
+    created_at  timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX otp_codes_email_created
+    ON otp_codes (email, created_at DESC);
+```
+
+OTP: 6 digits, 10-min TTL, max 5 `attempts`, resend cooldown = count
+recent rows per `email` (no separate rate-limit table needed).
+
+### `auth_sessions`
+
+```sql
+CREATE TABLE auth_sessions (
+    id           uuid PRIMARY KEY,
+    user_id      uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash   text NOT NULL,         -- sha256; raw token lives only in the cookie
+    expires_at   timestamptz NOT NULL,
+    last_seen_at timestamptz,
+    created_at   timestamptz NOT NULL DEFAULT now()
+);
+CREATE UNIQUE INDEX auth_sessions_token_hash ON auth_sessions (token_hash);
+```
+
+Session cookie `vishnu_session=<opaque>` — HttpOnly, SameSite=Lax,
+`Secure` when served over TLS, 30-day sliding expiry (`expires_at`
+bumped on `last_seen_at`).
+
+### Auth flow (for `api.md`)
+
+`POST /api/auth/request-otp {email}` → always 200 (don't leak
+membership); sends via Brevo only if email is in `users`.
+`POST /api/auth/verify {email, code}` → compares hash, enforces
+attempts/expiry, marks `consumed_at`, inserts `auth_sessions`, sets
+cookie. `POST /api/auth/logout` deletes the row. `GET /api/auth/me`
+returns the user for the SPA shell. Middleware guards `/api/*` (except
+`/api/auth/*`) and `/p/*` — the SPA itself stays public (it renders the
+login gate).
 
 No Redis: OTP and session state live in Postgres — right-sized for a
-localhost tool, and `deleted_at`/`expires_at` keep cleanup trivial.
+single-user server, and `deleted_at`/`expires_at` keep cleanup trivial.
 
 ## Commands
 

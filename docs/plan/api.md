@@ -57,7 +57,9 @@ migrations, and the domain/repository/usecase conventions.
 | `VISHNU_PROJECTS_DIR` | `$VISHNU_DATA_DIR/projects` | where GitHub clones land |
 | `VISHNU_CRUSH_BIN` | `crush` (`$PATH`) | binary spawned for managed projects |
 | `VISHNU_PORT_START` | `9201` | first port probed upward for managed crushes |
-| `BREVO_API_KEY` / `BREVO_API_URL` / `BREVO_FROM_EMAIL` / `BREVO_FROM_NAME` | — / `https://api.brevo.com` / — / — | transactional email (auth OTP, later) |
+| `BREVO_API_KEY` / `BREVO_API_URL` / `BREVO_FROM_EMAIL` / `BREVO_FROM_NAME` | — / `https://api.brevo.com` / — / — | transactional email (auth OTP) |
+| `VISHNU_BOOTSTRAP_EMAIL` | unset | first `admin` user upserted at boot (auth allowlist seed) |
+| `VISHNU_SESSION_TTL` | `720h` (30d) | auth session/cookie lifetime |
 | `VISHNU_EMAIL_TIMEOUT` | `10s` | Brevo request timeout |
 | `VISHNU_ENV` | `development` | prefixes email subjects outside prod |
 
@@ -87,10 +89,17 @@ migrations, and the domain/repository/usecase conventions.
 
 | Route | Handler | Notes |
 | --- | --- | --- |
-| `GET /healthz` | inline | `{status}` |
-| `GET/POST/DELETE /api/projects*` | ProjectHandler | registry CRUD + ensure-running/workspace |
-| `ALL /p/:pid/v1/*` | ProxyHandler.Forward | strip prefix → per-project upstream, incl. SSE |
-| `ALL /*` (fallback) | WebHandler.Handle | file → bytes; miss → index.html |
+| `GET /healthz` | inline | `{status}` — public |
+| `POST /api/auth/request-otp` + `/verify` | AuthHandler | OTP issue/verify → session cookie; public |
+| `POST /api/auth/logout`, `GET /api/auth/me` | AuthHandler | session-guarded |
+| `GET/POST/DELETE /api/projects*` | ProjectHandler | registry CRUD + ensure-running/workspace — session-guarded |
+| `ALL /p/:pid/v1/*` | ProxyHandler.Forward | strip prefix → per-project upstream, incl. SSE — session-guarded |
+| `ALL /*` (fallback) | WebHandler.Handle | file → bytes; miss → index.html — public (SPA renders login gate) |
+
+Auth middleware sits in front of `/api/*` (except `/api/auth/*`) and
+`/p/*`: validates the `vishnu_session` cookie against `auth_sessions`
+(token-hash lookup, expiry + sliding `last_seen_at`). Flow + schema in
+`data.md`.
 
 ## Feature → endpoint mapping
 
