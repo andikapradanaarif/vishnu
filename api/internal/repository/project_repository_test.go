@@ -242,3 +242,20 @@ func TestListOrdersByCreatedAt(t *testing.T) {
 		}
 	}
 }
+
+// Postgres rejects a malformed uuid with a type error rather than returning
+// no rows, so an unknown id has to be short-circuited to not-found.
+func TestMalformedIDsAreReportedAsNotFound(t *testing.T) {
+	repo := repository.NewProjectRepository(testDB(t))
+	ctx := context.Background()
+
+	if _, err := repo.GetByID(ctx, "does-not-exist"); !errors.Is(err, errs.ErrProjectNotFound) {
+		t.Fatalf("GetByID: expected ErrProjectNotFound, got %v", err)
+	}
+	if err := repo.SoftDelete(ctx, "does-not-exist"); !errors.Is(err, errs.ErrProjectNotFound) {
+		t.Fatalf("SoftDelete: expected ErrProjectNotFound, got %v", err)
+	}
+	if err := repo.SetStatus(ctx, "does-not-exist", domain.ProjectStatusReady, ""); !errors.Is(err, errs.ErrProjectNotFound) {
+		t.Fatalf("SetStatus: expected ErrProjectNotFound, got %v", err)
+	}
+}
