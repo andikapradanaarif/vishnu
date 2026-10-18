@@ -12,6 +12,15 @@
         "syncpack": "^15.3.3",
       },
     },
+    "contract": {
+      "name": "@vishnu/api-contract",
+      "version": "1.0.0",
+      "devDependencies": {
+        "@types/react": "^19.3.0",
+        "oxlint": "^1.88.0",
+        "typescript": "^7.0.2",
+      },
+    },
     "shared-ui": {
       "name": "@vishnu/ui-component",
       "version": "1.0.0",
@@ -50,6 +59,7 @@
         "@iconify/react": "^6.0.2",
         "@tanstack/react-form": "^1.33.5",
         "@tanstack/react-query": "^5.104.3",
+        "@vishnu/api-contract": "workspace:*",
         "@vishnu/ui-component": "workspace:*",
         "react": "^19.3.1",
         "react-dom": "^19.3.1",
@@ -351,6 +361,8 @@
     "@typescript/typescript-win32-x64": ["@typescript/typescript-win32-x64@7.0.2", "", { "os": "win32", "cpu": "x64" }, "sha512-0BQ3HkAHHlKLSp1qRvf3SUhGpGsDuhB/jgFw75guyqbxJqEaS0Cw/VFO8i2nHglJUzQCRtMMR/IBAKE3ETMC4g=="],
 
     "@ungap/structured-clone": ["@ungap/structured-clone@1.4.0", "", {}, "sha512-1mEZtMKPM09vDmQt5y7YvmN2+DFTP7Tg0EWXdic8/C6VRnpb33e4ghisCIE3WZjsE2N8mf+QV1Zqh7ZFYLWInQ=="],
+
+    "@vishnu/api-contract": ["@vishnu/api-contract@workspace:contract"],
 
     "@vishnu/ui-component": ["@vishnu/ui-component@workspace:shared-ui"],
 
