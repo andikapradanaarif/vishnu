@@ -81,6 +81,44 @@ constructors.
 | `ALL /p/:pid/v1/*` | ProxyHandler.Forward | strip prefix → per-project upstream, incl. SSE |
 | `ALL /*` (fallback) | WebHandler.Handle | file → bytes; miss → index.html |
 
+## Feature → endpoint mapping
+
+| Feature | Endpoint |
+| --- | --- |
+| List/add/remove projects | `GET/POST/DELETE /api/projects` |
+| Start/stop project agent | `POST /api/projects/{id}/start` `/stop` |
+| Select project → workspace | `GET /api/projects/{id}/workspace` (ensure) |
+| All crush calls below | under `/p/{pid}` — e.g. `/p/{pid}/v1/workspaces/{id}/sessions` |
+| List sessions (title, busy, cost, updated) | `GET /v1/workspaces/{id}/sessions` |
+| Create session | `POST /v1/workspaces/{id}/sessions` |
+| Delete session | `DELETE /v1/workspaces/{id}/sessions/{sid}` |
+| Message history | `GET /v1/workspaces/{id}/sessions/{sid}/messages` → `[]proto.Message` |
+| Send prompt (detached run, survives reload) | `POST /v1/workspaces/{id}/agent` body `{session_id, prompt}` → 202 |
+| Cancel a running turn | `POST /v1/workspaces/{id}/agent/sessions/{sid}/cancel` |
+| Live stream | `GET /v1/workspaces/{id}/events?client_id=<uuid>` (SSE) |
+| Report viewed session (scopes prompts) | `POST /v1/workspaces/{id}/current-session` |
+| Permission grant | `POST /v1/workspaces/{id}/permissions/grant` `{permission, action}` (`allow`/`allow_session`/`deny`) |
+| Skip-permissions toggle | `GET`/`POST /v1/workspaces/{id}/permissions/skip` `{skip}` |
+| Question batch answer | `POST /v1/workspaces/{id}/questions/answer` + `/cancel` |
+| Switch model | `GET …/agent` (`model_cfg`) + `GET …/providers` → `POST …/config/model` `{scope: 1, model_type, model: {model, provider}}` |
+| Switch agent | `POST …/agent/main` `{agent_id}` (`coder`/`plan`/`task`) |
+| Agent/busy state | `GET …/agent` → `AgentInfo{is_busy, is_ready, model, model_cfg}` |
+
+## Crush wire notes
+
+- SSE: `GET …/events?client_id=<id>` → `text/event-stream`; each event
+  is `data: {type, payload}\n\n` flushed per publish
+  (`internal/server/proto.go`). `client_id` is required. `message`
+  events carry the **full `proto.Message` snapshot** — merge by id,
+  no delta diffing.
+- `POST …/agent` returns 202 — the run is detached server-side and
+  survives the browser closing; the SSE stream is how output returns.
+- Permission/question delivery is scoped to the client's reported
+  session (`POST …/current-session?client_id=`); clients that never
+  report get everything (fail-open).
+- Workspace create takes `client_id` **in the JSON body**; other
+  mutating endpoints take it as a `?client_id=` query param.
+
 ## SPA serving
 
 `web_handler.go`: `fs.ReadFile(fsys, cleanPath)`; on miss →

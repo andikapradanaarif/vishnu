@@ -93,6 +93,52 @@ usePermissionsSkip(wid) ─┘          run_complete → busy off + invalidate
   `current-session?client_id` so permission/question events reach only
   this tab.
 
+## Event stream handling
+
+`message` events carry the **full `proto.Message` snapshot**, so the
+UI merges by message `id` — replace-by-id, no delta diffing. Dispatch:
+
+- `message` — new/updated message parts (streamed text, tool calls/results)
+- `session` — session row updates (title, busy, cost → refresh list row)
+- `agent_event` — run lifecycle (typing indicator)
+- `permission_request` — render Approve/Deny/Allow-for-session card
+- `permission_notification` — clear the card when resolved (incl. when
+  another client answered — stale cards don't linger)
+- `question_batch_request` / `question_batch_notification` — question
+  tool's prompt; render answer UI / dismiss
+- `run_complete` — mark session idle, invalidate messages + sessions
+- `config_changed`, `update_available` — invalidate config/agent, no-op
+
+### Client identity
+
+Crush scopes permission/question delivery to the session a client
+reported viewing: a stable `?client_id=` (per-tab UUID in
+sessionStorage) rides the EventSource URL and every mutating POST via
+the ApiClient `defaultQuery`; `POST …/current-session` fires on
+session open. Clients that never report get everything (fail-open) —
+reporting keeps a second tab from answering another tab's prompts.
+
+## Answering the agent
+
+The agent blocks on two request kinds; both arrive as SSE events and
+are answered by POST:
+
+**Permissions** — `permission_request` → `PermissionRequest{id,
+session_id, tool_call_id, tool_name, description, action, params,
+path}`. Card pinned above the composer: tool name, description,
+path/command → **Allow** / **Allow for session** / **Deny** →
+`POST …/permissions/grant {permission: <the request>, action}`.
+`permission_notification` (granted/denied) dismisses the card.
+
+**Questions** (`question` tool batches) — `question_batch_request` →
+`QuestionRequest{id, session_id, tool_call_id, questions[],
+confirm_title}`. Each `QuestionItem{type, question, choices[]}` is a
+select/multi-select/fill-in/yes-no field. Submit →
+`POST …/questions/answer {batch_request_id, responses: [{request_id,
+selected_ids | fill_in_text | yes}]}`; Dismiss →
+`POST …/questions/cancel`. `question_batch_notification` = resolved
+elsewhere → dismiss the form.
+
 ## Component contracts
 
 - **features/sessions/SessionSidebar** — rows from `useSessions`; busy
@@ -122,6 +168,34 @@ usePermissionsSkip(wid) ─┘          run_complete → busy off + invalidate
   scope=1 type=large`); agent `Select` coder/plan/task → `agent/main`;
   skip toggle → `permissions/skip`; SSE `Chip` dot
   (open/connecting/closed).
+
+## Message rendering
+
+`proto.Message` carries `Parts` — v1 renders: user text, assistant
+text (markdown via `react-markdown` + `remark-gfm`, no raw HTML),
+reasoning (collapsible "Thinking"), tool call name + args summary +
+result excerpt, `shell_command` as `$ cmd` + output, `is_error` in
+red. Unknown part types degrade to a quiet one-liner.
+
+## Mobile support
+
+Target: iPhone/Android browser, portrait-first (post-v1 polish).
+
+- **Layout**: single column; session list becomes a slide-over
+  `Drawer` (hamburger) under ~768px; conversation full-width;
+  composer is a sticky bottom bar (above the keyboard).
+- **Viewport/CSS**: `viewport-fit=cover` + `env(safe-area-inset-*)`
+  padding; `100dvh` (not `100vh`) for iOS chrome collapse; ≥44px
+  touch targets; input font-size ≥16px (no iOS focus zoom); code
+  blocks/tool outputs scroll horizontally.
+- **PWA**: manifest + `display: standalone` + apple-touch-icon →
+  chromeless "app" window.
+- **SSE on mobile**: EventSource works in mobile Safari/Chrome. iOS
+  suspends JS when backgrounded — on resume the stream reconnects and
+  we re-fetch messages; runs continue server-side (detached POSTs),
+  so nothing is lost — a permission card just sits waiting.
+- **Notifications**: none — prompts wait in the UI. (Later: web-push
+  needs a service worker + server-side sender.)
 
 ## Types note
 
