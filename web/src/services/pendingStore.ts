@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import type { PermissionRequest, QuestionRequest } from "@/types/crush";
+import type { PermissionRequest, QuestionRequest } from "@vishnu/api-contract";
 
 /**
  * Tiny external store for SSE-driven UI state that doesn't belong in

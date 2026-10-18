@@ -6,7 +6,7 @@ import { LoadingSpinner } from "@vishnu/ui-component/loadingAnimation";
 import { usePendingState } from "@/services/pendingStore";
 import { useCreateSession, useDeleteSession, useSessions } from "@/hooks/queries";
 import { formatCost, relativeTime } from "@/utils/format";
-import type { Session } from "@/types/crush";
+import type { Session } from "@vishnu/api-contract";
 
 interface SessionSidebarProps {
 	wid: string;

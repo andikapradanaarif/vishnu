@@ -3,7 +3,7 @@ import { EmptyState } from "@vishnu/ui-component/emptyState";
 import { LoadingSpinner } from "@vishnu/ui-component/loadingAnimation";
 import { useMessages } from "@/hooks/queries";
 import { usePendingState } from "@/services/pendingStore";
-import type { Message } from "@/types/crush";
+import type { Message } from "@vishnu/api-contract";
 import { MessagePart } from "./MessageParts";
 
 interface ChatPaneProps {

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Icon } from "@iconify/react";
 import { Button } from "@vishnu/ui-component/button";
 import { useAnswerQuestions, useCancelQuestions } from "@/hooks/queries";
-import type { QuestionItem, QuestionRequest, QuestionResponseItem } from "@/types/crush";
+import type { QuestionItem, QuestionRequest, QuestionResponseItem } from "@vishnu/api-contract";
 
 interface QuestionCardProps {
 	wid: string;

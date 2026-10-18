@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react";
-import type { ContentPart, Message, ToolCall, ToolResult } from "@/types/crush";
+import type { ContentPart, Message, ToolCall, ToolResult } from "@vishnu/api-contract";
 import { clamp, prettyJson } from "@/utils/format";
 import { Markdown } from "./Markdown";
 

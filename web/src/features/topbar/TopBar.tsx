@@ -12,7 +12,7 @@ import {
 	useSetModel,
 	useSetPermissionsSkip,
 } from "@/hooks/queries";
-import type { Workspace } from "@/types/crush";
+import type { Workspace } from "@vishnu/api-contract";
 
 interface TopBarProps {
 	workspace: Workspace | undefined;

@@ -1,7 +1,7 @@
 import { Icon } from "@iconify/react";
 import { Button } from "@vishnu/ui-component/button";
 import { useGrantPermission } from "@/hooks/queries";
-import type { PermissionRequest } from "@/types/crush";
+import type { PermissionRequest } from "@vishnu/api-contract";
 import { clamp, prettyJson } from "@/utils/format";
 
 interface PermissionCardProps {

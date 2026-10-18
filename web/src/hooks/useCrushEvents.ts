@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useQueryClient, type QueryClient } from "@tanstack/react-query";
-import { clientId } from "@/services/clientId";
-import { crush } from "@/services/crushClient";
+import { eventsClient } from "@/services/api";
 import { pendingStore } from "@/services/pendingStore";
 import type {
 	AgentEvent,
@@ -13,7 +12,7 @@ import type {
 	QuestionRequest,
 	RunComplete,
 	Session,
-} from "@/types/crush";
+} from "@vishnu/api-contract";
 import { queryKeys } from "@/hooks/queries";
 
 /**
@@ -26,7 +25,7 @@ export function useCrushEvents(workspaceId: string | undefined) {
 	useEffect(() => {
 		if (!workspaceId) return;
 
-		const es = new EventSource(crush.eventsUrl(workspaceId, clientId()));
+		const es = new EventSource(eventsClient.url(workspaceId));
 		es.onopen = () => pendingStore.setConn("open");
 		es.onerror = () => pendingStore.setConn("closed");
 

@@ -1,5 +1,5 @@
 import { QueryClient } from "@tanstack/react-query";
-import { ApiError } from "@/services/crushClient";
+import { ApiError } from "@vishnu/api-contract/client";
 
 /**
  * Single query client for the app.

@@ -1,6 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { crush } from "@/services/crushClient";
-import { clientId } from "@/services/clientId";
+import {
+	agentClient,
+	configClient,
+	permissionsClient,
+	questionsClient,
+	sessionsClient,
+	workspacesClient,
+} from "@/services/api";
 import { pendingStore } from "@/services/pendingStore";
 import type {
 	AgentMessage,
@@ -10,7 +16,7 @@ import type {
 	ResolvedResponse,
 	SelectedModel,
 	SelectedModelType,
-} from "@/types/crush";
+} from "@vishnu/api-contract";
 
 export const queryKeys = {
 	workspaces: ["workspaces"] as const,
@@ -25,13 +31,13 @@ export const queryKeys = {
 // ---------- Queries ----------
 
 export function useWorkspaces() {
-	return useQuery({ queryKey: queryKeys.workspaces, queryFn: () => crush.listWorkspaces() });
+	return useQuery({ queryKey: queryKeys.workspaces, queryFn: () => workspacesClient.list() });
 }
 
 export function useSessions(wid: string | undefined) {
 	return useQuery({
 		queryKey: queryKeys.sessions(wid ?? ""),
-		queryFn: () => crush.listSessions(wid!),
+		queryFn: () => sessionsClient.list(wid!),
 		enabled: !!wid,
 		refetchInterval: 30_000,
 	});
@@ -40,7 +46,7 @@ export function useSessions(wid: string | undefined) {
 export function useMessages(wid: string | undefined, sid: string | undefined) {
 	return useQuery({
 		queryKey: queryKeys.messages(wid ?? "", sid ?? ""),
-		queryFn: () => crush.getMessages(wid!, sid!),
+		queryFn: () => sessionsClient.messages(wid!, sid!),
 		enabled: !!wid && !!sid,
 	});
 }
@@ -48,7 +54,7 @@ export function useMessages(wid: string | undefined, sid: string | undefined) {
 export function useAgentInfo(wid: string | undefined) {
 	return useQuery({
 		queryKey: queryKeys.agent(wid ?? ""),
-		queryFn: () => crush.getAgentInfo(wid!),
+		queryFn: () => agentClient.info(wid!),
 		enabled: !!wid,
 	});
 }
@@ -56,7 +62,7 @@ export function useAgentInfo(wid: string | undefined) {
 export function useProviders(wid: string | undefined) {
 	return useQuery({
 		queryKey: queryKeys.providers(wid ?? ""),
-		queryFn: () => crush.getProviders(wid!),
+		queryFn: () => configClient.providers(wid!),
 		enabled: !!wid,
 	});
 }
@@ -64,7 +70,7 @@ export function useProviders(wid: string | undefined) {
 export function useConfig(wid: string | undefined) {
 	return useQuery({
 		queryKey: queryKeys.config(wid ?? ""),
-		queryFn: () => crush.getConfig(wid!),
+		queryFn: () => configClient.get(wid!),
 		enabled: !!wid,
 	});
 }
@@ -72,7 +78,7 @@ export function useConfig(wid: string | undefined) {
 export function usePermissionsSkip(wid: string | undefined) {
 	return useQuery({
 		queryKey: queryKeys.permissionsSkip(wid ?? ""),
-		queryFn: () => crush.getPermissionsSkip(wid!),
+		queryFn: () => permissionsClient.getSkip(wid!),
 		enabled: !!wid,
 	});
 }
@@ -83,7 +89,7 @@ export function useCreateSession(wid: string | undefined) {
 	const qc = useQueryClient();
 	return useMutation({
 		mutationKey: ["sessions", "create"],
-		mutationFn: (title?: string) => crush.createSession(wid!, title),
+		mutationFn: (title?: string) => sessionsClient.create(wid!, title),
 		onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.sessions(wid!) }),
 	});
 }
@@ -92,7 +98,7 @@ export function useDeleteSession(wid: string | undefined) {
 	const qc = useQueryClient();
 	return useMutation({
 		mutationKey: ["sessions", "delete"],
-		mutationFn: (sid: string) => crush.deleteSession(wid!, sid),
+		mutationFn: (sid: string) => sessionsClient.delete(wid!, sid),
 		onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.sessions(wid!) }),
 	});
 }
@@ -100,7 +106,7 @@ export function useDeleteSession(wid: string | undefined) {
 export function useSendPrompt(wid: string | undefined) {
 	return useMutation({
 		mutationKey: ["agent", "send"],
-		mutationFn: (msg: AgentMessage) => crush.sendPrompt(wid!, msg),
+		mutationFn: (msg: AgentMessage) => agentClient.sendPrompt(wid!, msg),
 		onSuccess: (_d, msg) => pendingStore.setBusy(msg.session_id, true),
 	});
 }
@@ -108,7 +114,7 @@ export function useSendPrompt(wid: string | undefined) {
 export function useCancelRun(wid: string | undefined) {
 	return useMutation({
 		mutationKey: ["agent", "cancel"],
-		mutationFn: (sid: string) => crush.cancelRun(wid!, sid),
+		mutationFn: (sid: string) => agentClient.cancelRun(wid!, sid),
 		onSuccess: (_d, sid) => pendingStore.setBusy(sid, false),
 	});
 }
@@ -117,7 +123,7 @@ export function useSetMainAgent(wid: string | undefined) {
 	const qc = useQueryClient();
 	return useMutation({
 		mutationKey: ["agent", "set-main"],
-		mutationFn: (agentId: string) => crush.setMainAgent(wid!, agentId),
+		mutationFn: (agentId: string) => agentClient.setMain(wid!, agentId),
 		onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.agent(wid!) }),
 	});
 }
@@ -129,7 +135,7 @@ export function useGrantPermission(wid: string | undefined) {
 		{ permission: PermissionRequest; action: PermissionAction }
 	>({
 		mutationKey: ["permissions", "grant"],
-		mutationFn: ({ permission, action }) => crush.grantPermission(wid!, permission, action),
+		mutationFn: ({ permission, action }) => permissionsClient.grant(wid!, permission, action),
 		onSuccess: (_d, { permission }) => pendingStore.removePermission(permission.tool_call_id),
 	});
 }
@@ -137,7 +143,7 @@ export function useGrantPermission(wid: string | undefined) {
 export function useAnswerQuestions(wid: string | undefined) {
 	return useMutation<ResolvedResponse, Error, QuestionAnswer>({
 		mutationKey: ["questions", "answer"],
-		mutationFn: (answer) => crush.answerQuestions(wid!, answer),
+		mutationFn: (answer) => questionsClient.answer(wid!, answer),
 		onSuccess: (_d, answer) => pendingStore.removeQuestion(answer.batch_request_id),
 	});
 }
@@ -145,7 +151,7 @@ export function useAnswerQuestions(wid: string | undefined) {
 export function useCancelQuestions(wid: string | undefined) {
 	return useMutation<ResolvedResponse, Error, string>({
 		mutationKey: ["questions", "cancel"],
-		mutationFn: () => crush.cancelQuestions(wid!),
+		mutationFn: () => questionsClient.cancel(wid!),
 		onSuccess: (_d, batchId) => pendingStore.removeQuestion(batchId),
 	});
 }
@@ -159,7 +165,7 @@ export function useSetModel(wid: string | undefined) {
 		unknown
 	>({
 		mutationKey: ["config", "set-model"],
-		mutationFn: ({ modelType, model }) => crush.setModel(wid!, modelType, model),
+		mutationFn: ({ modelType, model }) => configClient.setModel(wid!, modelType, model),
 		onSuccess: () => {
 			qc.invalidateQueries({ queryKey: queryKeys.agent(wid!) });
 			qc.invalidateQueries({ queryKey: queryKeys.config(wid!) });
@@ -171,7 +177,7 @@ export function useSetPermissionsSkip(wid: string | undefined) {
 	const qc = useQueryClient();
 	return useMutation({
 		mutationKey: ["permissions", "skip"],
-		mutationFn: (skip: boolean) => crush.setPermissionsSkip(wid!, skip),
+		mutationFn: (skip: boolean) => permissionsClient.setSkip(wid!, skip),
 		onSuccess: () =>
 			qc.invalidateQueries({ queryKey: queryKeys.permissionsSkip(wid!) }),
 	});
@@ -181,6 +187,6 @@ export function useSetPermissionsSkip(wid: string | undefined) {
 export function useReportCurrentSession(wid: string | undefined) {
 	return useMutation<void, Error, string>({
 		mutationKey: ["client", "current-session"],
-		mutationFn: (sid) => crush.setCurrentSession(wid!, clientId(), sid),
+		mutationFn: (sid) => sessionsClient.setCurrent(wid!, sid),
 	});
 }
