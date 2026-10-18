@@ -3,16 +3,19 @@
 ## Scope
 
 One Go module (`github.com/andikapradanaarif/vishnu`, module root at
-`api/`) that does exactly two things:
+`api/`) that does three things:
 
 1. Serve the built `web/` SPA (embedded via `go:embed` for the single
    binary prod path, `VISHNU_WEB_DIR` override for disk).
-2. Reverse-proxy all `/v1/*` traffic to `crush server`, streaming
-   responses — the SSE endpoint must flush per event.
+2. Own a **project registry + process manager** — `/api/projects`
+   CRUD, spawn/health/stop one `crush server` per project
+   (see `projects.md`).
+3. Reverse-proxy `/p/{pid}/v1/*` to that project's crush upstream,
+   streaming responses — the SSE endpoint must flush per event.
+   Path-prefixed per project because `EventSource` can't set headers.
 
-There are deliberately **no app-owned API routes** beyond `/healthz`:
-crush's `/v1` surface is the API. If vishnu needs its own endpoints
-later (auth token check, config), add `internal/handler/<ctx>` then.
+Brevo email service lives in `internal/service/email` (auth OTP
+later).
 
 ## Layering (nexus-style)
 
@@ -20,7 +23,11 @@ later (auth token check, config), add `internal/handler/<ctx>` then.
 cmd/server/main.go                     wiring + lifecycle
 internal/config/config.go              env → Config
 internal/service/upstream_service.go   net/http client + request builder
-internal/handler/proxy_handler.go      /v1/* → upstream (streaming)
+internal/service/email/                EmailService iface + brevo.go (OTP later)
+internal/service/registry/             projects.json CRUD (id,name,path,mode,port)
+internal/service/process/              crush spawn/health-check/stop per project
+internal/handler/proxy_handler.go      /p/{pid}/v1/* → project upstream (streaming)
+internal/handler/project_handler.go    /api/projects* CRUD + start/stop + ensure-workspace
 internal/handler/web_handler.go        SPA static + index.html fallback
 internal/webui/webui.go                //go:embed all:dist
 internal/webui/dist/.gitkeep           placeholder so embed compiles pre-build
@@ -35,13 +42,22 @@ constructors.
 | Env | Default | Purpose |
 | --- | --- | --- |
 | `VISHNU_LISTEN_ADDR` | `127.0.0.1:8080` | bind address (localhost default; LAN/Tailscale is deliberate opt-in) |
-| `VISHNU_CRUSH_UPSTREAM` | `http://127.0.0.1:9119` | crush server base URL (http/https only, validated at boot) |
 | `VISHNU_WEB_DIR` | unset → embed | serve SPA from disk instead of embedded `dist` |
+| `VISHNU_DATA_DIR` | `~/.local/share/vishnu` | registry `projects.json` lives here |
+| `VISHNU_CRUSH_BIN` | `crush` (`$PATH`) | binary spawned for managed projects |
+| `VISHNU_PORT_START` | `9201` | first port probed upward for managed crushes |
+| `BREVO_API_KEY` / `BREVO_API_URL` / `BREVO_FROM_EMAIL` / `BREVO_FROM_NAME` | — / `https://api.brevo.com` / — / — | transactional email (auth OTP, later) |
+| `VISHNU_EMAIL_TIMEOUT` | `10s` | Brevo request timeout |
+| `VISHNU_ENV` | `development` | prefixes email subjects outside prod |
 
 ## Proxy mechanics (the only non-trivial part)
 
-- `app.All("/v1/*", proxy.Forward)` — catch-all, method-agnostic.
-- Request: `c.OriginalURL()` (path+query) appended to upstream base;
+- `app.All("/p/:pid/v1/*", proxy.Forward)` — catch-all, method-agnostic;
+  `{pid}` resolves to a registry project's upstream (unknown → 404,
+  project down → 502). The `/p/{pid}` prefix is stripped before
+  forwarding so crush sees its native `/v1/*` shape.
+- Request: `c.OriginalURL()` minus the prefix (path+query) appended to
+  upstream base;
   headers copied minus hop-by-hop (`Connection`, `TE`,
   `Transfer-Encoding`, …) and `Accept-Encoding` (let net/http inject
   and transparently decode gzip).
@@ -60,8 +76,9 @@ constructors.
 
 | Route | Handler | Notes |
 | --- | --- | --- |
-| `GET /healthz` | inline | `{status, upstream}` |
-| `ALL /v1/*` | ProxyHandler.Forward | full passthrough incl. SSE |
+| `GET /healthz` | inline | `{status}` |
+| `GET/POST/DELETE /api/projects*` | ProjectHandler | registry CRUD, start/stop, ensure-workspace |
+| `ALL /p/:pid/v1/*` | ProxyHandler.Forward | strip prefix → per-project upstream, incl. SSE |
 | `ALL /*` (fallback) | WebHandler.Handle | file → bytes; miss → index.html |
 
 ## SPA serving

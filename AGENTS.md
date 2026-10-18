@@ -6,7 +6,9 @@ Monorepo, bun workspaces — style/stack follows valo & nexus-bo-api.
 ## Layout
 
 - `api/` — Go module `github.com/andikapradanaarif/vishnu`, Fiber v3.
-  `cmd/server` → `internal/{config,service,handler}`. Proxies `/v1/*` to crush
+  `cmd/server` → `internal/{config,service,handler}`. Owns the project
+  registry (`/api/projects`, JSON file) and spawns one `crush server`
+  per project; proxies `/p/{pid}/v1/*` to that project's upstream
   (SSE via SendStreamWriter, no upstream timeout), serves embedded SPA.
 - `web/` — Vite + React 19 + TS strict, TanStack Query, Tailwind v4,
   components from `@vishnu/ui-component` (`shared-ui/`), feature code in
@@ -28,20 +30,26 @@ Monorepo, bun workspaces — style/stack follows valo & nexus-bo-api.
 ## Runtime
 
 ```bash
-cd <project> && crush server --host tcp://127.0.0.1:9119   # upstream
-cd api && make build && ./bin/vishnu-api                   # http://127.0.0.1:8080
+cd api && make build && ./bin/vishnu-api   # http://127.0.0.1:8080
+# vishnu spawns `crush server` per registered project (managed mode)
 ```
 
 Env: `VISHNU_LISTEN_ADDR` (default `127.0.0.1:8080`, loopback only — a
-shell-capable agent must not be LAN-exposed), `VISHNU_CRUSH_UPSTREAM`
-(default `http://127.0.0.1:9119`), `VISHNU_WEB_DIR` (dev override for embed).
+shell-capable agent must not be LAN-exposed), `VISHNU_DATA_DIR`
+(registry, default `~/.local/share/vishnu`), `VISHNU_CRUSH_BIN`,
+`VISHNU_PORT_START` (default `9201`), `VISHNU_WEB_DIR` (dev override),
+`BREVO_*` (auth email, later).
 
 ## Crush wire notes
 
+- Per-project routing: `/p/{pid}/v1/*` → prefix stripped → project
+  upstream (EventSource can't set headers → project id lives in path).
 - Workspace create: `POST /v1/workspaces` with `client_id` **in JSON body**.
 - Other mutating endpoints take `?client_id=<uuid>` query param.
 - Events: `GET /v1/workspaces/{id}/events?client_id=<uuid>` (SSE).
 - Content parts are `{type, data}` envelopes; SSE payloads are `{type, payload}`.
+- `.crush/` data dirs are locked per process — never share a project
+  path between two crush processes.
 
 ## Conventions
 

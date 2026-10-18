@@ -33,20 +33,24 @@ web/
     main.tsx              QueryClientProvider + App
     index.css             @import "tailwindcss" + @vishnu/ui-component/styles.css
                           + .md markdown styles + safe-area helpers
-    App.tsx               workspace pick → layout shell; owns activeSessionId,
-                          current-session reporting, drawer state
-    types/crush.ts        wire types mirrored from internal/proto+pubsub
+    App.tsx               project pick → workspace ensure → layout shell;
+                          owns activeSessionId, current-session reporting,
+                          drawer state
     services/clientId.ts  sessionStorage UUID — per-tab identity
-    services/crushClient.ts  fetch wrapper + ApiError + all endpoints
+    services/api.ts       ApiClient wiring (/api registry + /p/{pid}/v1
+                          crush clients) + domain SDK singletons
     services/queryClient.ts    4xx no-retry, 15s staleTime
     services/pendingStore.ts   useSyncExternalStore: pending permission/question
                                + busy sessions + SSE connection state
     hooks/useCrushEvents.ts    EventSource lifecycle + payload dispatch
-    hooks/queries.ts           useWorkspaces/Sessions/Messages/AgentInfo/
+    hooks/queries.ts           useProjects/Sessions/Messages/AgentInfo/
                                Providers/PermissionsSkip + mutations
     features/             feature modules (valo backoffice convention)
-      topbar/TopBar.tsx        workspace path, model select, agent select,
-                               skip-permissions toggle, conn dot, hamburger
+      projects/                ProjectPicker (list + status + start/stop),
+                               AddProjectDialog (managed path | external url)
+      topbar/TopBar.tsx        project name + status, model select, agent
+                               select, skip-permissions toggle, conn dot,
+                               hamburger
       sessions/SessionSidebar.tsx  list rows, new/delete session
       chat/ChatPane.tsx        transcript + auto-scroll
       chat/MessageParts.tsx    per-part renderers (text/reasoning/tool_call/
@@ -67,10 +71,12 @@ in `index.css`. Features own composition + crush-specific rendering
 ## Data flow
 
 ```
-REST (query)                    SSE (one stream per workspace)
-─────────────                   ────────────────────────────────
-useWorkspaces()          ┌──►   EventSource(.../events?client_id)
-  → workspaces[0]        │        onmessage: {type, payload}
+REST (query)                    SSE (one stream per project/workspace)
+─────────────                   ────────────────────────────────────────
+useProjects()            ┌──►   EventSource(/p/{pid}/v1/.../events?client_id)
+  → select project       │        onmessage: {type, payload}
+  → ensureWorkspace(pid) │          (rebinds apiClient baseUrl to /p/{pid}/v1)
+  → workspacesClient     │
 useSessions(wid)         │          message   → merge into
 useMessages(wid,sid)     │            ['messages', sid] cache by id
 useAgentInfo(wid)        │          session   → update sessions row
@@ -119,11 +125,13 @@ usePermissionsSkip(wid) ─┘          run_complete → busy off + invalidate
 
 ## Types note
 
-`types/crush.ts` mirrors the wire exactly: messages carry
-`parts: [{type, data}]`; SSE envelope is `{type, payload}`;
-`config.Scope` is an **int** on the wire (0 global, 1 workspace — use
-`scope: 1`); question types are `yes_no|single_choice|multi_choice|
-free_text`; permission actions `allow|allow_session|deny`.
+Wire types come from `@vishnu/api-contract` (`types.ts` mirrors crush
+proto exactly): messages carry `parts: [{type, data}]`; SSE envelope
+is `{type, payload}`; `config.Scope` is an **int** on the wire
+(0 global, 1 workspace — use `scope: 1`); question types are
+`yes_no|single_choice|multi_choice|free_text`; permission actions
+`allow|allow_session|deny`. Project registry types are vishnu-owned —
+clearly marked in the contract.
 
 ## Styling
 
@@ -142,8 +150,9 @@ subpaths (they point at `dist/`). Root `build` script:
 
 ## Verification
 
-`bun i` at repo root → `cd shared-ui && bun run build` → `cd ../web &&
-bun run typecheck && bun run lint && bun run build`. Manual dev flow:
-`crush server -H tcp://127.0.0.1:9119` + `bun run dev` → create
-session, prompt, watch SSE merge live, approve a permission card,
-switch model, reload mid-run → history + stream reattach.
+`bun i` at repo root → root `bun run build` (shared-ui → contract →
+web). Manual dev flow: `./bin/vishnu-api` → add project → select →
+create session, prompt, watch SSE merge live, approve a permission
+card, switch model, reload mid-run → history + stream reattach.
+Styling-only iteration: `bun run dev` with vite proxying `/v1` to a
+hand-run `crush server`.

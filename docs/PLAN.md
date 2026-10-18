@@ -2,9 +2,12 @@
 
 ## Goal
 
-A web app that lets me drive `crush` from a browser: see the
-session list, open a session, send prompts to the agent, and watch it
-work — without the TUI. Personal tool, localhost only.
+A web app that lets me drive `crush` from a browser across several
+projects: register projects, pick one, see its session list, open a
+session, send prompts, watch it work — without the TUI. Personal tool,
+localhost only. **One `crush server` process per project** — memory
+and context stay isolated (and a shared server would hold `.crush/`
+data-dir locks that block opening a TUI in the same project).
 
 **No crush fork or patch needed**: every endpoint used
 (sessions CRUD, `POST …/agent`, SSE `…/events`, `permissions/grant`,
@@ -29,13 +32,17 @@ browser from talking to it directly:
    /v1/workspaces/{id}/events` (SSE). Proxying it same-origin keeps
    `EventSource` trivial.
 
-So the app is: **React SPA + thin proxy**. The proxy serves the
-built frontend and forwards `/v1/*` (incl. SSE) to `crush server`.
+So the app is: **React SPA + thin proxy + project registry**. The proxy
+serves the built frontend and forwards `/p/{pid}/v1/*` (incl. SSE) to
+the crush server of the selected project — path-prefixed because
+`EventSource` can't carry headers.
 
 ```
-browser ── http://127.0.0.1:8080 ──> proxy ──> crush server (tcp://127.0.0.1:9119
-│        index.html, assets          │         or unix://~/.local/share/crush/crush.sock)
-│        React SPA                   └─ /v1/* → reverse proxy (SSE passthrough)
+browser ── http://127.0.0.1:8080 ──> proxy ──┬─> crush server A (proj A) :9201
+│        index.html, assets          │       ├─> crush server B (proj B) :9202
+│        React SPA                   │       └─> crush server C (proj C) :9203
+│                                    ├─ /api/projects → registry CRUD/lifecycle
+│                                    └─ /p/{pid}/v1/* → per-project proxy
 ```
 
 ## Stack (valo/nexus style)
@@ -67,15 +74,20 @@ monorepos:
   the nexus repo after vendoring.
 - **`api/`**: Go + Fiber v3, nexus-style layering
   (`cmd/server` → `internal/config` → `internal/service` →
-  `internal/handler`). The `/v1/*` proxy streams responses via
-  `SendStreamWriter` with a flush per read — SSE events arrive
-  per-publish, same as `httputil.ReverseProxy`. Serves the embedded
-  `web/dist` build in prod (env override `VISHNU_WEB_DIR` for dev).
-  For UI iteration, Vite's dev-server proxies `/v1` straight to crush —
-  no Go process needed.
+  `internal/handler`). Owns a **project registry** (JSON file; managed
+  crushes it spawns + external upstreams it routes to) and a
+  **process manager** (spawn/health/stop per project). The
+  `/p/{pid}/v1/*` proxy resolves `{pid}` → that project's upstream and
+  streams responses via `SendStreamWriter` with a flush per read —
+  SSE events arrive per-publish. Serves the embedded `web/dist` build
+  in prod (env override `VISHNU_WEB_DIR` for dev). For UI iteration,
+  Vite's dev-server proxies `/v1` straight to a crush — no Go process
+  needed for styling work.
 
 Detailed work plans: [`plan/api.md`](plan/api.md) (API),
-[`plan/web.md`](plan/web.md) (web frontend).
+[`plan/web.md`](plan/web.md) (web frontend),
+[`plan/projects.md`](plan/projects.md) (multi-project registry +
+per-project crush servers — **decided**).
 
 ## Project layout
 
@@ -89,7 +101,11 @@ vishnu/
     cmd/server/main.go
     internal/config/config.go
     internal/service/upstream_service.go
-    internal/handler/proxy_handler.go   /v1/* streaming proxy
+    internal/service/email/             Brevo EmailService (auth OTP later)
+    internal/service/process/           crush spawn/health/stop per project
+    internal/service/registry/          projects.json CRUD
+    internal/handler/proxy_handler.go   /p/{pid}/v1/* streaming proxy
+    internal/handler/project_handler.go /api/projects* CRUD + lifecycle
     internal/handler/web_handler.go     SPA + index.html fallback
     internal/webui/                     go:embed dist/
     Makefile
@@ -106,20 +122,25 @@ vishnu/
   web/                    Vite + React + TS
     index.html
     vite.config.ts        dev proxy: /v1 -> crush server
-    src/App.tsx           shell: workspace pick, drawer, current-session
+    src/App.tsx           shell: project pick → workspace ensure →
+                          drawer, current-session
     src/services/         api (domain SDK wiring), queryClient, clientId, pendingStore
     src/hooks/            useCrushEvents (SSE dispatch), queries
-    src/features/         sessions/ (sidebar), chat/ (pane, composer),
+    src/features/         projects/ (picker, add dialog, status),
+                          sessions/ (sidebar), chat/ (pane, composer),
                           prompts/ (permission + question cards),
-                          topbar/ (model & agent switcher)
+                          topbar/ (project, model & agent switcher)
 ```
 
 ## v1 features → API mapping
 
 | Feature | Endpoint |
 | --- | --- |
+| List/add/remove projects | vishnu-owned `GET/POST/DELETE /api/projects` |
+| Start/stop project agent | vishnu-owned `POST /api/projects/{id}/start` `/stop` |
+| Select project → workspace | vishnu-owned `GET /api/projects/{id}/workspace` (ensure) |
+| All crush calls below | under `/p/{pid}` — e.g. `/p/{pid}/v1/workspaces/{id}/sessions` |
 | List sessions (title, busy, cost, updated) | `GET /v1/workspaces/{id}/sessions` |
-| Pick the one workspace | `GET /v1/workspaces` → use `[0]`; error state if several/none |
 | Create session | `POST /v1/workspaces/{id}/sessions` |
 | Delete session | `DELETE /v1/workspaces/{id}/sessions/{sid}` |
 | Message history | `GET /v1/workspaces/{id}/sessions/{sid}/messages` → `[]proto.Message` |
@@ -220,18 +241,17 @@ assistant text.
 ## Run flow
 
 ```bash
-# terminal 1 — one crush server per project dir
-cd <project> && crush server --host tcp://127.0.0.1:9119
-
-# terminal 2 — web dev (vite proxies /v1 straight to :9119)
-cd vishnu/web && bun i && bun run dev
-
-# prod — single binary, web/dist embedded into api
+# vishnu spawns crush servers per registered project itself
 cd vishnu/api && make build && ./bin/vishnu-api   # :8080
-# env overrides: VISHNU_LISTEN_ADDR, VISHNU_CRUSH_UPSTREAM, VISHNU_WEB_DIR
+# env: VISHNU_LISTEN_ADDR, VISHNU_DATA_DIR, VISHNU_CRUSH_BIN,
+#      VISHNU_PORT_START, VISHNU_WEB_DIR
+# web dev for styling: cd vishnu/web && bun run dev
+#   (vite proxies /v1 to one crush — enough for CSS iteration)
 ```
 
-Browser opens `http://127.0.0.1:8080`.
+Browser opens `http://127.0.0.1:8080` → Add project (path) → select →
+sessions. Managed crushes die with vishnu; `mode: external` projects
+(crushes you run yourself) are only routed, never touched.
 
 ## Mobile support
 
@@ -278,22 +298,25 @@ Localhost binding can't be reached by the phone — pick one:
 
 ## Out of scope for v1
 
-- Workspace picker beyond a `<select>` when several are reported (one
-  crush server = one workspace normally)
+- Multiple workspaces per project server (vishnu uses the one
+  workspace matching the project path)
+- Auto-restart of managed crushes on vishnu boot (start is explicit)
+- Per-project crush log viewer (ring buffer exists; UI later)
 - Plan-mode approval, queued-prompt management, slash commands,
   attachments upload, LSP/MCP panels, file tracker
-- Auth/multi-user
+- Auth/multi-user (Brevo service is in place; email+OTP planned)
 - Message editing/regenerate
 
 ## Open questions
 
-- [ ] Proxy in Go vs Node — defaulting Go (single binary, SSE-safe
-      `ReverseProxy`, matches crush's toolchain)
+- [x] One crush server vs per-project — **decided**: one `crush
+      server` per project (data-dir lock + blast radius). See
+      `plan/projects.md`.
+- [x] Proxy in Go vs Node — **decided**: Go/Fiber v3, shipping.
 - [ ] Whether `permissions skip` should be a v1 toggle
       (`GET/POST /v1/workspaces/{id}/permissions/skip`) or left to
       `crushrc` as today
 - [ ] Attachments (file upload) — `AgentMessage.Attachments` exists;
       defer unless needed
-- [ ] Does the proxy need to survive crush server restarts (retry
-      EventSource with backoff — yes, EventSource auto-reconnects;
-      proxy just 502s while server is down)
+- [ ] Managed crush auto-restart policy on vishnu boot (default:
+      stopped, explicit start)
