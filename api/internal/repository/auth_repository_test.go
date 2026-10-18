@@ -64,6 +64,14 @@ func TestUserRepositoryUpsertIsIdempotent(t *testing.T) {
 	}
 }
 
+func TestUserRepositoryRejectsMalformedIDs(t *testing.T) {
+	repositories := repository.NewRepositories(authDB(t))
+
+	if _, err := repositories.User.GetByID(context.Background(), "not-a-uuid"); !errors.Is(err, errs.ErrUserNotFound) {
+		t.Fatalf("expected ErrUserNotFound for a malformed id, got %v", err)
+	}
+}
+
 func TestOTPRepositoryFlow(t *testing.T) {
 	repositories := repository.NewRepositories(authDB(t))
 	ctx := context.Background()
