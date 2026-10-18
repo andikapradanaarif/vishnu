@@ -101,7 +101,9 @@ vishnu/
     internal/handler/project_handler.go /api/projects* CRUD + lifecycle
     internal/handler/web_handler.go     SPA + index.html fallback
     internal/webui/                     go:embed dist/
-    docker-compose.yml  Makefile
+    Dockerfile              multi-stage: bun → go → alpine+git+crush
+    deploy/docker-compose.yml           postgres + vishnu services
+    entrypoint.sh  Makefile
   shared-ui/              @vishnu/ui-component — vendored nexus shared-ts
   contract/               @vishnu/api-contract — crush /v1 types + SDK
     src/types.ts          wire types · src/paths.ts route constants
@@ -134,10 +136,12 @@ vishnu/
 ## Run flow
 
 ```bash
-# vishnu spawns crush servers per registered project itself
-cd vishnu/api
-make db && make migrate                # postgres (compose) + schema
-make build && ./bin/vishnu-api         # :8080
+# dev (host-native): postgres in docker, api + crush on the host
+cd vishnu/api && make db && make migrate && make dev
+
+# prod: everything in docker — image builds web + api + crush binary,
+# compose runs postgres + vishnu (restart: unless-stopped)
+docker compose -f api/deploy/docker-compose.yml up -d --build
 # env: VISHNU_LISTEN_ADDR, DB_*, VISHNU_DATA_DIR, VISHNU_PROJECTS_DIR,
 #      VISHNU_CRUSH_BIN, VISHNU_PORT_START, VISHNU_WEB_DIR
 ```
@@ -151,8 +155,9 @@ you run yourself) are only routed, never touched.
 
 ## Security posture (Debian server)
 
-- Runs as a systemd-managed service on a Debian server; the browser
-  reaches it remotely. Default bind stays `127.0.0.1` — access via
+- Runs as a docker compose stack on a Debian server (`restart:
+  unless-stopped`); the browser reaches it remotely. Loopback publish
+  `127.0.0.1:8080` stays the default — access via
   **SSH tunnel** (`ssh -L 8080:127.0.0.1:8080 server`, zero config) or
   **Tailscale** (bind `tailscale0` / `tailscale serve` — the
   phone-friendly option).

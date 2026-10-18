@@ -154,45 +154,71 @@ make build    # bun build web → copy dist into webui → CGO_ENABLED=0 go buil
 make test / lint / format / tidy
 ```
 
-## Deployment — Debian server
+## Deployment — Debian server (docker, valo-style)
 
-Production target is a Debian server (systemd), browser connects
-remotely. `VISHNU_WEB_DIR` stays unset — embedded SPA is the prod path.
+Production runs fully containerized: `api/deploy/docker-compose.yml`
+brings up `postgres` + `vishnu` (`restart: unless-stopped` — docker's
+restart policy replaces a systemd unit). `VISHNU_WEB_DIR` stays unset —
+embedded SPA is the prod path.
 
-**Service** — user-level unit + `loginctl enable-linger` so it survives
-logout and reboot without root:
+**Image** (`api/Dockerfile`, build context = repo root — the SPA has
+to build inside the image):
 
-```ini
-# ~/.config/systemd/user/vishnu.service
-[Unit]
-Description=vishnu crush session manager
-After=network-online.target
+1. `oven/bun` stage — `bun install` + `bun run build` over
+   shared-ui → contract → web → `web/dist`.
+2. `golang:1.26-alpine` stage — copy `api/`, copy `web/dist` into
+   `internal/webui/dist`, build `vishnu-api` + `migrate` in one RUN
+   (shared build cache, `-trimpath -ldflags="-s -w"`, `GOTOOLCHAIN=local`).
+   Vendor `go.mod` deps later if build time becomes annoying (valo
+   vendors; we don't yet).
+3. `alpine` runtime — `apk add git openssh-client curl` (cloner +
+   healthcheck), both binaries, `entrypoint.sh` (nexus-style:
+   `migrate` arg dispatches to `./migrate`, default execs the server —
+   which already auto-migrates on boot), crush binary from a
+   `go install github.com/charmbracelet/crush@$CRUSH_VERSION`
+   builder stage (build-arg pinned).
+   Root `.dockerignore`: `node_modules`, `dist`, `bin`, `.git`.
 
-[Service]
-EnvironmentFile=-%h/vishnu/api/.env
-ExecStart=%h/vishnu/api/bin/vishnu-api
-Restart=on-failure
-RestartSec=3
+**Compose** (`api/deploy/docker-compose.yml`):
 
-[Install]
-WantedBy=default.target
+```yaml
+services:
+  vishnu:
+    build: { context: .., dockerfile: api/Dockerfile }
+    container_name: vishnu
+    restart: unless-stopped
+    env_file: ../.env
+    environment: { DB_HOST: vishnu-db }
+    ports: ["127.0.0.1:8080:8080"]   # loopback publish — tunnel/Tailscale in
+    volumes:
+      - vishnu-data:/data            # VISHNU_DATA_DIR=/data
+      - ~/.ssh:/root/.ssh:ro         # server-side git auth for clones
+      # - /srv/projects:/srv/projects  # link-mode: mount host dirs at same path
+    healthcheck: curl -f localhost:8080/healthz
+    depends_on: { postgres: { condition: service_healthy } }
+  postgres:
+    image: postgres:17-alpine
+    container_name: vishnu-db
+    restart: unless-stopped
+    environment: { POSTGRES_USER/DB/…: from env }
+    volumes: [postgres_data:/var/lib/postgresql/data]
+    healthcheck: pg_isready
 ```
 
-`systemctl --user enable --now vishnu` — restart-on-failure plus the
-lazy-start path in the proc mgr covers crashes end to end.
+Ops: `docker compose -f api/deploy/docker-compose.yml up -d`;
+`... run --rm vishnu migrate status|down`; logs via `docker logs vishnu`.
 
-**Postgres** — `make db` (compose) on the server, or the system
-`postgresql` package; either satisfies `DB_*`.
+**Container-scoped caveats** — crush children run *inside* the vishnu
+container (same process tree): clones land in the `vishnu-data` volume;
+`git ls-remote`/clone use the mounted `~/.ssh` (or a `SSH_AUTH_SOCK`
+socket mount); **link-local-path mode requires the host dir
+bind-mounted at an identical in-container path** — the path is stored
+in the registry and handed to crush verbatim.
 
 **Remote access** (pick one, in increasing exposure):
 1. SSH tunnel: `ssh -L 8080:127.0.0.1:8080 server` — nothing to change.
-2. Tailscale: `tailscale serve` or `VISHNU_LISTEN_ADDR=<tailscale0-ip>:8080`.
+2. Tailscale: `tailscale serve` or publish on the `tailscale0` IP.
 3. LAN/`0.0.0.0` — only after the auth milestone ships.
-
-**Server-side caveats** — `git ls-remote`/clone use the *server's* git
-auth (deploy keys/credential helper configured on the server);
-`VISHNU_CRUSH_BIN` must point at a Linux-built crush; `VISHNU_PROJECTS_DIR`
-lives on the server's filesystem.
 
 ## Edge cases & checks
 
