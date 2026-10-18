@@ -46,7 +46,7 @@ web/
     hooks/queries.ts           useProjects/Sessions/Messages/AgentInfo/
                                Providers/PermissionsSkip + mutations
     features/             feature modules (valo backoffice convention)
-      projects/                ProjectPicker (list + status + start/stop),
+      projects/                ProjectPicker (list + status + delete),
                                AddProjectDialog (managed path | external url)
       topbar/TopBar.tsx        project name + status, model select, agent
                                select, skip-permissions toggle, conn dot,

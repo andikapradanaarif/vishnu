@@ -8,7 +8,7 @@ One Go module (`github.com/andikapradanaarif/vishnu`, module root at
 1. Serve the built `web/` SPA (embedded via `go:embed` for the single
    binary prod path, `VISHNU_WEB_DIR` override for disk).
 2. Own a **project registry + process manager** — `/api/projects`
-   CRUD, spawn/health/stop one `crush server` per project
+   CRUD, lazy-spawn/health-check one `crush server` per project
    (see `projects.md`).
 3. Reverse-proxy `/p/{pid}/v1/*` to that project's crush upstream,
    streaming responses — the SSE endpoint must flush per event.
@@ -25,9 +25,9 @@ internal/config/config.go              env → Config
 internal/service/upstream_service.go   net/http client + request builder
 internal/service/email/                EmailService iface + brevo.go (OTP later)
 internal/service/registry/             projects.json CRUD (id,name,path,mode,port)
-internal/service/process/              crush spawn/health-check/stop per project
+internal/service/process/              crush lazy-spawn/health-check per project
 internal/handler/proxy_handler.go      /p/{pid}/v1/* → project upstream (streaming)
-internal/handler/project_handler.go    /api/projects* CRUD + start/stop + ensure-workspace
+internal/handler/project_handler.go    /api/projects* CRUD + ensure-running/workspace
 internal/handler/web_handler.go        SPA static + index.html fallback
 internal/webui/webui.go                //go:embed all:dist
 internal/webui/dist/.gitkeep           placeholder so embed compiles pre-build
@@ -77,7 +77,7 @@ constructors.
 | Route | Handler | Notes |
 | --- | --- | --- |
 | `GET /healthz` | inline | `{status}` |
-| `GET/POST/DELETE /api/projects*` | ProjectHandler | registry CRUD, start/stop, ensure-workspace |
+| `GET/POST/DELETE /api/projects*` | ProjectHandler | registry CRUD + ensure-running/workspace |
 | `ALL /p/:pid/v1/*` | ProxyHandler.Forward | strip prefix → per-project upstream, incl. SSE |
 | `ALL /*` (fallback) | WebHandler.Handle | file → bytes; miss → index.html |
 
@@ -86,8 +86,7 @@ constructors.
 | Feature | Endpoint |
 | --- | --- |
 | List/add/remove projects | `GET/POST/DELETE /api/projects` |
-| Start/stop project agent | `POST /api/projects/{id}/start` `/stop` |
-| Select project → workspace | `GET /api/projects/{id}/workspace` (ensure) |
+| Select project → workspace | `GET /api/projects/{id}/workspace` (lazy-start managed crush + ensure workspace) |
 | All crush calls below | under `/p/{pid}` — e.g. `/p/{pid}/v1/workspaces/{id}/sessions` |
 | List sessions (title, busy, cost, updated) | `GET /v1/workspaces/{id}/sessions` |
 | Create session | `POST /v1/workspaces/{id}/sessions` |

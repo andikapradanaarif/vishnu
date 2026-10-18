@@ -83,7 +83,7 @@ vishnu/
     internal/config/config.go
     internal/service/upstream_service.go
     internal/service/email/             Brevo EmailService (auth OTP later)
-    internal/service/process/           crush spawn/health/stop per project
+    internal/service/process/           crush lazy-spawn/health per project
     internal/service/registry/          projects.json CRUD
     internal/handler/proxy_handler.go   /p/{pid}/v1/* streaming proxy
     internal/handler/project_handler.go /api/projects* CRUD + lifecycle
@@ -125,8 +125,10 @@ cd vishnu/api && make build && ./bin/vishnu-api   # :8080
 ```
 
 Browser opens `http://127.0.0.1:8080` → Add project (path) → select →
-sessions. Managed crushes die with vishnu; `mode: external` projects
-(crushes you run yourself) are only routed, never touched.
+sessions. Selecting a project spawns its crush if it isn't running
+(lazy start — covers restarts and crashes too); deleting stops it.
+Managed crushes die with vishnu; `mode: external` projects (crushes
+you run yourself) are only routed, never touched.
 
 ## Security posture (personal tool)
 
@@ -142,7 +144,8 @@ sessions. Managed crushes die with vishnu; `mode: external` projects
 
 - Multiple workspaces per project server (vishnu uses the one
   workspace matching the project path)
-- Auto-restart of managed crushes on vishnu boot (start is explicit)
+- Explicit start/stop or "park" lifecycle (lazy start on select covers
+  it; managed crushes die with vishnu)
 - Per-project crush log viewer (ring buffer exists; UI later)
 - Plan-mode approval, queued-prompt management, slash commands,
   attachments upload, LSP/MCP panels, file tracker
@@ -155,8 +158,8 @@ sessions. Managed crushes die with vishnu; `mode: external` projects
       (data-dir lock + blast radius). See `plan/projects.md`.
 - [x] Proxy in Go vs Node — **decided**: Go/Fiber v3, shipping.
 - [x] UI transport — **decided**: SSE + detached POSTs, no WebSocket.
+- [x] Project lifecycle — **decided**: create/delete only; managed
+      crush lazy-starts on select (no start/stop endpoints).
 - [ ] `permissions skip` as a v1 toggle vs left to `crushrc`.
 - [ ] Attachments (file upload) — `AgentMessage.Attachments` exists;
       defer unless needed.
-- [ ] Managed crush auto-restart policy on vishnu boot (default:
-      stopped, explicit start).

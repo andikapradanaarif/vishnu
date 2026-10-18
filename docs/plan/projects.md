@@ -43,21 +43,28 @@ survive a restart). v1 storage: JSON file; DB later with the user model.
 
 ## Process manager (`internal/service/process/`)
 
+Lifecycle is deliberately minimal — **create, delete, lazy-start**:
+
 - `Add`: `os.Stat` the path (must be an existing dir — `POST
   /workspaces` gives crush a foothold there), allocate a port
   (`VISHNU_PORT_START`, default `9201`, probe upward until free),
-  `exec.Command(crushBin, "server", "--host", "tcp://127.0.0.1:port")`
-  `Dir=path`, capture stdout/stderr to a ring buffer per project
-  (diagnostics, later a logs view).
+  register the project. Nothing spawns yet.
+- **Lazy start on select**: `GET /api/projects/{id}/workspace` (or any
+  `/p/{pid}` proxy hit) first ensures the managed crush is alive —
+  health-check the port, `exec.Command(crushBin, "server", "--host",
+  "tcp://127.0.0.1:port")` `Dir=path` if dead, wait for `/v1/health`
+  before forwarding. This single code path covers first use, vishnu
+  restarts, and crash respawn — no explicit start action needed.
+  stdout/stderr → ring buffer per project (diagnostics, logs view
+  later).
 - `crushBin`: `VISHNU_CRUSH_BIN`, default `crush` from `$PATH`.
-- Boot recovery: registry survives; pids don't. On startup,
-  health-check managed projects (`GET /v1/health` on their port);
-  dead → status `stopped`, user clicks start (auto-restart is a
-  follow-up — don't surprise-spawn agent processes on vishnu boot).
-- Shutdown: SIGTERM managed children on vishnu shutdown
+- `Delete`: SIGTERM the managed child, remove the registry entry.
+  Never deletes anything on disk.
+- Shutdown: SIGTERM all managed children on vishnu shutdown
   (`ShutdownWithContext` window); external untouched.
-- `Stop`/`Start`/`Delete` per project — delete removes the registry
-  entry after stopping; never deletes anything on disk.
+- No `start`/`stop` endpoints: a managed project is "running"
+  whenever it's selected. (If keeping idle-but-registered projects
+  parked matters later, a "park" action is a nicety — not v1.)
 
 ## Routing — `/p/{pid}/v1/*`
 
@@ -67,7 +74,7 @@ to the right project.
 
 ```
 browser ──> vishnu api
-            ├─ /api/projects*        registry CRUD + start/stop
+            ├─ /api/projects*        registry CRUD + lazy-start
             ├─ /p/{pid}/v1/*         strip prefix → proxy to project's upstream
             └─ /*                    SPA
 ```
@@ -83,8 +90,7 @@ flush-per-read) are unchanged — only upstream lookup is per-request.
 | `GET /api/projects` | list registry + live status (up/down, port) |
 | `POST /api/projects` | `{name, path}` managed | `{name, upstream}` external |
 | `DELETE /api/projects/{id}` | stop (managed) + remove |
-| `POST /api/projects/{id}/start` `/stop` | lifecycle (managed only) |
-| `GET /api/projects/{id}/workspace` | ensure-workspace: list upstream workspaces, match `path`, `POST /v1/workspaces` if missing → returns the `wid` the SPA needs |
+| `GET /api/projects/{id}/workspace` | ensure-running (lazy start) + ensure-workspace: list upstream workspaces, match `path`, `POST /v1/workspaces` if missing → returns the `wid` the SPA needs |
 
 After select, all crush calls keep their existing `/v1` shape —
 just under `/p/{pid}`: `/p/{pid}/v1/workspaces/{wid}/sessions`, etc.
@@ -100,7 +106,7 @@ just under `/p/{pid}`: `/p/{pid}/v1/workspaces/{wid}/sessions`, etc.
 ## web/ changes
 
 - `features/projects/` — `ProjectPicker` (cards/table of registered
-  projects + status chip + start/stop), `AddProjectDialog` (name+path,
+  projects + status dot + delete), `AddProjectDialog` (name+path,
   or external URL tab).
 - `App.tsx` — `useProjects()` gate: no project selected → picker;
   selected → `ensureWorkspace(pid)` → set `apiClient` baseUrl →
@@ -111,14 +117,15 @@ just under `/p/{pid}`: `/p/{pid}/v1/workspaces/{wid}/sessions`, etc.
 
 ## Status model
 
-`up` (health check ok) / `down` (managed stopped or external
-unreachable) / `starting`. Health = `GET {upstream}/v1/health` with a
-short timeout, cached a few seconds — never proxy a dead upstream
-into a hanging SSE.
+`up` (health check ok) / `down` (managed not yet spawned or external
+unreachable) / `starting` (spawned, health check pending). Health =
+`GET {upstream}/v1/health` with a short timeout, cached a few
+seconds — never proxy a dead upstream into a hanging SSE; a dead
+managed project respawns lazily on next use.
 
 ## Follow-ups (not v1)
 
-- Auto-restart managed crushes on vishnu boot (opt-in flag)
+- "Park" action (keep registered, deliberately stopped)
 - Per-project logs view (ring buffer → SSE)
 - DB-backed registry with the user model; per-user project ACLs
 - Attach-mode for a crush TUI's server (same lock constraint — a TUI
