@@ -1,4 +1,4 @@
-# api/ work plan — crush reverse proxy + SPA host
+# api/ work plan — project registry + crush proxy + SPA host
 
 ## Scope
 
@@ -106,5 +106,6 @@ make test / lint / format / tidy
 - **Big bodies**: `BodyLimit: 64MiB` on the Fiber app (prompts can
   carry file contents later).
 - **Verify**: `go build ./...`, `go vet ./...`, `gofmt -l` clean.
-  Manual: `curl -N localhost:8080/v1/workspaces/{id}/events?client_id=…`
-  shows events as they arrive; `curl localhost:8080/` returns the SPA.
+  Manual: `curl -N localhost:8080/p/{pid}/v1/workspaces/{id}/events?client_id=…`
+  shows events as they arrive; `curl localhost:8080/` returns the SPA;
+  `curl localhost:8080/api/projects` lists the registry.

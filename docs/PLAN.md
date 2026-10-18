@@ -1,4 +1,9 @@
-# crush-web — personal web UI for crush sessions
+# vishnu — personal web UI for crush sessions
+
+**Status** — built & verified: proxy + SPA v1 (sessions, chat, SSE,
+permissions/questions, model & agent switching). Planned next:
+multi-project registry ([`plan/projects.md`](plan/projects.md)), then
+email+OTP auth (Brevo service already in `api/`).
 
 ## Goal
 
@@ -96,6 +101,7 @@ vishnu/
   docs/PLAN.md            this file
   docs/plan/api.md        API work plan
   docs/plan/web.md        web frontend work plan
+  docs/plan/projects.md   multi-project registry + per-project crushes
   package.json            bun workspace root (shared-ui + contract + web)
   api/                    Go module (github.com/andikapradanaarif/vishnu)
     cmd/server/main.go
@@ -174,7 +180,7 @@ re-fetches history and re-attaches the stream mid-run.
 
 `GET …/events?client_id=<id>` is `text/event-stream` — headers flush
 immediately, each event is `data: <json>\n\n` flushed per publish
-(`internal/server/proto.go:177`). `client_id` is required.
+(`internal/server/proto.go`). `client_id` is required.
 
 Events carry a `pubsub.Payload` envelope — a `PayloadType`
 discriminator + typed payload JSON. `message` events carry the **full
@@ -235,8 +241,8 @@ that reported `current-session` — which is why the app registers a
 `proto.Message` carries `Parts` — text, reasoning, tool calls (with
 inputs), tool results, attachments. v1 renders: user text, assistant
 text, reasoning (collapsible), tool call name + args summary +
-result excerpt. Markdown via a tiny renderer (or `marked`) for
-assistant text.
+result excerpt. Assistant text renders as markdown via
+`react-markdown` + `remark-gfm` (no raw HTML).
 
 ## Run flow
 
@@ -284,8 +290,8 @@ Localhost binding can't be reached by the phone — pick one:
   auth needed beyond the tailnet, works off-wifi too.
 - **LAN bind**: proxy binds `0.0.0.0` or the LAN IP — fine on a home
   network you trust, but *anyone on the network can drive the agent*.
-  If LAN: add a cheap shared-token check in the proxy (one env var →
-  required `?token=` cookie) as minimum insurance.
+  Do not ship LAN without the planned email+OTP auth (or at minimum a
+  shared-token check: one env var → required `?token=` cookie).
 - SSH port-forward from the phone works too but is clunky.
 
 ## Security posture (personal tool)

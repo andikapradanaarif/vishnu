@@ -144,9 +144,9 @@ tables), `.no-scrollbar` helper like nexus. Sidebar is a fixed column
 
 ## Build order
 
-`shared-ui` must build before `web` resolves `@vishnu/ui-component`
-subpaths (they point at `dist/`). Root `build` script:
-`cd shared-ui && bun run build && cd ../web && bun run build`.
+`shared-ui` and `contract` must build before `web` resolves the
+`@vishnu/*` subpath exports (they point at `dist/`). Root `build`
+script: `shared-ui` → `contract` → `web` (`bun run build` at root).
 
 ## Verification
 
