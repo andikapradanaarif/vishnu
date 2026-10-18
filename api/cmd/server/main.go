@@ -1,6 +1,7 @@
 // Command server runs the vishnu web API: a Fiber app that serves the
-// embedded SPA, exposes the project registry, and reverse-proxies /v1/*
-// (including the SSE event stream) to a `crush server`.
+// embedded SPA, exposes the project registry, and reverse-proxies
+// /p/{pid}/v1/* (including the SSE event stream) to that project's
+// `crush server`.
 package main
 
 import (
@@ -15,10 +16,12 @@ import (
 
 	"github.com/andikapradanaarif/vishnu/internal/config"
 	"github.com/andikapradanaarif/vishnu/internal/handler"
+	"github.com/andikapradanaarif/vishnu/internal/middleware"
 	"github.com/andikapradanaarif/vishnu/internal/migrator"
 	"github.com/andikapradanaarif/vishnu/internal/repository"
 	"github.com/andikapradanaarif/vishnu/internal/service"
 	"github.com/andikapradanaarif/vishnu/internal/service/cloner"
+	"github.com/andikapradanaarif/vishnu/internal/service/email"
 	"github.com/andikapradanaarif/vishnu/internal/service/process"
 	"github.com/andikapradanaarif/vishnu/internal/usecase"
 )
@@ -47,8 +50,26 @@ func main() {
 	clonerClient := cloner.New(cloner.LoadDir())
 	crush := service.NewCrushClient()
 
+	var mailer usecase.Mailer = email.NewLogService()
+	if brevo, err := email.NewBrevoService(cfg); err != nil {
+		slog.Warn("Brevo is not configured — sign-in codes are logged instead", "error", err)
+	} else {
+		mailer = brevo
+	}
+
+	auth := usecase.NewAuthUsecase(repositories.User, repositories.OTP, repositories.Session, mailer, cfg.SessionTTL)
+	if cfg.BootstrapEmail != "" {
+		user, err := auth.Bootstrap(context.Background(), cfg.BootstrapEmail, "Owner")
+		if err != nil {
+			slog.Error("Failed to prepare the bootstrap user", "error", err)
+			os.Exit(1)
+		}
+		slog.Info("Bootstrap user ready", "email", user.Email, "role", user.Role)
+	}
+
 	projects := usecase.NewProjectUsecase(repositories.Project, manager, clonerClient, crush)
 	projectHandler := handler.NewProjectHandler(projects)
+	authHandler := handler.NewAuthHandler(auth)
 	proxy := handler.NewProxyHandler(repositories.Project, manager, service.NewProxy())
 	web, err := handler.NewWebHandler(cfg.WebDir)
 	if err != nil {
@@ -65,13 +86,21 @@ func main() {
 		return c.JSON(fiber.Map{"status": "ok"})
 	})
 
+	// Sign-in has to be reachable before a session exists.
+	authHandler.Register(app)
+
+	session := middleware.Auth(auth)
+	app.Use("/api", session)
+	app.Use("/p", session)
+
 	projectHandler.Register(app)
 
 	// Per-project crush traffic — including the SSE stream at
 	// /p/{pid}/v1/workspaces/{id}/events.
 	app.All("/p/:pid/v1/*", proxy.Forward)
 
-	// The SPA and its assets.
+	// The SPA and its assets: public, because the shell renders the
+	// sign-in form and every API call behind it is authenticated.
 	app.Use("/", web.Handle)
 
 	slog.Info("Vishnu listening",
