@@ -144,12 +144,18 @@ sessions. Selecting a project spawns its crush if it isn't running
 Managed crushes die with vishnu; `mode: external` projects (crushes
 you run yourself) are only routed, never touched.
 
-## Security posture (personal tool)
+## Security posture (Debian server)
 
-- Default bind stays `127.0.0.1`; Tailscale is the recommended way to
-  reach it from a phone — encrypted, no extra auth needed.
-- LAN/`0.0.0.0` binding ships only after auth lands — the API grants
+- Runs as a systemd-managed service on a Debian server; the browser
+  reaches it remotely. Default bind stays `127.0.0.1` — access via
+  **SSH tunnel** (`ssh -L 8080:127.0.0.1:8080 server`, zero config) or
+  **Tailscale** (bind `tailscale0` / `tailscale serve` — the
+  phone-friendly option).
+- `0.0.0.0`/LAN binding ships only after auth lands — the API grants
   shell execution through the agent.
+- Git eligibility checks (`git ls-remote`) and clones run with the
+  **server's** git credentials — SSH deploy keys or a credential
+  helper must be configured server-side for private repos.
 - Permission prompts render tool name + what's being asked, not raw
   JSON. Project paths are `os.Stat`-validated before a crush gets a
   foothold in them.

@@ -145,6 +145,46 @@ make build    # bun build web → copy dist into webui → CGO_ENABLED=0 go buil
 make test / lint / format / tidy
 ```
 
+## Deployment — Debian server
+
+Production target is a Debian server (systemd), browser connects
+remotely. `VISHNU_WEB_DIR` stays unset — embedded SPA is the prod path.
+
+**Service** — user-level unit + `loginctl enable-linger` so it survives
+logout and reboot without root:
+
+```ini
+# ~/.config/systemd/user/vishnu.service
+[Unit]
+Description=vishnu crush session manager
+After=network-online.target
+
+[Service]
+EnvironmentFile=-%h/vishnu/api/.env
+ExecStart=%h/vishnu/api/bin/vishnu-api
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target
+```
+
+`systemctl --user enable --now vishnu` — restart-on-failure plus the
+lazy-start path in the proc mgr covers crashes end to end.
+
+**Postgres** — `make db` (compose) on the server, or the system
+`postgresql` package; either satisfies `DB_*`.
+
+**Remote access** (pick one, in increasing exposure):
+1. SSH tunnel: `ssh -L 8080:127.0.0.1:8080 server` — nothing to change.
+2. Tailscale: `tailscale serve` or `VISHNU_LISTEN_ADDR=<tailscale0-ip>:8080`.
+3. LAN/`0.0.0.0` — only after the auth milestone ships.
+
+**Server-side caveats** — `git ls-remote`/clone use the *server's* git
+auth (deploy keys/credential helper configured on the server);
+`VISHNU_CRUSH_BIN` must point at a Linux-built crush; `VISHNU_PROJECTS_DIR`
+lives on the server's filesystem.
+
 ## Edge cases & checks
 
 - **crush down**: `Forward` error → 502 `{message: "crush upstream unreachable"}`;
