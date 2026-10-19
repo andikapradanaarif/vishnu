@@ -91,13 +91,13 @@ func main() {
 
 	session := middleware.Auth(auth)
 	app.Use("/api", session)
-	app.Use("/p", session)
 
 	projectHandler.Register(app)
 
 	// Per-project crush traffic — including the SSE stream at
-	// /p/{pid}/v1/workspaces/{id}/events.
-	app.All("/p/:pid/v1/*", proxy.Forward)
+	// /p/{pid}/v1/workspaces/{id}/events. Auth is attached to the route
+	// itself so the middleware cannot leak onto unrelated /p… paths.
+	app.All("/p/:pid/v1/*", session, proxy.Forward)
 
 	// The SPA and its assets: public, because the shell renders the
 	// sign-in form and every API call behind it is authenticated.
