@@ -13,7 +13,18 @@ export interface Workspace {
 	data_dir?: string;
 	version?: string;
 	client_id?: string;
+	config?: unknown;
+	env?: string[];
 	channels?: string[];
+	skills?: SkillState[];
+}
+
+/** Wire mirror of `skills.SkillState` (state: 0 = normal, 1 = error). */
+export interface SkillState {
+	name: string;
+	path: string;
+	state: 0 | 1;
+	error?: string;
 }
 
 /**
@@ -36,14 +47,9 @@ export interface ErrorBody {
 }
 
 export interface Todo {
-	id?: string;
-	key?: string;
 	content: string;
 	status: string;
-	active_form?: string;
-	depends_on?: string[];
-	evidence_checks?: string[];
-	evidence_paths?: string[];
+	active_form: string;
 }
 
 export interface Session {
@@ -74,6 +80,10 @@ export interface Message {
 	parts: ContentPart[];
 	model: string;
 	provider: string;
+	prism_model_id?: string;
+	prism_model_name?: string;
+	prism_hypercredit_savings?: number;
+	prism_dollar_savings?: number;
 	created_at: number;
 	updated_at: number;
 	is_summary_message?: boolean;
@@ -85,7 +95,6 @@ export interface TextContent {
 }
 
 export interface ReasoningContent {
-	id?: string;
 	thinking: string;
 	signature?: string;
 	started_at?: number;
@@ -160,6 +169,8 @@ export interface AgentEvent {
 	session_title?: string;
 	progress?: string;
 	done?: boolean;
+	aws_sso_command?: string;
+	aws_sso_url?: string;
 }
 
 // ---------- Models & providers ----------
@@ -184,7 +195,7 @@ export interface ProviderConfig {
 	models?: CatwalkModel[];
 }
 
-export type SelectedModelType = "large" | "small" | "summary";
+export type SelectedModelType = "large" | "small";
 
 /** Scope is an int on the wire: 0 = global, 1 = workspace. */
 export type ConfigScope = 0 | 1;
@@ -237,7 +248,6 @@ export interface PermissionGrant {
 }
 
 export interface PermissionNotification {
-	session_id: string;
 	tool_call_id: string;
 	granted: boolean;
 	denied: boolean;
