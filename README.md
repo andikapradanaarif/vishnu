@@ -76,6 +76,10 @@ vishnu/
 # Builds the SPA + api + crush into one image, runs postgres + vishnu
 docker compose -f api/deploy/docker-compose.yml up -d --build
 # → http://127.0.0.1:8080 (loopback — tunnel/Tailscale for remote)
+
+# Settings/credentials: cp api/deploy/.env.example api/deploy/.env
+# Schema ops against the running stack:
+docker compose -f api/deploy/docker-compose.yml run --rm vishnu migrate status
 ```
 
 **Development** (postgres in docker, api + crush on the host):

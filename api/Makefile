@@ -1,4 +1,4 @@
-.PHONY: db migrate migratedown migratestatus dev build test lint format tidy
+.PHONY: db migrate migratedown migratestatus dev build test lint format tidy up logs
 
 dev:
 	VISHNU_WEB_DIR=../web/dist go run cmd/server/main.go
@@ -13,7 +13,13 @@ build: web
 	CGO_ENABLED=0 go build -o bin/vishnu-api cmd/server/main.go
 
 db:
-	docker compose up -d postgres
+	docker compose -f deploy/docker-compose.yml up -d postgres
+
+up:
+	docker compose -f deploy/docker-compose.yml up -d --build
+
+logs:
+	docker compose -f deploy/docker-compose.yml logs -f vishnu
 
 migrate:
 	go run ./cmd/migrate up
