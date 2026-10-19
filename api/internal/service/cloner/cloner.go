@@ -39,6 +39,9 @@ func LoadDir() string {
 	if v := os.Getenv("VISHNU_DATA_DIR"); v != "" {
 		return filepath.Join(v, "projects")
 	}
+	if home, err := os.UserHomeDir(); err == nil {
+		return filepath.Join(home, ".local", "share", "vishnu", "projects")
+	}
 	return "data/projects"
 }
 
@@ -50,6 +53,7 @@ var (
 
 func NormalizeRepoURL(raw string) (string, string, error) {
 	raw = strings.TrimSpace(raw)
+	raw = strings.TrimRight(raw, "/")
 	if raw == "" {
 		return "", "", ErrUnsupportedRepo
 	}
@@ -95,6 +99,10 @@ func (c *Cloner) Clone(ctx context.Context, url, destDir string, onDone func(err
 	go func() {
 		out, err := exec.CommandContext(ctx, "git", "clone", url, destDir).CombinedOutput()
 		if err != nil {
+			// AllocDir pre-creates the destination, so a failed clone would
+			// otherwise leave an empty directory behind and push a retry of
+			// the same slug onto a "-2" sibling.
+			_ = os.RemoveAll(destDir)
 			onDone(fmt.Errorf("clone %s: %w: %s", url, err, lastLine(out)))
 			return
 		}

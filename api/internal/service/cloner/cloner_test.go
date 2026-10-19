@@ -24,6 +24,9 @@ func TestNormalizeRepoURL(t *testing.T) {
 		{"git@github.com:owner/repo", "git@github.com:owner/repo.git", "repo"},
 		{"  owner/repo  ", "https://github.com/owner/repo", "repo"},
 		{"andikapradanaarif/vishnu", "https://github.com/andikapradanaarif/vishnu", "vishnu"},
+		{"https://github.com/owner/repo/", "https://github.com/owner/repo", "repo"},
+		{"git@github.com:owner/repo.git/", "git@github.com:owner/repo.git", "repo"},
+		{"owner/repo/", "https://github.com/owner/repo", "repo"},
 	}
 
 	for _, tc := range accepted {
@@ -162,6 +165,28 @@ func TestCloneReportsFailure(t *testing.T) {
 		}
 	case <-time.After(30 * time.Second):
 		t.Fatal("failed clone did not report completion")
+	}
+
+	if _, err := os.Stat(dest); !errors.Is(err, os.ErrNotExist) {
+		t.Fatalf("a failed clone must not leave %s behind: %v", dest, err)
+	}
+}
+
+func TestLoadDirDefaultsUnderTheDataDirectory(t *testing.T) {
+	t.Setenv("VISHNU_PROJECTS_DIR", "")
+	t.Setenv("VISHNU_DATA_DIR", "/tmp/vishnu-data")
+	if got := LoadDir(); got != filepath.Join("/tmp/vishnu-data", "projects") {
+		t.Fatalf("got %q, want the projects dir under VISHNU_DATA_DIR", got)
+	}
+
+	t.Setenv("VISHNU_DATA_DIR", "")
+	home, err := os.UserHomeDir()
+	if err != nil {
+		t.Skipf("no home directory available: %v", err)
+	}
+	want := filepath.Join(home, ".local", "share", "vishnu", "projects")
+	if got := LoadDir(); got != want {
+		t.Fatalf("got %q, want %q", got, want)
 	}
 }
 

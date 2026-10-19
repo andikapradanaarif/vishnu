@@ -340,11 +340,14 @@ func (m *Manager) healthy(ctx context.Context, upstream string) bool {
 	return resp.StatusCode >= 200 && resp.StatusCode < 300
 }
 
+// signal targets the child's process group rather than the direct child: crush
+// spawns LSP and tool subprocesses of its own, and those would orphan when only
+// the crush server received the signal.
 func (m *Manager) signal(e *entry, sig syscall.Signal) {
 	if e.cmd == nil || e.cmd.Process == nil {
 		return
 	}
-	if err := e.cmd.Process.Signal(sig); err != nil && !errors.Is(err, os.ErrProcessDone) {
+	if err := syscall.Kill(-e.cmd.Process.Pid, sig); err != nil && !errors.Is(err, syscall.ESRCH) {
 		slog.Warn("Failed to signal crush server", "pid", e.cmd.Process.Pid, "signal", sig, "error", err)
 	}
 }

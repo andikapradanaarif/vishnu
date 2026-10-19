@@ -197,6 +197,51 @@ func TestEnsureSpawnsThenStopTerminatesTheChild(t *testing.T) {
 	}
 }
 
+func TestStopKillsTheChildsWholeProcessGroup(t *testing.T) {
+	port := freePort(t)
+	path := t.TempDir()
+	childMarker := filepath.Join(t.TempDir(), "grandchild-pid")
+	t.Setenv("CRUSH_FAKE_PID", filepath.Join(t.TempDir(), "pid"))
+	t.Setenv("CRUSH_FAKE_GRANDCHILD_PID", childMarker)
+
+	manager := NewManager(Options{
+		CrushBin:             writeFakeCrush(t, false),
+		PortStart:            port,
+		HealthTimeout:        10 * time.Second,
+		HealthPollInterval:   20 * time.Millisecond,
+		HealthRequestTimeout: 500 * time.Millisecond,
+		HealthCacheTTL:       time.Second,
+		StopTimeout:          5 * time.Second,
+		LogLines:             50,
+	})
+
+	project := domain.Project{
+		ID:     "group",
+		Name:   "group",
+		Mode:   domain.ProjectModeManaged,
+		Path:   &path,
+		Port:   &port,
+		Status: domain.ProjectStatusReady,
+	}
+
+	if _, err := manager.Ensure(context.Background(), project); err != nil {
+		t.Fatalf("ensure: %v", err)
+	}
+	grandchild := readPID(t, childMarker)
+
+	if err := manager.Stop(context.Background(), project.ID); err != nil {
+		t.Fatalf("stop: %v", err)
+	}
+
+	for attempt := 0; attempt < 100; attempt++ {
+		if err := syscall.Kill(grandchild, 0); errors.Is(err, syscall.ESRCH) {
+			return
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
+	t.Fatalf("grandchild %d survived Stop, so the process group was not signalled", grandchild)
+}
+
 func TestEnsureRespawnsAfterTheChildDies(t *testing.T) {
 	port := freePort(t)
 	path := t.TempDir()
@@ -247,6 +292,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"os/exec"
 	"strings"
 )
 
@@ -259,6 +305,13 @@ func main() {
 	}
 	if marker := os.Getenv("CRUSH_FAKE_PID"); marker != "" {
 		os.WriteFile(marker, []byte(fmt.Sprint(os.Getpid())), 0o600)
+	}
+	if marker := os.Getenv("CRUSH_FAKE_GRANDCHILD_PID"); marker != "" {
+		child := exec.Command("sleep", "300")
+		if err := child.Start(); err == nil {
+			os.WriteFile(marker, []byte(fmt.Sprint(child.Process.Pid)), 0o600)
+			go child.Wait()
+		}
 	}
 	if ` + strconv.FormatBool(!silent) + ` {
 		fmt.Println("fake crush on " + strings.TrimPrefix(addr, "tcp://"))
