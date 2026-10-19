@@ -8,4 +8,5 @@ import "errors"
 var (
 	ErrProjectNotFound = errors.New("project not found")
 	ErrProjectConflict = errors.New("project already exists")
+	ErrPortConflict    = errors.New("project port already in use")
 )

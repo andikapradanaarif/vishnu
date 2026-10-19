@@ -12,6 +12,7 @@ var migrationFiles embed.FS
 
 var MigrationOrder = []string{
 	"create_projects_table",
+	"add_projects_port_unique",
 }
 
 func GetCreateMigrationsTableSQL() (string, error) {
