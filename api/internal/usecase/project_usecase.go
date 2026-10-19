@@ -32,7 +32,7 @@ type Cloner interface {
 }
 
 type Workspaces interface {
-	EnsureWorkspace(ctx context.Context, upstream, path string) (string, error)
+	EnsureWorkspace(ctx context.Context, upstream, path string, create bool) (string, error)
 }
 
 type ProjectUsecase struct {
@@ -121,7 +121,7 @@ func (u *ProjectUsecase) EnsureWorkspace(ctx context.Context, id string) (dto.Wo
 		path = *project.Path
 	}
 
-	workspaceID, err := u.workspaces.EnsureWorkspace(ctx, upstream, path)
+	workspaceID, err := u.workspaces.EnsureWorkspace(ctx, upstream, path, project.Mode == domain.ProjectModeManaged)
 	if err != nil {
 		return dto.WorkspaceResponse{}, err
 	}
@@ -282,18 +282,14 @@ func (u *ProjectUsecase) response(project domain.Project) dto.ProjectResponse {
 }
 
 // effectiveStatus merges the persisted lifecycle with the process manager's
-// runtime view. An external server vishnu has not probed yet reports as
-// ready rather than down, because nothing is known to be wrong with it.
+// runtime view. A ready project reports what the manager observes: `up` when
+// the upstream answers a health check, `down` for an unreachable external
+// server or a managed one that has not spawned yet.
 func (u *ProjectUsecase) effectiveStatus(project domain.Project) string {
 	if project.Status != domain.ProjectStatusReady {
 		return string(project.Status)
 	}
-
-	live := u.proc.LiveStatus(project.ID)
-	if live == process.StatusUp || project.Mode == domain.ProjectModeManaged {
-		return string(live)
-	}
-	return string(project.Status)
+	return string(u.proc.LiveStatus(project.ID))
 }
 
 func countSources(req dto.CreateProjectRequest) int {

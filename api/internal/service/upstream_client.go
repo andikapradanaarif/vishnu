@@ -40,17 +40,27 @@ func NewCrushClient() *CrushClient {
 	}
 }
 
-func (c *CrushClient) EnsureWorkspace(ctx context.Context, upstream, path string) (string, error) {
+// EnsureWorkspace returns the id of the workspace rooted at path. Managed
+// projects own their crush server, so a missing workspace is created; external
+// servers are route-only, so vishnu reuses an existing workspace instead of
+// creating one behind the user's back.
+func (c *CrushClient) EnsureWorkspace(ctx context.Context, upstream, path string, create bool) (string, error) {
 	workspaces, err := c.listWorkspaces(ctx, upstream)
 	if err != nil {
 		return "", err
 	}
 	for _, workspace := range workspaces {
-		if workspace.Path == path {
+		if path != "" && workspace.Path == path {
 			return workspace.ID, nil
 		}
 	}
-	return c.createWorkspace(ctx, upstream, path)
+	if create {
+		return c.createWorkspace(ctx, upstream, path)
+	}
+	if len(workspaces) == 0 {
+		return "", fmt.Errorf("%w: %s has no workspaces", ErrUpstreamBadResponse, upstream)
+	}
+	return workspaces[0].ID, nil
 }
 
 func (c *CrushClient) listWorkspaces(ctx context.Context, upstream string) ([]Workspace, error) {

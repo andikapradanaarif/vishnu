@@ -139,11 +139,15 @@ func (f *fakeCloner) AllocDir(slug string) (string, error) {
 }
 
 type fakeWorkspaces struct {
-	id  string
-	err error
+	id     string
+	err    error
+	calls  int
+	create bool
 }
 
-func (f *fakeWorkspaces) EnsureWorkspace(context.Context, string, string) (string, error) {
+func (f *fakeWorkspaces) EnsureWorkspace(_ context.Context, _, _ string, create bool) (string, error) {
+	f.calls++
+	f.create = create
 	return f.id, f.err
 }
 
@@ -422,5 +426,50 @@ func TestEnsureWorkspaceSurfacesAnUnreachableServer(t *testing.T) {
 
 	if _, err := usecase.EnsureWorkspace(context.Background(), linked.Project.ID); !errors.Is(err, process.ErrHealthTimeout) {
 		t.Fatalf("expected ErrHealthTimeout, got %v", err)
+	}
+}
+
+func TestEnsureWorkspaceLeavesExternalServersAlone(t *testing.T) {
+	repo := newFakeRepo()
+	proc := &fakeProc{upstream: "http://127.0.0.1:9119"}
+	workspaces := &fakeWorkspaces{id: "workspace-9"}
+	usecase := newUsecase(repo, proc, &fakeCloner{}, workspaces)
+
+	external, err := usecase.Create(context.Background(), dto.CreateProjectRequest{Upstream: "http://127.0.0.1:9119"})
+	if err != nil {
+		t.Fatalf("create external: %v", err)
+	}
+
+	if _, err := usecase.EnsureWorkspace(context.Background(), external.Project.ID); err != nil {
+		t.Fatalf("ensure workspace: %v", err)
+	}
+	if workspaces.calls != 1 {
+		t.Fatalf("expected one workspace lookup, got %d", workspaces.calls)
+	}
+	if workspaces.create {
+		t.Fatal("vishnu must not create workspaces on a server it does not own")
+	}
+}
+
+func TestExternalStatusFollowsReachability(t *testing.T) {
+	repo := newFakeRepo()
+	proc := &fakeProc{}
+	usecase := newUsecase(repo, proc, &fakeCloner{}, &fakeWorkspaces{})
+
+	external, err := usecase.Create(context.Background(), dto.CreateProjectRequest{Upstream: "http://127.0.0.1:9119"})
+	if err != nil {
+		t.Fatalf("create external: %v", err)
+	}
+	if external.Project.Status != string(process.StatusDown) {
+		t.Fatalf("got status %q, want down for an unreachable external server", external.Project.Status)
+	}
+
+	proc.status = process.StatusUp
+	projects, err := usecase.List(context.Background())
+	if err != nil {
+		t.Fatalf("list: %v", err)
+	}
+	if len(projects) != 1 || projects[0].Status != string(process.StatusUp) {
+		t.Fatalf("got %+v, want the external server reported up", projects)
 	}
 }
