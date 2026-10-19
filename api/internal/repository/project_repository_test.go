@@ -57,6 +57,14 @@ func managed(name, path string) *domain.Project {
 	}
 }
 
+// managedOn gives a project an explicit port, for tests that create more than
+// one live row: the registry enforces that ports are unique.
+func managedOn(name, path string, port int) *domain.Project {
+	project := managed(name, path)
+	project.Port = ptr(port)
+	return project
+}
+
 func TestCreateAndGet(t *testing.T) {
 	repo := repository.NewProjectRepository(testDB(t))
 	ctx := context.Background()
@@ -97,21 +105,45 @@ func TestCreateConflictPerUniqueColumn(t *testing.T) {
 		t.Fatalf("create first: %v", err)
 	}
 
-	dupPath := managed("dup-path", "/tmp/first")
+	dupPath := managedOn("dup-path", "/tmp/first", 9202)
 	if err := repo.Create(ctx, dupPath); !errors.Is(err, errs.ErrProjectConflict) {
 		t.Fatalf("expected conflict on path, got %v", err)
 	}
 
-	dupRepo := managed("dup-repo", "/tmp/dup-repo")
+	dupRepo := managedOn("dup-repo", "/tmp/dup-repo", 9203)
 	dupRepo.RepoURL = ptr("github.com/owner/repo")
 	if err := repo.Create(ctx, dupRepo); !errors.Is(err, errs.ErrProjectConflict) {
 		t.Fatalf("expected conflict on repo_url, got %v", err)
 	}
 
-	dupUpstream := managed("dup-upstream", "/tmp/dup-upstream")
+	dupUpstream := managedOn("dup-upstream", "/tmp/dup-upstream", 9204)
 	dupUpstream.Upstream = ptr("http://127.0.0.1:9201")
 	if err := repo.Create(ctx, dupUpstream); !errors.Is(err, errs.ErrProjectConflict) {
 		t.Fatalf("expected conflict on upstream, got %v", err)
+	}
+}
+
+func TestPortClashIsRetryableNotAProjectConflict(t *testing.T) {
+	repo := repository.NewProjectRepository(testDB(t))
+	ctx := context.Background()
+
+	first := managed("first", "/tmp/first")
+	if err := repo.Create(ctx, first); err != nil {
+		t.Fatalf("create first: %v", err)
+	}
+
+	second := managed("second", "/tmp/second")
+	if err := repo.Create(ctx, second); !errors.Is(err, errs.ErrPortConflict) {
+		t.Fatalf("expected ErrPortConflict for a duplicate port, got %v", err)
+	}
+
+	// The index covers live rows only, so deleting a project frees its port.
+	if err := repo.SoftDelete(ctx, first.ID); err != nil {
+		t.Fatalf("soft delete: %v", err)
+	}
+	third := managed("third", "/tmp/third")
+	if err := repo.Create(ctx, third); err != nil {
+		t.Fatalf("a deleted project must release its port: %v", err)
 	}
 }
 
@@ -190,7 +222,7 @@ func TestUpdatePersistsAndRespectsUniqueIndex(t *testing.T) {
 	ctx := context.Background()
 
 	first := managed("first", "/tmp/first")
-	second := managed("second", "/tmp/second")
+	second := managedOn("second", "/tmp/second", 9202)
 	for _, p := range []*domain.Project{first, second} {
 		if err := repo.Create(ctx, p); err != nil {
 			t.Fatalf("create %s: %v", p.Name, err)
@@ -221,7 +253,7 @@ func TestListOrdersByCreatedAt(t *testing.T) {
 
 	now := time.Now().UTC().Truncate(time.Millisecond)
 	for i, name := range []string{"oldest", "middle", "newest"} {
-		project := managed(name, "/tmp/"+name)
+		project := managedOn(name, "/tmp/"+name, 9201+i)
 		project.CreatedAt = now.Add(time.Duration(i-2) * time.Minute)
 		project.UpdatedAt = project.CreatedAt
 		if err := repo.Create(ctx, project); err != nil {

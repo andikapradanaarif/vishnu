@@ -85,6 +85,11 @@ func mapError(err error) error {
 	}
 	var pgErr *pgconn.PgError
 	if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+		// A port clash is retryable — the caller picks another port — while
+		// a path/repo/upstream clash is a genuine conflict for the user.
+		if pgErr.ConstraintName == "projects_port_unique" {
+			return errs.ErrPortConflict
+		}
 		return errs.ErrProjectConflict
 	}
 	return err
