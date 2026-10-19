@@ -86,6 +86,7 @@ type fakeProc struct {
 	upstream  string
 	ensureErr error
 	port      int
+	reserved  []int
 	stopped   []string
 }
 
@@ -108,7 +109,8 @@ func (f *fakeProc) LiveStatus(string) process.Status {
 	return f.status
 }
 
-func (f *fakeProc) AllocPort() (int, error) {
+func (f *fakeProc) AllocPort(reserved []int) (int, error) {
+	f.reserved = reserved
 	if f.port == 0 {
 		return 9201, nil
 	}
@@ -203,6 +205,25 @@ func TestCreateCloneSurfacesAnUnreachableRepository(t *testing.T) {
 	_, err := usecase.Create(context.Background(), dto.CreateProjectRequest{RepoURL: "owner/repo"})
 	if !errors.Is(err, cloner.ErrRepoUnreachable) {
 		t.Fatalf("expected ErrRepoUnreachable, got %v", err)
+	}
+}
+
+func TestCreateReservesPortsOfRegisteredProjects(t *testing.T) {
+	repo := newFakeRepo()
+	proc := &fakeProc{port: 9301}
+	usecase := newUsecase(repo, proc, &fakeCloner{}, &fakeWorkspaces{})
+
+	if _, err := usecase.Create(context.Background(), dto.CreateProjectRequest{Path: t.TempDir()}); err != nil {
+		t.Fatalf("create link: %v", err)
+	}
+
+	proc.port = 9302
+	if _, err := usecase.Create(context.Background(), dto.CreateProjectRequest{RepoURL: "owner/repo"}); err != nil {
+		t.Fatalf("create clone: %v", err)
+	}
+
+	if len(proc.reserved) != 1 || proc.reserved[0] != 9301 {
+		t.Fatalf("got reserved %v, want the already-registered port 9301", proc.reserved)
 	}
 }
 

@@ -22,7 +22,7 @@ type ProcessManager interface {
 	Ensure(ctx context.Context, project domain.Project) (string, error)
 	Stop(ctx context.Context, id string) error
 	LiveStatus(id string) process.Status
-	AllocPort() (int, error)
+	AllocPort(reserved []int) (int, error)
 }
 
 type Cloner interface {
@@ -153,7 +153,13 @@ func (u *ProjectUsecase) createClone(ctx context.Context, req dto.CreateProjectR
 		return CreateResult{}, err
 	}
 
-	port, err := u.proc.AllocPort()
+	reserved, err := u.reservedPorts(ctx)
+	if err != nil {
+		_ = os.Remove(dir)
+		return CreateResult{}, err
+	}
+
+	port, err := u.proc.AllocPort(reserved)
 	if err != nil {
 		_ = os.Remove(dir)
 		return CreateResult{}, err
@@ -211,7 +217,12 @@ func (u *ProjectUsecase) createLink(ctx context.Context, req dto.CreateProjectRe
 		name = filepath.Base(absolute)
 	}
 
-	port, err := u.proc.AllocPort()
+	reserved, err := u.reservedPorts(ctx)
+	if err != nil {
+		return CreateResult{}, err
+	}
+
+	port, err := u.proc.AllocPort(reserved)
 	if err != nil {
 		return CreateResult{}, err
 	}
@@ -290,6 +301,24 @@ func (u *ProjectUsecase) effectiveStatus(project domain.Project) string {
 		return string(project.Status)
 	}
 	return string(u.proc.LiveStatus(project.ID))
+}
+
+// reservedPorts lists the ports the registry already claims. A project whose
+// crush has not spawned yet owns a port that nothing is listening on, so the
+// process manager cannot discover it by probing alone.
+func (u *ProjectUsecase) reservedPorts(ctx context.Context) ([]int, error) {
+	projects, err := u.projects.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	ports := make([]int, 0, len(projects))
+	for _, project := range projects {
+		if project.Port != nil {
+			ports = append(ports, *project.Port)
+		}
+	}
+	return ports, nil
 }
 
 func countSources(req dto.CreateProjectRequest) int {
