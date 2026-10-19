@@ -16,8 +16,9 @@ import (
 )
 
 type fakeRepo struct {
-	projects map[string]*domain.Project
-	conflict bool
+	projects      map[string]*domain.Project
+	conflict      bool
+	portConflicts int
 }
 
 func newFakeRepo() *fakeRepo {
@@ -42,6 +43,11 @@ func (f *fakeRepo) GetByID(_ context.Context, id string) (*domain.Project, error
 }
 
 func (f *fakeRepo) Create(_ context.Context, project *domain.Project) error {
+	// Stands in for the unique index losing a race with a concurrent create.
+	if f.portConflicts > 0 {
+		f.portConflicts--
+		return errs.ErrPortConflict
+	}
 	if f.conflict {
 		return errs.ErrProjectConflict
 	}
@@ -86,6 +92,7 @@ type fakeProc struct {
 	upstream  string
 	ensureErr error
 	port      int
+	portSeq   []int
 	reserved  []int
 	stopped   []string
 }
@@ -111,6 +118,11 @@ func (f *fakeProc) LiveStatus(string) process.Status {
 
 func (f *fakeProc) AllocPort(reserved []int) (int, error) {
 	f.reserved = reserved
+	if len(f.portSeq) > 0 {
+		port := f.portSeq[0]
+		f.portSeq = f.portSeq[1:]
+		return port, nil
+	}
 	if f.port == 0 {
 		return 9201, nil
 	}
@@ -224,6 +236,21 @@ func TestCreateReservesPortsOfRegisteredProjects(t *testing.T) {
 
 	if len(proc.reserved) != 1 || proc.reserved[0] != 9301 {
 		t.Fatalf("got reserved %v, want the already-registered port 9301", proc.reserved)
+	}
+}
+
+func TestCreateRetriesWhenAConcurrentCreateClaimsThePort(t *testing.T) {
+	repo := newFakeRepo()
+	repo.portConflicts = 1
+	proc := &fakeProc{portSeq: []int{9301, 9302}}
+	usecase := newUsecase(repo, proc, &fakeCloner{}, &fakeWorkspaces{})
+
+	result, err := usecase.Create(context.Background(), dto.CreateProjectRequest{Path: t.TempDir()})
+	if err != nil {
+		t.Fatalf("create link: %v", err)
+	}
+	if result.Project.Port != 9302 {
+		t.Fatalf("got port %d, want the re-allocated 9302", result.Project.Port)
 	}
 }
 

@@ -97,7 +97,8 @@ func statusFor(err error) (int, string) {
 		return fiber.StatusForbidden, "repository_unreachable"
 	case errors.Is(err, errs.ErrProjectNotFound):
 		return fiber.StatusNotFound, "not_found"
-	case errors.Is(err, errs.ErrProjectConflict):
+	case errors.Is(err, errs.ErrProjectConflict),
+		errors.Is(err, errs.ErrPortConflict):
 		return fiber.StatusConflict, "conflict"
 	case errors.Is(err, process.ErrNotConfigured),
 		errors.Is(err, process.ErrUnreachable),

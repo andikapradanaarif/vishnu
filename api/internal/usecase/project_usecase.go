@@ -5,6 +5,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"net/url"
 	"os"
@@ -153,27 +154,14 @@ func (u *ProjectUsecase) createClone(ctx context.Context, req dto.CreateProjectR
 		return CreateResult{}, err
 	}
 
-	reserved, err := u.reservedPorts(ctx)
-	if err != nil {
-		_ = os.Remove(dir)
-		return CreateResult{}, err
-	}
-
-	port, err := u.proc.AllocPort(reserved)
-	if err != nil {
-		_ = os.Remove(dir)
-		return CreateResult{}, err
-	}
-
 	project := domain.Project{
 		Name:    name,
 		Path:    &dir,
 		Mode:    domain.ProjectModeManaged,
-		Port:    &port,
 		RepoURL: &normalized,
 		Status:  domain.ProjectStatusCloning,
 	}
-	if err := u.projects.Create(ctx, &project); err != nil {
+	if err := u.createManaged(ctx, &project); err != nil {
 		_ = os.Remove(dir)
 		return CreateResult{}, err
 	}
@@ -217,24 +205,13 @@ func (u *ProjectUsecase) createLink(ctx context.Context, req dto.CreateProjectRe
 		name = filepath.Base(absolute)
 	}
 
-	reserved, err := u.reservedPorts(ctx)
-	if err != nil {
-		return CreateResult{}, err
-	}
-
-	port, err := u.proc.AllocPort(reserved)
-	if err != nil {
-		return CreateResult{}, err
-	}
-
 	project := domain.Project{
 		Name:   name,
 		Path:   &absolute,
 		Mode:   domain.ProjectModeManaged,
-		Port:   &port,
 		Status: domain.ProjectStatusReady,
 	}
-	if err := u.projects.Create(ctx, &project); err != nil {
+	if err := u.createManaged(ctx, &project); err != nil {
 		return CreateResult{}, err
 	}
 
@@ -319,6 +296,36 @@ func (u *ProjectUsecase) reservedPorts(ctx context.Context) ([]int, error) {
 		}
 	}
 	return ports, nil
+}
+
+const portAllocationAttempts = 5
+
+// createManaged inserts a managed project, re-allocating its port when a
+// concurrent create claimed the same one first. The unique index on
+// projects.port is the authority here; the registry snapshot can be stale by
+// the time the row lands.
+func (u *ProjectUsecase) createManaged(ctx context.Context, project *domain.Project) error {
+	var last error
+	for attempt := 0; attempt < portAllocationAttempts; attempt++ {
+		reserved, err := u.reservedPorts(ctx)
+		if err != nil {
+			return err
+		}
+		port, err := u.proc.AllocPort(reserved)
+		if err != nil {
+			return err
+		}
+		project.Port = &port
+
+		last = u.projects.Create(ctx, project)
+		if last == nil {
+			return nil
+		}
+		if !errors.Is(last, errs.ErrPortConflict) {
+			return last
+		}
+	}
+	return last
 }
 
 func countSources(req dto.CreateProjectRequest) int {
