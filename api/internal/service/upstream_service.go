@@ -93,12 +93,26 @@ var hopByHopHeaders = map[string]bool{
 	"Host":                true,
 }
 
-// copyHeader copies inbound request headers to the outbound request,
-// dropping hop-by-hop headers and Accept-Encoding (the transport re-adds
-// gzip itself and transparently decodes the response).
+// requestCredentials never cross the proxy. The session cookie and any
+// Authorization belong to the browser and the vishnu API; crush reads neither,
+// and an external upstream is a server the user registered — forwarding the
+// session token there would hand it to whoever runs that server.
+var requestCredentials = map[string]bool{
+	"Cookie":        true,
+	"Authorization": true,
+}
+
+// copyHeader copies inbound request headers to the outbound request, dropping
+// hop-by-hop headers, the caller's credentials and Accept-Encoding (the
+// transport re-adds gzip itself and transparently decodes the response).
 func copyHeader(dst, src http.Header) {
 	for key, values := range src {
-		if hopByHopHeaders[http.CanonicalHeaderKey(key)] || strings.EqualFold(key, "Accept-Encoding") {
+		switch {
+		case hopByHopHeaders[http.CanonicalHeaderKey(key)]:
+			continue
+		case requestCredentials[http.CanonicalHeaderKey(key)]:
+			continue
+		case strings.EqualFold(key, "Accept-Encoding"):
 			continue
 		}
 		for _, value := range values {

@@ -120,6 +120,39 @@ func TestForwardRoutesEachProjectToItsOwnUpstream(t *testing.T) {
 	}
 }
 
+func TestForwardDoesNotLeakSessionCredentialsUpstream(t *testing.T) {
+	var cookie, authorization string
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/v1/health" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		cookie = r.Header.Get("Cookie")
+		authorization = r.Header.Get("Authorization")
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer upstream.Close()
+
+	app := proxyApp(externalProject("a", upstream.URL, domain.ProjectStatusReady))
+
+	req := httptest.NewRequest("GET", "/p/a/v1/workspaces?client_id=c1", nil)
+	req.Header.Set("Cookie", "vishnu_session=super-secret")
+	req.Header.Set("Authorization", "Bearer super-secret")
+
+	resp, err := app.Test(req)
+	if err != nil {
+		t.Fatalf("GET: %v", err)
+	}
+	defer func() { _ = resp.Body.Close() }()
+
+	if cookie != "" {
+		t.Fatalf("the session cookie reached the upstream: %q", cookie)
+	}
+	if authorization != "" {
+		t.Fatalf("the authorization header reached the upstream: %q", authorization)
+	}
+}
+
 func TestForwardStreamsEventStreamsThrough(t *testing.T) {
 	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/event-stream")
