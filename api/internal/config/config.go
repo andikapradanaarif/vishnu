@@ -16,9 +16,6 @@ type Brevo struct {
 type Config struct {
 	// ListenAddr is the address the web server binds to.
 	ListenAddr string
-	// CrushUpstream is the base URL of the `crush server` instance every
-	// /v1/* request is proxied to (e.g. http://127.0.0.1:9119).
-	CrushUpstream string
 	// WebDir, when set, serves the SPA from this directory instead of the
 	// embedded build output.
 	WebDir string
@@ -33,10 +30,9 @@ type Config struct {
 // Load reads configuration from environment variables.
 func Load() *Config {
 	return &Config{
-		ListenAddr:    getenv("VISHNU_LISTEN_ADDR", "127.0.0.1:8080"),
-		CrushUpstream: getenv("VISHNU_CRUSH_UPSTREAM", "http://127.0.0.1:9119"),
-		WebDir:        os.Getenv("VISHNU_WEB_DIR"),
-		Environment:   getenv("VISHNU_ENV", "development"),
+		ListenAddr:  getenv("VISHNU_LISTEN_ADDR", "127.0.0.1:8080"),
+		WebDir:      os.Getenv("VISHNU_WEB_DIR"),
+		Environment: getenv("VISHNU_ENV", "development"),
 		Brevo: Brevo{
 			APIKey:         os.Getenv("BREVO_API_KEY"),
 			APIURL:         getenv("BREVO_API_URL", "https://api.brevo.com"),

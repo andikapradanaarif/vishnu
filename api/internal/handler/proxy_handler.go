@@ -4,30 +4,78 @@ package handler
 import (
 	"bufio"
 	"context"
+	"errors"
 	"io"
 	"log/slog"
 	"net/http"
 	"strings"
 
-	"github.com/andikapradanaarif/vishnu/internal/service"
 	"github.com/gofiber/fiber/v3"
+
+	"github.com/andikapradanaarif/vishnu/internal/domain"
+	"github.com/andikapradanaarif/vishnu/internal/errs"
+	"github.com/andikapradanaarif/vishnu/internal/service"
 )
 
-// ProxyHandler forwards /v1/* requests to the crush server upstream.
-// Responses — including the SSE event stream — are streamed through a
-// bufio writer with a flush per read so events are delivered as they
-// arrive.
+type ProjectLocator interface {
+	GetByID(ctx context.Context, id string) (*domain.Project, error)
+}
+
+type UpstreamResolver interface {
+	Ensure(ctx context.Context, project domain.Project) (string, error)
+}
+
+// ProxyHandler forwards /p/{pid}/v1/* requests to that project's crush
+// server. Responses — including the SSE event stream — are streamed
+// through a bufio writer with a flush per read so events are delivered as
+// they arrive. The project is resolved per request from the registry, so
+// only the upstream lookup is dynamic; the streaming mechanics are not.
 type ProxyHandler struct {
-	upstream *service.Upstream
+	projects ProjectLocator
+	proc     UpstreamResolver
+	client   *service.Proxy
 }
 
-// NewProxyHandler builds the handler.
-func NewProxyHandler(upstream *service.Upstream) *ProxyHandler {
-	return &ProxyHandler{upstream: upstream}
+func NewProxyHandler(projects ProjectLocator, proc UpstreamResolver, client *service.Proxy) *ProxyHandler {
+	return &ProxyHandler{projects: projects, proc: proc, client: client}
 }
 
-// Forward proxies a single request to the upstream.
 func (h *ProxyHandler) Forward(c fiber.Ctx) error {
+	pid := c.Params("pid")
+
+	project, err := h.projects.GetByID(c.RequestCtx(), pid)
+	if err != nil {
+		if errors.Is(err, errs.ErrProjectNotFound) {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": "unknown project", "code": "not_found"})
+		}
+		slog.Error("Failed to load the project for a proxied request", "project", pid, "error", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to load project", "code": "internal_error"})
+	}
+
+	switch project.Status {
+	case domain.ProjectStatusCloning:
+		return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{"message": "project is still cloning", "code": "cloning"})
+	case domain.ProjectStatusError:
+		message := "project failed to clone"
+		if project.Error != nil && *project.Error != "" {
+			message = *project.Error
+		}
+		return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{"message": message, "code": "project_error"})
+	}
+
+	upstream, err := h.proc.Ensure(c.RequestCtx(), *project)
+	if err != nil {
+		slog.Warn("Project upstream unavailable", "project", pid, "error", err)
+		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"message": "crush upstream unreachable", "code": "crush_unreachable"})
+	}
+
+	// The registry has no knowledge of session paths, so the prefix is
+	// stripped here and only the crush-shaped part is forwarded.
+	requestURI := strings.TrimPrefix(c.OriginalURL(), "/p/"+pid)
+	if !strings.HasPrefix(requestURI, "/") {
+		requestURI = "/" + requestURI
+	}
+
 	// The upstream request is cancelled when the stream writer exits —
 	// which happens when the response finishes or the client disconnects.
 	ctx, cancel := context.WithCancel(context.Background())
@@ -39,12 +87,13 @@ func (h *ProxyHandler) Forward(c fiber.Ctx) error {
 		}
 	}
 
-	resp, err := h.upstream.Forward(ctx, c.Method(), c.OriginalURL(), header, c.Body())
+	resp, err := h.client.Forward(ctx, upstream, c.Method(), requestURI, header, c.Body())
 	if err != nil {
 		cancel()
-		slog.Warn("Upstream request failed", "method", c.Method(), "url", c.OriginalURL(), "error", err)
+		slog.Warn("Upstream request failed", "project", pid, "method", c.Method(), "url", requestURI, "error", err)
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
 			"message": "crush upstream unreachable",
+			"code":    "crush_unreachable",
 		})
 	}
 
@@ -54,6 +103,13 @@ func (h *ProxyHandler) Forward(c fiber.Ctx) error {
 			continue
 		}
 		for _, value := range values {
+			// Content-Type goes through Set: Appending leaves Fiber's own
+			// content-type field unset, so it adds its default and the
+			// event stream ends up advertising text/plain as well.
+			if strings.EqualFold(key, "Content-Type") {
+				c.Set(key, value)
+				continue
+			}
 			c.Append(key, value)
 		}
 	}
