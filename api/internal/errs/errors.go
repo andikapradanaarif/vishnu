@@ -20,5 +20,6 @@ var (
 	ErrOTPNotFound          = errors.New("no pending code for that address")
 	ErrOTPExpired           = errors.New("the code has expired")
 	ErrOTPInvalid           = errors.New("invalid code")
+	ErrOTPConsumed          = errors.New("the code has already been used")
 	ErrOTPAttemptsExhausted = errors.New("too many incorrect attempts")
 )

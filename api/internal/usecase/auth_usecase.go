@@ -160,8 +160,12 @@ func (u *AuthUsecase) Verify(ctx context.Context, rawEmail, code string) (string
 	}
 
 	// A code is single-use: consuming it before the session exists means a
-	// replayed request cannot mint a second one.
+	// replayed request cannot mint a second one. A lost race for the same
+	// code reports the code as invalid rather than minting a second session.
 	if err := u.otps.Consume(ctx, pending.ID, u.now()); err != nil {
+		if errors.Is(err, errs.ErrOTPConsumed) {
+			return "", nil, errs.ErrOTPInvalid
+		}
 		return "", nil, err
 	}
 

@@ -127,6 +127,9 @@ func TestOTPRepositoryFlow(t *testing.T) {
 	if _, err := repositories.OTP.LatestPending(ctx, "owner@example.com"); !errors.Is(err, errs.ErrOTPNotFound) {
 		t.Fatalf("expected ErrOTPNotFound after consuming, got %v", err)
 	}
+	if err := repositories.OTP.Consume(ctx, code.ID, now.Add(time.Second)); !errors.Is(err, errs.ErrOTPConsumed) {
+		t.Fatalf("expected ErrOTPConsumed for a second consume, got %v", err)
+	}
 }
 
 func TestSessionRepositoryCreateLookupAndSlide(t *testing.T) {

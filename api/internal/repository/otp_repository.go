@@ -57,8 +57,20 @@ func (r *otpRepository) IncrementAttempts(ctx context.Context, id string) error 
 		UpdateColumn("attempts", gorm.Expr("attempts + 1")).Error
 }
 
+// Consume marks a pending code as used and reports whether this call was the
+// one that did it. The `consumed_at IS NULL` predicate makes a second update a
+// no-op, which still updates zero rows — so the affected-row count is what
+// tells two racing Verifies apart. Without it both could compare the code,
+// both see the update "succeed", and both mint a session.
 func (r *otpRepository) Consume(ctx context.Context, id string, at time.Time) error {
-	return r.db.WithContext(ctx).Model(&domain.OTPCode{}).
+	result := r.db.WithContext(ctx).Model(&domain.OTPCode{}).
 		Where("id = ? AND consumed_at IS NULL", id).
-		UpdateColumn("consumed_at", at).Error
+		UpdateColumn("consumed_at", at)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return errs.ErrOTPConsumed
+	}
+	return nil
 }

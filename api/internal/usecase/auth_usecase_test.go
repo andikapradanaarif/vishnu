@@ -64,6 +64,9 @@ func (f *fakeUsers) Upsert(_ context.Context, user *domain.User) error {
 
 type fakeOTPs struct {
 	codes []*domain.OTPCode
+	// consumeErr stands in for the repository reporting that another request
+	// already claimed the code.
+	consumeErr error
 	// now mirrors the database's created_at default, so the fake and the
 	// usecase agree on when a code was issued.
 	now func() time.Time
@@ -120,12 +123,21 @@ func (f *fakeOTPs) IncrementAttempts(_ context.Context, id string) error {
 	return nil
 }
 
+// Consume mirrors the repository: only a still-pending code can be claimed, so
+// a racer that lost the update sees ErrOTPConsumed.
 func (f *fakeOTPs) Consume(_ context.Context, id string, at time.Time) error {
+	if f.consumeErr != nil {
+		return f.consumeErr
+	}
 	for _, code := range f.codes {
-		if code.ID == id {
-			consumed := at
-			code.ConsumedAt = &consumed
+		if code.ID != id {
+			continue
 		}
+		if code.ConsumedAt != nil {
+			return errs.ErrOTPConsumed
+		}
+		consumed := at
+		code.ConsumedAt = &consumed
 	}
 	return nil
 }
@@ -320,6 +332,25 @@ func TestVerifyIssuesASessionAndConsumesTheCode(t *testing.T) {
 
 	if _, _, err := fixture.usecase.Verify(context.Background(), "owner@example.com", "123456"); !errors.Is(err, errs.ErrOTPInvalid) {
 		t.Fatalf("a consumed code must not work twice, got %v", err)
+	}
+}
+
+// Two requests can both read the same pending code before either consumes it.
+// The loser of that race must not mint a session of its own.
+func TestVerifyRejectsACodeAnotherRequestConsumed(t *testing.T) {
+	fixture := newAuthFixture(t)
+	fixture.users.add("owner@example.com")
+
+	if err := fixture.usecase.RequestOTP(context.Background(), "owner@example.com"); err != nil {
+		t.Fatalf("request otp: %v", err)
+	}
+	fixture.otps.consumeErr = errs.ErrOTPConsumed
+
+	if _, _, err := fixture.usecase.Verify(context.Background(), "owner@example.com", "123456"); !errors.Is(err, errs.ErrOTPInvalid) {
+		t.Fatalf("a code claimed by another request must be rejected, got %v", err)
+	}
+	if len(fixture.session.byHash) != 0 {
+		t.Fatalf("losing the consume race must not create a session, got %d", len(fixture.session.byHash))
 	}
 }
 
