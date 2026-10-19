@@ -1,7 +1,10 @@
 // Package config loads runtime configuration from the environment.
 package config
 
-import "os"
+import (
+	"os"
+	"time"
+)
 
 // Brevo holds the Brevo transactional-email configuration.
 type Brevo struct {
@@ -25,6 +28,10 @@ type Config struct {
 	Brevo Brevo
 	// Database carries the Postgres connection settings (DB_* envs).
 	Database Database
+	// BootstrapEmail is upserted as an admin user at startup.
+	BootstrapEmail string
+	// SessionTTL is how long a sign-in lasts; the window slides on use.
+	SessionTTL time.Duration
 }
 
 // Load reads configuration from environment variables.
@@ -40,8 +47,19 @@ func Load() *Config {
 			FromName:       os.Getenv("BREVO_FROM_NAME"),
 			RequestTimeout: getenv("VISHNU_EMAIL_TIMEOUT", "10s"),
 		},
-		Database: LoadDatabase(),
+		Database:       LoadDatabase(),
+		BootstrapEmail: os.Getenv("VISHNU_BOOTSTRAP_EMAIL"),
+		SessionTTL:     getduration("VISHNU_SESSION_TTL", 720*time.Hour),
 	}
+}
+
+func getduration(key string, fallback time.Duration) time.Duration {
+	if v := os.Getenv(key); v != "" {
+		if parsed, err := time.ParseDuration(v); err == nil {
+			return parsed
+		}
+	}
+	return fallback
 }
 
 func getenv(key, fallback string) string {
