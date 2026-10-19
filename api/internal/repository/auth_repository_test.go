@@ -64,6 +64,24 @@ func TestUserRepositoryUpsertIsIdempotent(t *testing.T) {
 	}
 }
 
+func TestUserRepositoryCreateRejectsADuplicateEmail(t *testing.T) {
+	repositories := repository.NewRepositories(authDB(t))
+	ctx := context.Background()
+
+	first := &domain.User{Email: "Owner@Example.com", Role: domain.UserRoleMember}
+	if err := repositories.User.Create(ctx, first); err != nil {
+		t.Fatalf("create: %v", err)
+	}
+	if first.ID == "" {
+		t.Fatal("create did not assign an id")
+	}
+
+	second := &domain.User{Email: "owner@example.com"}
+	if err := repositories.User.Create(ctx, second); !errors.Is(err, errs.ErrUserConflict) {
+		t.Fatalf("expected ErrUserConflict, got %v", err)
+	}
+}
+
 func TestUserRepositoryRejectsMalformedIDs(t *testing.T) {
 	repositories := repository.NewRepositories(authDB(t))
 

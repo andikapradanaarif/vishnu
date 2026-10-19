@@ -78,6 +78,45 @@ func (u *AuthUsecase) Bootstrap(ctx context.Context, rawEmail, name string) (*do
 	return u.users.GetByEmail(ctx, email)
 }
 
+// CreateUser adds an address to the allowlist. Only an admin may do it, and
+// creating an address that already exists is a conflict rather than a silent
+// update: the sign-in flow never creates accounts on its own.
+func (u *AuthUsecase) CreateUser(ctx context.Context, actor *domain.User, rawEmail, name, rawRole string) (*domain.User, error) {
+	if actor == nil || actor.Role != domain.UserRoleAdmin {
+		return nil, errs.ErrForbidden
+	}
+
+	email, err := normalizeEmail(rawEmail)
+	if err != nil {
+		return nil, err
+	}
+
+	role, err := parseUserRole(rawRole)
+	if err != nil {
+		return nil, err
+	}
+
+	user := &domain.User{Email: email, Role: role}
+	if trimmed := strings.TrimSpace(name); trimmed != "" {
+		user.Name = &trimmed
+	}
+	if err := u.users.Create(ctx, user); err != nil {
+		return nil, err
+	}
+	return u.users.GetByEmail(ctx, email)
+}
+
+func parseUserRole(raw string) (domain.UserRole, error) {
+	switch role := domain.UserRole(strings.TrimSpace(raw)); role {
+	case "":
+		return domain.UserRoleMember, nil
+	case domain.UserRoleAdmin, domain.UserRoleMember:
+		return role, nil
+	default:
+		return "", errs.ErrInvalidRole
+	}
+}
+
 // RequestOTP reports success whether or not the address is registered, and
 // stays quiet inside the resend window: the response must not reveal who is
 // eligible, and a second code nobody asked for is noise.

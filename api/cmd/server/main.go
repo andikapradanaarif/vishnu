@@ -70,6 +70,7 @@ func main() {
 	projects := usecase.NewProjectUsecase(repositories.Project, manager, clonerClient, crush)
 	projectHandler := handler.NewProjectHandler(projects)
 	authHandler := handler.NewAuthHandler(auth)
+	userHandler := handler.NewUserHandler(auth)
 	proxy := handler.NewProxyHandler(repositories.Project, manager, service.NewProxy())
 	web, err := handler.NewWebHandler(cfg.WebDir)
 	if err != nil {
@@ -93,6 +94,7 @@ func main() {
 	app.Use("/api", session)
 
 	projectHandler.Register(app)
+	userHandler.Register(app)
 
 	// Per-project crush traffic — including the SSE stream at
 	// /p/{pid}/v1/workspaces/{id}/events. Auth is attached to the route

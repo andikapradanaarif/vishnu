@@ -47,6 +47,23 @@ func (f *fakeUsers) GetByEmail(_ context.Context, email string) (*domain.User, e
 	return user, nil
 }
 
+func (f *fakeUsers) Create(_ context.Context, user *domain.User) error {
+	email := strings.ToLower(strings.TrimSpace(user.Email))
+	if _, ok := f.byEmail[email]; ok {
+		return errs.ErrUserConflict
+	}
+	if user.ID == "" {
+		user.ID = uuid.NewString()
+	}
+	if user.Role == "" {
+		user.Role = domain.UserRoleMember
+	}
+	user.Email = email
+	copy := *user
+	f.byEmail[email] = &copy
+	return nil
+}
+
 func (f *fakeUsers) Upsert(_ context.Context, user *domain.User) error {
 	existing, ok := f.byEmail[user.Email]
 	if ok {
@@ -509,6 +526,58 @@ func TestBootstrapUpsertsAnAdminUser(t *testing.T) {
 	}
 	if len(fixture.users.byEmail) != 1 {
 		t.Fatalf("expected one user, got %d", len(fixture.users.byEmail))
+	}
+}
+
+func TestCreateUserRequiresAnAdmin(t *testing.T) {
+	fixture := newAuthFixture(t)
+	member := fixture.users.add("member@example.com")
+
+	if _, err := fixture.usecase.CreateUser(context.Background(), member, "new@example.com", "New", ""); !errors.Is(err, errs.ErrForbidden) {
+		t.Fatalf("expected ErrForbidden, got %v", err)
+	}
+	if _, err := fixture.usecase.CreateUser(context.Background(), nil, "new@example.com", "New", ""); !errors.Is(err, errs.ErrForbidden) {
+		t.Fatalf("expected ErrForbidden for a missing actor, got %v", err)
+	}
+	if len(fixture.users.byEmail) != 1 {
+		t.Fatalf("a forbidden call must not add a user, got %d", len(fixture.users.byEmail))
+	}
+}
+
+func TestCreateUserAddsAnAllowlistedAddress(t *testing.T) {
+	fixture := newAuthFixture(t)
+	admin := &domain.User{ID: uuid.NewString(), Email: "admin@example.com", Role: domain.UserRoleAdmin}
+
+	user, err := fixture.usecase.CreateUser(context.Background(), admin, " New@Example.com ", " New User ", "")
+	if err != nil {
+		t.Fatalf("create user: %v", err)
+	}
+	if user.Email != "new@example.com" || user.Role != domain.UserRoleMember {
+		t.Fatalf("unexpected user: %+v", user)
+	}
+	if user.Name == nil || *user.Name != "New User" {
+		t.Fatalf("name not stored: %+v", user)
+	}
+
+	if _, err := fixture.usecase.CreateUser(context.Background(), admin, "new@example.com", "", ""); !errors.Is(err, errs.ErrUserConflict) {
+		t.Fatalf("expected ErrUserConflict, got %v", err)
+	}
+}
+
+func TestCreateUserValidatesEmailAndRole(t *testing.T) {
+	fixture := newAuthFixture(t)
+	admin := &domain.User{ID: uuid.NewString(), Email: "admin@example.com", Role: domain.UserRoleAdmin}
+
+	if _, err := fixture.usecase.CreateUser(context.Background(), admin, "not-an-email", "", ""); !errors.Is(err, errs.ErrInvalidEmail) {
+		t.Fatalf("expected ErrInvalidEmail, got %v", err)
+	}
+	if _, err := fixture.usecase.CreateUser(context.Background(), admin, "new@example.com", "", "superuser"); !errors.Is(err, errs.ErrInvalidRole) {
+		t.Fatalf("expected ErrInvalidRole, got %v", err)
+	}
+
+	created, err := fixture.usecase.CreateUser(context.Background(), admin, "second@example.com", "", "admin")
+	if err != nil || created.Role != domain.UserRoleAdmin {
+		t.Fatalf("explicit admin role not honoured: %+v (%v)", created, err)
 	}
 }
 

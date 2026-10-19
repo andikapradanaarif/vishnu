@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgconn"
 	"gorm.io/gorm"
 
 	"github.com/andikapradanaarif/vishnu/internal/domain"
@@ -38,6 +39,17 @@ func (r *userRepository) GetByEmail(ctx context.Context, email string) (*domain.
 		return nil, mapUserError(err)
 	}
 	return &user, nil
+}
+
+func (r *userRepository) Create(ctx context.Context, user *domain.User) error {
+	if user.ID == "" {
+		user.ID = uuid.NewString()
+	}
+	user.Email = normalizeEmail(user.Email)
+	if user.Role == "" {
+		user.Role = domain.UserRoleMember
+	}
+	return mapUserError(r.db.WithContext(ctx).Create(user).Error)
 }
 
 func (r *userRepository) Upsert(ctx context.Context, user *domain.User) error {
@@ -75,6 +87,10 @@ func mapUserError(err error) error {
 	}
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return errs.ErrUserNotFound
+	}
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+		return errs.ErrUserConflict
 	}
 	return err
 }
