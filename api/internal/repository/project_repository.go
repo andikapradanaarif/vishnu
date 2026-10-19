@@ -29,6 +29,10 @@ func (r *projectRepository) List(ctx context.Context) ([]domain.Project, error) 
 }
 
 func (r *projectRepository) GetByID(ctx context.Context, id string) (*domain.Project, error) {
+	if !isUUID(id) {
+		return nil, errs.ErrProjectNotFound
+	}
+
 	var project domain.Project
 	if err := r.db.WithContext(ctx).First(&project, "id = ?", id).Error; err != nil {
 		return nil, mapError(err)
@@ -48,6 +52,10 @@ func (r *projectRepository) Update(ctx context.Context, project *domain.Project)
 }
 
 func (r *projectRepository) SoftDelete(ctx context.Context, id string) error {
+	if !isUUID(id) {
+		return errs.ErrProjectNotFound
+	}
+
 	result := r.db.WithContext(ctx).Delete(&domain.Project{}, "id = ?", id)
 	if result.Error != nil {
 		return mapError(result.Error)
@@ -59,6 +67,10 @@ func (r *projectRepository) SoftDelete(ctx context.Context, id string) error {
 }
 
 func (r *projectRepository) SetStatus(ctx context.Context, id string, status domain.ProjectStatus, errMsg string) error {
+	if !isUUID(id) {
+		return errs.ErrProjectNotFound
+	}
+
 	var message *string
 	if errMsg != "" {
 		message = &errMsg
@@ -74,6 +86,14 @@ func (r *projectRepository) SetStatus(ctx context.Context, id string, status dom
 		return errs.ErrProjectNotFound
 	}
 	return nil
+}
+
+// isUUID guards id lookups: Postgres rejects a malformed uuid with a type
+// error rather than returning no rows, which turns an unknown id into a
+// 500 instead of a 404.
+func isUUID(id string) bool {
+	_, err := uuid.Parse(id)
+	return err == nil
 }
 
 func mapError(err error) error {
