@@ -63,12 +63,20 @@ export class ApiError extends Error {
 	readonly status: number;
 	/** Parsed error body from the response, if available. */
 	readonly body: ErrorBody;
+	/** Machine-readable error code from the response body, if present. */
+	readonly code?: string;
 
 	constructor(status: number, body: ErrorBody) {
 		super(body.message || `API error ${status}`);
 		this.name = "ApiError";
 		this.status = status;
 		this.body = body;
+		this.code = body.code;
+	}
+
+	/** True when the session is missing or expired — send the user to sign in. */
+	get isAuthError(): boolean {
+		return this.status === 401;
 	}
 }
 

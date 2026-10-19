@@ -8,6 +8,8 @@
  * import { v1WorkspaceSessions } from "@vishnu/api-contract/paths";
  * buildPath(v1WorkspaceSessions, { id: workspaceId });
  */
+import { buildPath } from "./client";
+
 export const v1Workspaces = "/workspaces";
 export const v1WorkspaceById = "/workspaces/{id}";
 export const v1WorkspaceSessions = "/workspaces/{id}/sessions";
@@ -25,3 +27,27 @@ export const v1WorkspacePermissionsGrant = "/workspaces/{id}/permissions/grant";
 export const v1WorkspacePermissionsSkip = "/workspaces/{id}/permissions/skip";
 export const v1WorkspaceQuestionsAnswer = "/workspaces/{id}/questions/answer";
 export const v1WorkspaceQuestionsCancel = "/workspaces/{id}/questions/cancel";
+
+// ---------- vishnu project routing ----------
+
+/**
+ * Base of one project's crush surface. vishnu mounts every project's
+ * `crush server` under its id, so the same domain SDKs work per project.
+ */
+export const vishnuProjectBase = "/p/{pid}/v1";
+
+/**
+ * Resolves the crush base URL for a selected project. Construct the crush
+ * clients per project; the `client_id` query param stays opt-in.
+ *
+ * @example
+ * const api = new ApiClient({
+ *   baseUrl: projectBaseUrl(projectId),
+ *   defaultQuery: { client_id },
+ * });
+ * const events = new EventsClient(api);
+ * new EventSource(events.url(workspaceId));
+ */
+export function projectBaseUrl(projectId: string): string {
+	return buildPath(vishnuProjectBase, { pid: projectId });
+}

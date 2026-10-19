@@ -28,9 +28,11 @@ export interface CreateWorkspaceRequest {
 	data_dir?: string;
 }
 
-/** Error envelope returned by crush on non-2xx responses. */
+/** Error envelope returned by the API and crush on non-2xx responses. */
 export interface ErrorBody {
 	message?: string;
+	/** Machine-readable code, e.g. "forbidden" or "invalid_code". */
+	code?: string;
 }
 
 export interface Todo {
