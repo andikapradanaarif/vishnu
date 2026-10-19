@@ -109,6 +109,20 @@ func TestAuthLeavesTheSignInRoutesOpen(t *testing.T) {
 	}
 }
 
+func TestAuthDoesNotExemptPathsSharingTheSignInPrefix(t *testing.T) {
+	app := fiber.New()
+	app.Use("/api", Auth(&fakeSessions{err: errs.ErrSessionNotFound}))
+	app.Get("/api/authors", func(c fiber.Ctx) error { return c.SendStatus(fiber.StatusOK) })
+	app.Get("/api/authz/roles", func(c fiber.Ctx) error { return c.SendStatus(fiber.StatusOK) })
+
+	for _, target := range []string{"/api/authors", "/api/authz/roles"} {
+		status, _ := call(t, app, httptest.NewRequest("GET", target, nil))
+		if status != fiber.StatusUnauthorized {
+			t.Fatalf("%s must require a session, got %d", target, status)
+		}
+	}
+}
+
 func TestAuthProtectsProjectProxyPaths(t *testing.T) {
 	sessions := &fakeSessions{err: errors.New("no session")}
 
