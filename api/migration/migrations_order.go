@@ -10,7 +10,9 @@ import (
 //go:embed *.sql
 var migrationFiles embed.FS
 
-var MigrationOrder = []string{}
+var MigrationOrder = []string{
+	"create_projects_table",
+}
 
 func GetCreateMigrationsTableSQL() (string, error) {
 	return readMigrationFile("create_migrations_table.sql")
