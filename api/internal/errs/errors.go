@@ -15,7 +15,10 @@ var (
 	ErrInvalidUpstream = errors.New("upstream must be an http(s) URL")
 
 	ErrUserNotFound         = errors.New("user not found")
+	ErrUserConflict         = errors.New("user already exists")
 	ErrInvalidEmail         = errors.New("a valid email address is required")
+	ErrInvalidRole          = errors.New("role must be admin or member")
+	ErrForbidden            = errors.New("forbidden")
 	ErrSessionNotFound      = errors.New("session not found")
 	ErrOTPNotFound          = errors.New("no pending code for that address")
 	ErrOTPExpired           = errors.New("the code has expired")
