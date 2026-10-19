@@ -40,12 +40,30 @@ func TestAllocPortSkipsBusyPorts(t *testing.T) {
 	busy := listener.Addr().(*net.TCPAddr).Port
 
 	manager := NewManager(Options{PortStart: busy})
-	got, err := manager.AllocPort()
+	got, err := manager.AllocPort(nil)
 	if err != nil {
 		t.Fatalf("alloc port: %v", err)
 	}
 	if got <= busy {
 		t.Fatalf("got port %d, want one above the busy %d", got, busy)
+	}
+}
+
+func TestAllocPortSkipsPortsClaimedByRegisteredProjects(t *testing.T) {
+	manager := NewManager(Options{PortStart: freePort(t)})
+	first, err := manager.AllocPort(nil)
+	if err != nil {
+		t.Fatalf("first alloc: %v", err)
+	}
+
+	// The first project's crush has not spawned, so nothing is listening on
+	// its port — only the registry knows the port is spoken for.
+	second, err := manager.AllocPort([]int{first})
+	if err != nil {
+		t.Fatalf("second alloc: %v", err)
+	}
+	if second == first {
+		t.Fatalf("got %d twice, want the reserved port to be skipped", first)
 	}
 }
 

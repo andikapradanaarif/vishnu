@@ -158,7 +158,10 @@ func (m *Manager) Ensure(ctx context.Context, project domain.Project) (string, e
 		}
 	}
 
-	if err := m.waitHealthy(ctx, e); err != nil {
+	// The spawn outlives the request that triggered it: a browser that drops
+	// the workspace call mid-spawn must not abort the health wait and get the
+	// child it just started killed underneath it.
+	if err := m.waitHealthy(context.WithoutCancel(ctx), e); err != nil {
 		m.signal(e, syscall.SIGTERM)
 		return "", err
 	}
@@ -191,7 +194,14 @@ func (m *Manager) Stop(ctx context.Context, id string) error {
 	case <-time.After(deadline):
 		slog.Warn("Crush server ignored SIGTERM, killing", "project", id)
 		m.signal(e, syscall.SIGKILL)
-		<-e.done
+		// SIGKILL is not guaranteed to reap the process (EPERM, a zombie
+		// parent, an uninterruptible state). Waiting without a bound here
+		// would hold e.mu forever and wedge every later call for the project.
+		select {
+		case <-e.done:
+		case <-time.After(m.opts.StopTimeout):
+			slog.Warn("Crush server did not exit after SIGKILL", "project", id)
+		}
 	}
 
 	m.forget(id)
@@ -248,8 +258,21 @@ func (m *Manager) Logs(id string) []string {
 	return e.logs.Lines()
 }
 
-func (m *Manager) AllocPort() (int, error) {
+// AllocPort walks upward from VISHNU_PORT_START and returns the first port that
+// is neither listening nor already claimed by a registered project. Probing
+// the listener alone is not enough: a project whose crush has not spawned yet
+// holds a port that nothing is bound to, and handing that port to a second
+// project makes B's health check succeed against A's server.
+func (m *Manager) AllocPort(reserved []int) (int, error) {
+	skip := make(map[int]bool, len(reserved))
+	for _, port := range reserved {
+		skip[port] = true
+	}
+
 	for port := m.opts.PortStart; port < m.opts.PortStart+1000; port++ {
+		if skip[port] {
+			continue
+		}
 		listener, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", port))
 		if err != nil {
 			continue
