@@ -4,9 +4,9 @@ import { Chip } from "@vishnu/ui-component/chip";
 import { Dialog } from "@vishnu/ui-component/dialog";
 import { EmptyState } from "@vishnu/ui-component/emptyState";
 import { useDeleteProject, useProjects } from "@/hooks/queries";
-import { Spinner } from "@/components/Spinner";
+import { LoadingSpinner } from "@vishnu/ui-component/loadingAnimation";
 import { errorLabel } from "@/utils/errors";
-import type { Project, ProjectMode, ProjectStatus } from "@vishnu/api-contract";
+import type { Project, ProjectMode } from "@vishnu/api-contract";
 import { AddProjectDialog } from "./AddProjectDialog";
 
 interface ProjectPickerProps {
@@ -19,20 +19,13 @@ const MODE_CLASS: Record<ProjectMode, string> = {
 	external: "!rounded-sm border border-pink-500/50 bg-pink-500/10 text-pink-300",
 };
 
-const STATUS_CLASS: Record<ProjectStatus, string> = {
-	up: "!rounded-sm border border-success-500/50 bg-success-500/10 text-success-300",
-	starting: "!rounded-sm border border-warning-500/50 bg-warning-500/10 text-warning-300",
-	cloning: "!rounded-sm border border-warning-500/50 bg-warning-500/10 text-warning-300 blink",
-	down: "!rounded-sm border border-border bg-raised text-ghost",
-	error: "!rounded-sm border border-danger-500/50 bg-danger-500/10 text-danger-300",
-};
-
 function isSelectable(project: Project): boolean {
 	return project.status !== "cloning" && project.status !== "error";
 }
 
 function secondaryLine(project: Project): string | undefined {
-	return project.mode === "external" ? project.upstream : project.path;
+	if (project.mode === "external") return project.upstream;
+	return project.repo_url ?? project.path;
 }
 
 /** Main menu: the registered projects, with add and delete. */
@@ -65,7 +58,7 @@ export function ProjectPicker({ onSelect, onLogout }: ProjectPickerProps) {
 
 			{isLoading && (
 				<div className="flex items-center justify-center gap-3 py-12 text-center font-display text-lg text-on-surface-muted">
-					<Spinner className="text-primary-400" /> loading projects…
+					<LoadingSpinner size={16} className="text-primary-400" /> loading projects…
 				</div>
 			)}
 			{error && (
@@ -114,22 +107,12 @@ export function ProjectPicker({ onSelect, onLogout }: ProjectPickerProps) {
 									onSelect(project.id);
 								}
 							}}
-							className={`group flex items-start gap-2 border-2 px-3 py-2 ${
+							className={`flex items-start gap-2 border-2 px-3 py-2 ${
 								selectable
 									? "cursor-pointer border-border bg-surface hover:border-primary-500 hover:bg-raised"
 									: "border-line bg-surface/60 opacity-70"
 							}`}
 						>
-							<span
-								className={`mt-0.5 shrink-0 font-display text-lg ${
-									selectable
-										? "text-ghost group-hover:text-primary-400"
-										: "text-line"
-								}`}
-							>
-								▸
-							</span>
-
 							<div className="min-w-0 flex-1">
 								<div className="flex flex-wrap items-center gap-2">
 									<span className="truncate font-display text-xl text-on-surface">
@@ -141,13 +124,6 @@ export function ProjectPicker({ onSelect, onLogout }: ProjectPickerProps) {
 										colorClassName={MODE_CLASS[project.mode]}
 									>
 										{project.mode.toUpperCase()}
-									</Chip>
-									<Chip
-										size="sm"
-										color="custom"
-										colorClassName={STATUS_CLASS[project.status]}
-									>
-										{project.status.toUpperCase()}
 									</Chip>
 								</div>
 								{secondary && (
