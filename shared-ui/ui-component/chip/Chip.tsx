@@ -7,7 +7,7 @@ export const Chip = (props: ChipProps) => {
 
   const isSolid = variant === 'solid';
   const colorClass =
-    color === 'custom' ? '' : isSolid ? `${solidBgColorMap[color]} text-white` : `${bgColorMap[color]} ${fontColorMap[color]}`;
+    color === 'custom' ? '' : isSolid ? `${solidBgColorMap[color]} text-on-primary` : `${bgColorMap[color]} ${fontColorMap[color]}`;
 
   return (
     <div

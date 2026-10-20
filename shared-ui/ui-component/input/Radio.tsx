@@ -63,8 +63,8 @@ const Radio = forwardRef<HTMLDivElement, RadioProps>((props, forwardedRef) => {
 							className={classNames(
 								"w-4 h-4 rounded-full border flex items-center justify-center transition-colors flex-shrink-0 cursor-pointer",
 								!(disabled || option.disabled) && value === option.value && "border-primary-600",
-								!(disabled || option.disabled) && value !== option.value && "border-neutral-300 bg-white",
-								(disabled || option.disabled) && "bg-neutral-50 border-neutral-200 cursor-not-allowed",
+								!(disabled || option.disabled) && value !== option.value && "border-neutral-300 bg-surface",
+								(disabled || option.disabled) && "bg-surface-alt border-neutral-200 cursor-not-allowed",
 							)}
 							onClick={() => handleChange(option.value, option.disabled)}
 						>

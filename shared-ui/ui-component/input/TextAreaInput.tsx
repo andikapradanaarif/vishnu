@@ -102,7 +102,7 @@ const TextAreaInput = forwardRef<HTMLTextAreaElement, TextAreaInputProps>(
 							className={classNames(
 								"appearance-none block w-full px-3 py-2 border border-neutral-400/65 rounded-md placeholder-neutral-400 focus:outline-none focus:shadow-none focus:border-[var(--color-primary)] text-sm text-neutral-800 min-h-[40px]",
 								maxRows ? "overflow-y-auto" : "overflow-hidden",
-								disabled ? "bg-neutral-100 cursor-not-allowed text-neutral-400" : "bg-white",
+								disabled ? "bg-neutral-100 cursor-not-allowed text-neutral-400" : "bg-surface",
 								error && "border-danger-500",
 								success && "border-success-600",
 								className,

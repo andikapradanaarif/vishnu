@@ -133,6 +133,8 @@
 	--color-primary: var(--color-primary-500);
 	--color-surface: #ffffff;
 	--color-surface-alt: #f9fafb;
+	--color-on-surface: #111827;
+	--color-border: #e5e7eb;
 	--color-line: #e5e7eb;
 	--color-line-strong: #d1d5db;
 	--color-ink: #111827;

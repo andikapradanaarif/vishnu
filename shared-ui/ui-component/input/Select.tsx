@@ -54,7 +54,7 @@ const SelectTrigger = memo(function SelectTrigger({
 				disabled={disabled}
 				className={classNames(
 					"relative appearance-none flex items-center w-full min-w-0 px-3 py-2 border border-neutral-400/65 rounded-md focus:outline-none focus:shadow-none focus:border-[var(--color-primary)] text-sm text-left",
-					disabled ? "bg-neutral-100 cursor-not-allowed" : "bg-white cursor-pointer",
+					disabled ? "bg-neutral-100 cursor-not-allowed" : "bg-surface cursor-pointer",
 					isLoading || showClear ? "pr-14" : "pr-8",
 					prefixIcon ? "pl-9" : "",
 					error && "border-danger-500",
@@ -281,7 +281,7 @@ export default function Select<T = string>({
 				>
 					<div ref={listRef} className="flex flex-col w-full max-h-56 overflow-y-auto gap-1">
 						{isSearchable && (
-							<div className="sticky top-0 bg-white pb-1">
+							<div className="sticky top-0 bg-surface pb-1">
 								<SearchInput
 									ref={searchInputRef}
 									type="text"

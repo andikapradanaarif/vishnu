@@ -38,8 +38,8 @@ export const PaginationItem = (props: PaginationItemProps) => {
       className={classNames(
         'relative overflow-hidden p-4 w-4 h-4 rounded-sm text-sm flex justify-center items-center cursor-pointer font-normal transition-all',
         {
-          'bg-primary-500 text-white hover:bg-primary-600/90 transition-colors duration-200': isActive && !disabled,
-          'bg-primary-500 text-white cursor-disabled': isActive && disabled,
+          'bg-primary-500 text-on-primary hover:bg-primary-600/90 transition-colors duration-200': isActive && !disabled,
+          'bg-primary-500 text-on-primary cursor-disabled': isActive && disabled,
           'bg-neutral-100 hover:bg-neutral-200 text-neutral-800 transition-colors duration-200': !isActive && !disabled,
           'cursor-disabled text-neutral-400': !isActive && disabled,
         }

@@ -28,7 +28,7 @@ export const TimeTrigger = memo(function TimeTrigger(props: TimeTriggerProps) {
       className={classNames(
         'appearance-none flex items-center w-full px-3 py-2 border border-neutral-400/65 rounded-md text-left',
         'transition-colors focus:outline-none focus:shadow-none focus:border-[var(--color-primary)]',
-        disabled ? 'bg-neutral-100 cursor-not-allowed' : 'bg-white cursor-pointer',
+        disabled ? 'bg-neutral-100 cursor-not-allowed' : 'bg-surface cursor-pointer',
         error && 'border-danger-500',
         size === 'sm' ? 'text-xs' : 'text-sm'
       )}

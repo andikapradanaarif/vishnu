@@ -76,7 +76,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 						placeholder={placeholder}
 						className={classNames(
 							"appearance-none block w-full px-3 py-2 border border-neutral-400/65 rounded-md placeholder-neutral-400 focus:outline-none focus:shadow-none focus:border-[var(--color-primary)] text-sm",
-							disabled ? "bg-neutral-100 cursor-not-allowed text-neutral-700" : "bg-white text-neutral-800",
+							disabled ? "bg-neutral-100 cursor-not-allowed text-neutral-700" : "bg-surface text-neutral-800",
 							suffixIcon || isLoading ? "pr-10" : "",
 							suffixIcon && isLoading ? "pr-16" : "",
 							prefixIcon ? "pl-9" : "",

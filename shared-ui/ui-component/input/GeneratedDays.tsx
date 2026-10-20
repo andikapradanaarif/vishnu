@@ -68,7 +68,7 @@ export default function GeneratedDays(props: GeneratedDaysProps) {
             dateClassName?.(date),
             {
               'bg-primary-100 scale-105': isInRange,
-              'bg-primary-500 text-white hover:text-white hover:bg-primary-400 scale-105': isStartDate || isEndDate,
+              'bg-primary-500 text-on-primary hover:text-on-primary hover:bg-primary-400 scale-105': isStartDate || isEndDate,
             },
             isDisabled
               ? 'cursor-not-allowed text-neutral-600 bg-neutral-200'

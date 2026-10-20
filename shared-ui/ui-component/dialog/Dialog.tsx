@@ -93,7 +93,7 @@ export function Dialog({
 				<div
 					className={classNames(
 						className,
-						"relative rounded-lg bg-white text-left shadow-lg p-6 sm:mt-40 mt-16",
+						"relative rounded-lg bg-surface text-left shadow-lg p-6 sm:mt-40 mt-16",
 						isExiting ? "shared-dialog-panel-out" : "shared-dialog-panel",
 					)}
 					role="dialog"

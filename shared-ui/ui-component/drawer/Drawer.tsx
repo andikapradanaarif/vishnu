@@ -77,7 +77,7 @@ export const Drawer = ({
 
 			{/* Drawer */}
 			<div
-				className={`fixed top-0 ${position === "right" ? "right-0" : "left-0"} h-full ${isSmallerThanTablet ? "w-full" : width} bg-white shadow-xl flex flex-col ${className} ${panelClass}`}
+				className={`fixed top-0 ${position === "right" ? "right-0" : "left-0"} h-full ${isSmallerThanTablet ? "w-full" : width} bg-surface shadow-xl flex flex-col ${className} ${panelClass}`}
 				role="dialog"
 				aria-modal="true"
 				onClick={(e) => e.stopPropagation()}

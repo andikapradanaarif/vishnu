@@ -219,7 +219,7 @@ export function Popover({
 						}}
 						className={classNames(
 							// Base styles
-							"z-50 bg-white rounded-lg border border-neutral-100",
+							"z-50 bg-surface rounded-lg border border-neutral-100",
 							// Custom lighter and more diffuse shadow
 							"shadow-[0_2px_8px_0_rgba(0,0,0,0.04)]",
 
