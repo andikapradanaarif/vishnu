@@ -6,6 +6,8 @@
 	"description": "Vishnu — web UI for crush sessions",
 	"scripts": {
 		"dev": "vite",
+		"dev:mock": "VITE_API_UPSTREAM=http://127.0.0.1:8081 vite",
+		"mock": "bun run scripts/mock-api.ts",
 		"build": "tsc -b && vite build",
 		"typecheck": "tsc -b",
 		"lint": "tsc -b && oxlint .",

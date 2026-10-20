@@ -41,3 +41,19 @@ Prerequisites:
 
 Verification before shipping: `cd web && bun run lint && bun run build`,
 plus `bun run build` at the root.
+
+## Preview without the backend
+
+The SPA can run against an in-memory mock (`web/scripts/mock-api.ts`)
+with no Postgres, Go API or crush:
+
+```bash
+cd web
+bun run mock      # terminal 1 — mock API on :8081
+bun run dev:mock  # terminal 2 — Vite on :5173
+```
+
+Sign in with any email and code `123456` (`000000` exercises the
+`invalid_code` path). The mock serves sample projects (up, cloning,
+error, down), two sessions with message history, a pending permission
+and question, and canned replies to prompts.
