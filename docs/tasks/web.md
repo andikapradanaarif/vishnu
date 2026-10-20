@@ -1,9 +1,9 @@
 # web/ implementation — agent task breakdown
 
 Assignee: rewire `web/` onto the shipped API + contract, and rebuild the
-UI in the **vishnu retro-game theme**. Work is split into **4 PR-sized
-milestones** — land them in order; each PR must lint, typecheck and
-build clean. Commit per topic inside a PR.
+UI in the **vishnu retro-game theme**. Work is split into **5 PR-sized
+milestones** (one in `shared-ui/`, four in `web/`) — land them in order;
+each PR must lint, typecheck and build clean. Commit per topic.
 
 Canonical docs: `docs/PLAN.md` (grand), `plan/web.md` (layout + data
 flow + event dispatch), `plan/projects.md` (project lifecycle + status
@@ -39,8 +39,10 @@ contract, and reskins everything.
   into the query cache + `pendingStore`.
 - oxlint/oxfmt; `import type` for types; no `any`; comments only where
   the wire quirk isn't obvious from the code.
-- Do NOT touch `api/`, `contract/`, `shared-ui/` — if a needed type or
-  endpoint is missing, flag it instead of working around it.
+- Do NOT touch `api/` or `contract/` — if a needed type or endpoint is
+  missing, flag it instead of working around it. `shared-ui/` is touched
+  ONLY in PR 0, and only to swap hardcoded colors for theme tokens —
+  no component API or visual changes there.
 
 ## Global verification (before every commit)
 
@@ -77,13 +79,30 @@ Status → color: `up`=ok, `starting`/`cloning`=warn blink,
 
 ### Typography
 
-- **Display/HUD**: a pixel font — "VT323" or "Press Start 2P" (via
-  `@fontsource`; bundle it, no CDN) for the title screen, headings,
-  topbar HUD, big status words.
-- **Body/code**: JetBrains Mono (or IBM Plex Mono) — crush is a
-  terminal, everything data-shaped is monospace.
-- `font-feature` ligatures OFF; letter-spacing slightly loose on
-  pixel font (it reads cramped otherwise).
+shared-ui ships **no font tokens** — the app owns fonts entirely, so
+declare them as Tailwind theme tokens in `web/src/index.css`:
+
+```
+@theme {
+  --font-sans:    "JetBrains Mono", ui-monospace, monospace;  /* base  */
+  --font-display: "VT323", "JetBrains Mono", monospace;       /* HUD   */
+  --font-logo:    "Press Start 2P", "VT323", monospace;       /* title */
+}
+```
+
+- **`--font-sans` = JetBrains Mono** — the base font is mono. Crush is a
+  terminal: its whole UI is one monospace grid, so body text, inputs,
+  lists and buttons all ride on it. (This is the design-system-aligned
+  choice — crush's design system *is* monospace.)
+- **`--font-display` = VT323** — the retro display face for headings,
+  the topbar HUD, status words, dialog titles. Readable at UI sizes,
+  authentically phosphor-terminal.
+- **`--font-logo` = Press Start 2P** — only for the VISHNU wordmark on
+  the title screen + picker header. Too heavy for anything else.
+- Bundle via `@fontsource-variable/jetbrains-mono`, `@fontsource/vt323`,
+  `@fontsource/press-start-2p` — no CDN, no runtime font fetch.
+- Ligatures OFF, pixel faces get `letter-spacing: 0.02em` (they read
+  cramped otherwise). Body text never uses the pixel fonts.
 
 ### Chrome & effects
 
@@ -121,6 +140,39 @@ text; the theme is tokens + a few utility classes, not per-component
 one-offs.
 
 ---
+
+## PR 0 — shared-ui: consume its own theme tokens
+
+**Goal:** make the vendored `@vishnu/ui-component` rethemeable — it
+already defines `--color-surface`/`--color-surface-alt` in
+`styles.css`, but ~25 components hardcode `bg-white`/`text-black`
+instead of using them, so a dark theme renders white cards.
+
+- In `shared-ui/ui-component/**`, replace hardcoded surface colors with
+  the tokens Tailwind v4 generates from `styles.css`'s `@theme` block:
+  `bg-white` → `bg-surface`, `bg-neutral-50`-style page fills →
+  `bg-surface-alt`, `text-white`/`text-black` where they mean
+  on-surface/fg → the matching token. If a needed semantic token is
+  missing (`--color-on-surface`, `--color-border`), add it to
+  `styles.css`'s `@theme` — don't invent per-component vars.
+- **Scope**: only the components vishnu's app imports — `button`,
+  `chip`, `dialog`, `drawer`, `input/*` (Input, TextAreaInput, Select,
+  Checkbox, Radio, Switch, SegmentedControl), `menu`, `popover`,
+  `tooltip`, `emptyState`, `alert`, `message`, `loadingAnimation`,
+  `tabs`, `form`, `text`, `pagination`, `dataList`, `actionBar`,
+  `wrapper/ContentWrapper`. Leave `calendar/`, `table/`, `slider/`,
+  `stepper/` etc. for later — flag them as unthemed in a comment on the
+  follow-ups list.
+- **No API changes, no visual changes** — under the default
+  (`surface=white`) theme every component must render identically.
+  This is a token indirection PR.
+- If `index.ts`/`package.json#exports` change (they shouldn't), sync
+  `docs/PUBLIC_API.*` per `shared-ui/AGENTS.md`; otherwise leave them.
+
+**Acceptance:** `bun run build && bun run lint` in `shared-ui/` clean;
+`git diff` touches only class strings + the `@theme` block; a local
+override of `--color-surface: #1d2021` in a scratch page rethemes
+Dialog/Drawer/Input without code changes.
 
 ## PR 1 — service layer + auth gate
 
@@ -176,13 +228,21 @@ SSE stream targets the new `/p/{pid}`; delete removes the row.
 
 ## PR 3 — retro-game theme
 
-**Goal:** the whole app reskinned per "Design language", shared-ui
-respectfully overridden.
+**Goal:** the whole app reskinned per "Design language", driven by
+`@theme` overrides — shared-ui rethemes automatically after PR 0.
 
-- `index.css` + Tailwind theme tokens for the palette above; pixel +
-  mono font stacks loaded via `@fontsource` packages (add deps);
-  utility classes: `.crt-scanlines`, `.pixel-border`, `.glow`,
-  `.blink`, `.step-spin`.
+- `web/src/index.css` `@theme` overrides (the mechanism `styles.css`
+  documents): `--color-primary-*` indigo → mustard scale anchored on
+  `#fabd2f`, `--color-neutral-*` slate → warm gruvbox browns,
+  `--color-danger-*` → gruvbox reds, `--color-surface(-alt)` →
+  `#282828`/`#1d2021`, `--color-on-surface`/`--color-border` →
+  `#ebdbb2`/`#665c54`, and `--radius-*` → `0`/`2px` so every shared-ui
+  `rounded-md`/`rounded-lg` goes square without touching the package.
+  Plus the font tokens from Typography. A retheme is a token swap —
+  hex literals must not appear outside this block.
+- Utility classes in `index.css`: `.crt-scanlines`, `.pixel-border`,
+  `.glow`, `.blink`, `.step-spin`; font utility classes come free from
+  the `--font-*` tokens (`font-display`, `font-logo`).
 - Restyle in place — `index.css` overrides where shared-ui allows
   (Tailwind v4 tokens/CSS vars), feature-level classes elsewhere:
   LoginScreen (title screen), ProjectPicker (main menu),
@@ -233,7 +293,9 @@ running stack; `bun run lint && bun run build` clean.
 - Three add-project modes work; cloning/error/down states render
   correctly; switching projects never leaks state between them.
 - No hardcoded URLs or `fetch` in `web/src` outside `services/api.ts`;
-  no component hex literals outside the theme tokens.
+  no component hex literals outside the theme tokens — shared-ui
+  rethemes purely through `@theme` overrides.
+- `shared-ui` ships the surface-token fix with zero visual/API drift.
 - `bun run build` (root) green; `make build` produces a working
   embedded SPA (`api/internal/webui`).
 - `docs/plan/web.md` updated if the layout/file tree moved;
