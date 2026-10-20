@@ -1,8 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
 	agentClient,
+	authClient,
 	configClient,
 	permissionsClient,
+	projectsClient,
 	questionsClient,
 	sessionsClient,
 	workspacesClient,
@@ -10,6 +12,7 @@ import {
 import { pendingStore } from "@/services/pendingStore";
 import type {
 	AgentMessage,
+	CreateProjectRequest,
 	PermissionAction,
 	PermissionRequest,
 	QuestionAnswer,
@@ -19,6 +22,9 @@ import type {
 } from "@vishnu/api-contract";
 
 export const queryKeys = {
+	me: ["auth", "me"] as const,
+	projects: ["projects"] as const,
+	projectWorkspace: (pid: string) => ["projects", pid, "workspace"] as const,
 	workspaces: ["workspaces"] as const,
 	sessions: (wid: string) => ["sessions", wid] as const,
 	messages: (wid: string, sid: string) => ["messages", wid, sid] as const,
@@ -28,7 +34,79 @@ export const queryKeys = {
 	permissionsSkip: (wid: string) => ["permissions-skip", wid] as const,
 };
 
-// ---------- Queries ----------
+// ---------- Vishnu control plane ----------
+
+export function useMe() {
+	return useQuery({
+		queryKey: queryKeys.me,
+		queryFn: () => authClient.me(),
+		retry: false,
+		staleTime: 30_000,
+	});
+}
+
+export function useRequestOtp() {
+	return useMutation({
+		mutationKey: ["auth", "request-otp"],
+		mutationFn: (email: string) => authClient.requestOtp(email),
+	});
+}
+
+export function useVerify() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationKey: ["auth", "verify"],
+		mutationFn: ({ email, code }: { email: string; code: string }) =>
+			authClient.verify(email, code),
+		onSuccess: (user) => qc.setQueryData(queryKeys.me, user),
+	});
+}
+
+export function useLogout() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationKey: ["auth", "logout"],
+		mutationFn: () => authClient.logout(),
+		onSuccess: () => qc.removeQueries({ queryKey: queryKeys.me }),
+	});
+}
+
+export function useProjects() {
+	return useQuery({
+		queryKey: queryKeys.projects,
+		queryFn: () => projectsClient.list(),
+	});
+}
+
+export function useCreateProject() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationKey: ["projects", "create"],
+		mutationFn: (req: CreateProjectRequest) => projectsClient.create(req),
+		onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.projects }),
+	});
+}
+
+export function useDeleteProject() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationKey: ["projects", "delete"],
+		mutationFn: (id: string) => projectsClient.delete(id),
+		onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.projects }),
+	});
+}
+
+export function useProjectWorkspace(projectId: string | undefined) {
+	return useQuery({
+		queryKey: queryKeys.projectWorkspace(projectId ?? ""),
+		queryFn: () => projectsClient.workspace(projectId!),
+		enabled: !!projectId,
+		staleTime: 0,
+		retry: 1,
+	});
+}
+
+// ---------- Crush queries ----------
 
 export function useWorkspaces() {
 	return useQuery({ queryKey: queryKeys.workspaces, queryFn: () => workspacesClient.list() });
