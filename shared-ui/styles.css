@@ -142,11 +142,12 @@
 	--color-on-primary: #ffffff;
 }
 
-/* Ripple Effect */
+/* Ripple Effect — squared and stepped so presses flash in line with
+   the hard-edged theme rather than glowing round. */
 @keyframes shared-ripple {
 	from {
 		transform: translate(-50%, -50%) scale(0);
-		opacity: 0.25;
+		opacity: 0.18;
 	}
 	to {
 		transform: translate(-50%, -50%) scale(1);
@@ -157,13 +158,19 @@
 .shared-ripple {
 	position: absolute;
 	pointer-events: none;
-	border-radius: 9999px;
+	border-radius: 0;
 	background-color: currentColor;
-	opacity: 0.25;
+	opacity: 0.18;
 	width: var(--shared-ripple-size, 0px);
 	height: var(--shared-ripple-size, 0px);
 	left: var(--shared-ripple-x, 0px);
 	top: var(--shared-ripple-y, 0px);
 	transform: translate(-50%, -50%) scale(0);
-	animation: shared-ripple 750ms ease-out;
+	animation: shared-ripple 400ms steps(4, end);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.shared-ripple {
+		display: none;
+	}
 }
