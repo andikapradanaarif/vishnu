@@ -77,23 +77,17 @@ export function TopBar({
 				: conn === "connecting"
 					? "STARTING"
 					: "OFFLINE";
-	const ledDot =
-		led === "ONLINE"
-			? "bg-success-500"
-			: led === "STARTING"
-				? "bg-warning-500 animate-pulse"
-				: "bg-neutral-600";
 	const ledText =
 		led === "ONLINE"
-			? "text-success-400"
+			? "text-success-400 glow"
 			: led === "STARTING"
-				? "text-warning-400"
-				: "text-neutral-500";
+				? "text-warning-400 blink"
+				: "text-ghost";
 
 	return (
-		<header className="flex items-center gap-2 border-b border-neutral-800 bg-neutral-950 px-3 py-2">
+		<header className="flex items-center gap-2 border-b-2 border-border bg-surface px-3 py-2">
 			<button
-				className="rounded-md p-2 text-neutral-400 hover:bg-neutral-800"
+				className="p-2 text-on-surface-muted hover:bg-raised hover:text-primary-400"
 				onClick={onMenu}
 				aria-label="Open menu"
 			>
@@ -102,13 +96,12 @@ export function TopBar({
 
 			<div className="min-w-0 flex-1">
 				<div className="flex items-center gap-2">
-					<span className="truncate text-sm font-medium text-neutral-100">
+					<span className="truncate font-display text-xl text-on-surface">
 						{project.name}
 					</span>
-					<span className={`h-2 w-2 shrink-0 rounded-full ${ledDot}`} />
-					<span className={`shrink-0 text-[10px] tracking-wide ${ledText}`}>{led}</span>
+					<span className={`shrink-0 font-display text-sm ${ledText}`}>● {led}</span>
 				</div>
-				<div className="truncate text-xs text-neutral-500">
+				<div className="truncate text-xs text-on-surface-muted">
 					{sessionTitle ?? project.path ?? project.upstream ?? project.id}
 				</div>
 			</div>
@@ -116,10 +109,10 @@ export function TopBar({
 			<button
 				type="button"
 				onClick={onSwitchProject}
-				className="hidden shrink-0 items-center gap-1 rounded-md px-2 py-1 text-xs text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200 sm:inline-flex"
+				className="hidden shrink-0 items-center gap-1 px-2 py-1 font-display text-sm text-info-300 hover:bg-raised hover:text-info-200 sm:inline-flex"
 			>
 				<Icon icon="ri:folder-line" width={14} />
-				Projects
+				PROJECTS
 			</button>
 
 			<Select
@@ -129,7 +122,7 @@ export function TopBar({
 				options={agentOptions}
 				value={undefined}
 				onChange={(v) => setMainAgent.mutate(v)}
-				className="w-32"
+				className="w-32 font-display"
 				isLoading={setMainAgent.isPending}
 			/>
 
@@ -146,12 +139,12 @@ export function TopBar({
 					if (!provider || !model) return;
 					setModel.mutate({ modelType: "large", model: { provider, model } });
 				}}
-				className="hidden w-48 sm:block"
+				className="hidden w-48 font-display sm:block"
 				isLoading={setModel.isPending}
 			/>
 
 			<div className="hidden items-center gap-1.5 lg:flex" title="Skip permission prompts">
-				<span className="text-xs text-neutral-500">Skip&nbsp;perms</span>
+				<span className="font-display text-sm text-on-surface-muted">SKIP</span>
 				<Switch
 					name="skip-permissions"
 					checked={skip?.skip ?? false}

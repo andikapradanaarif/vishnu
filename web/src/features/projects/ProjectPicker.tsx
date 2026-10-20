@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { Button } from "@vishnu/ui-component/button";
-import { Chip, type ChipColorsType } from "@vishnu/ui-component/chip";
+import { Chip } from "@vishnu/ui-component/chip";
 import { Dialog } from "@vishnu/ui-component/dialog";
 import { EmptyState } from "@vishnu/ui-component/emptyState";
-import { LoadingSpinner } from "@vishnu/ui-component/loadingAnimation";
 import { useDeleteProject, useProjects } from "@/hooks/queries";
-import type { Project, ProjectStatus } from "@vishnu/api-contract";
+import type { Project, ProjectMode, ProjectStatus } from "@vishnu/api-contract";
 import { AddProjectDialog } from "./AddProjectDialog";
 
 interface ProjectPickerProps {
@@ -13,12 +12,17 @@ interface ProjectPickerProps {
 	onLogout: () => void;
 }
 
-const STATUS_COLORS: Record<ProjectStatus, ChipColorsType> = {
-	up: "green",
-	starting: "orange",
-	cloning: "orange",
-	down: "grey",
-	error: "red",
+const MODE_CLASS: Record<ProjectMode, string> = {
+	managed: "!rounded-sm border border-info-500/50 bg-info-500/10 text-info-300",
+	external: "!rounded-sm border border-pink-500/50 bg-pink-500/10 text-pink-300",
+};
+
+const STATUS_CLASS: Record<ProjectStatus, string> = {
+	up: "!rounded-sm border border-success-500/50 bg-success-500/10 text-success-300",
+	starting: "!rounded-sm border border-warning-500/50 bg-warning-500/10 text-warning-300",
+	cloning: "!rounded-sm border border-warning-500/50 bg-warning-500/10 text-warning-300 blink",
+	down: "!rounded-sm border border-border bg-raised text-ghost",
+	error: "!rounded-sm border border-danger-500/50 bg-danger-500/10 text-danger-300",
 };
 
 function isSelectable(project: Project): boolean {
@@ -49,26 +53,33 @@ export function ProjectPicker({ onSelect, onLogout }: ProjectPickerProps) {
 	return (
 		<div className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col gap-4 px-4 py-10">
 			<div className="flex items-center justify-between">
-				<h1 className="text-lg font-semibold tracking-[0.25em] text-neutral-100">
+				<h1 className="glow font-logo text-xs tracking-[0.2em] text-primary-400">
 					SELECT PROJECT
 				</h1>
-				<Button variant="text" size="sm" onClick={onLogout}>
-					Log out
+				<Button variant="text" size="sm" className="font-display" onClick={onLogout}>
+					LOG OUT
 				</Button>
 			</div>
 
 			{isLoading && (
-				<div className="flex justify-center py-12">
-					<LoadingSpinner size={22} />
+				<div className="py-12 text-center font-display text-lg text-on-surface-muted">
+					<span className="blink text-primary-400">▊</span> loading projects…
 				</div>
 			)}
-			{error && <p className="text-sm text-danger-400">{error.message}</p>}
-			{actionError && <p className="text-sm text-danger-400">{actionError}</p>}
+			{error && <p className="font-display text-sm text-danger-400">{error.message}</p>}
+			{actionError && (
+				<p className="font-display text-sm text-danger-400">{actionError}</p>
+			)}
 
 			{!isLoading && !error && (projects ?? []).length === 0 && (
-				<div className="flex flex-col items-center gap-4 py-16">
-					<EmptyState text="INSERT COIN" className="py-4" />
-					<Button onClick={() => setAddOpen(true)}>+ New project</Button>
+				<div className="flex flex-col items-center gap-5 py-16">
+					<EmptyState text="INSERT COIN" className="py-4 font-display text-2xl" />
+					<Button
+						className="font-display text-lg tracking-[0.2em]"
+						onClick={() => setAddOpen(true)}
+					>
+						+ NEW PROJECT
+					</Button>
 				</div>
 			)}
 
@@ -88,17 +99,17 @@ export function ProjectPicker({ onSelect, onLogout }: ProjectPickerProps) {
 									onSelect(project.id);
 								}
 							}}
-							className={`group flex items-start gap-2 rounded-md border border-neutral-800 px-3 py-2 ${
+							className={`group flex items-start gap-2 border-2 px-3 py-2 ${
 								selectable
-									? "cursor-pointer hover:border-neutral-600 hover:bg-neutral-900"
-									: "opacity-60"
+									? "cursor-pointer border-border bg-surface hover:border-primary-500 hover:bg-raised"
+									: "border-line bg-surface/60 opacity-70"
 							}`}
 						>
 							<span
-								className={`mt-0.5 shrink-0 text-xs ${
+								className={`mt-0.5 shrink-0 font-display text-lg ${
 									selectable
-										? "text-neutral-600 group-hover:text-primary-400"
-										: "text-neutral-700"
+										? "text-ghost group-hover:text-primary-400"
+										: "text-line"
 								}`}
 							>
 								▸
@@ -106,30 +117,32 @@ export function ProjectPicker({ onSelect, onLogout }: ProjectPickerProps) {
 
 							<div className="min-w-0 flex-1">
 								<div className="flex flex-wrap items-center gap-2">
-									<span className="truncate text-sm text-neutral-100">{project.name}</span>
+									<span className="truncate font-display text-xl text-on-surface">
+										{project.name}
+									</span>
 									<Chip
 										size="sm"
-										variant="solid"
-										color={project.mode === "managed" ? "blue" : "indigo"}
+										color="custom"
+										colorClassName={MODE_CLASS[project.mode]}
 									>
 										{project.mode.toUpperCase()}
 									</Chip>
 									<Chip
 										size="sm"
-										color={STATUS_COLORS[project.status]}
-										className={project.status === "cloning" ? "animate-pulse" : undefined}
+										color="custom"
+										colorClassName={STATUS_CLASS[project.status]}
 									>
 										{project.status.toUpperCase()}
 									</Chip>
 								</div>
 								{secondary && (
-									<div className="truncate text-xs text-neutral-500">{secondary}</div>
+									<div className="truncate text-xs text-on-surface-muted">{secondary}</div>
 								)}
 								{project.status === "cloning" && (
-									<div className="text-xs text-warning-400">cloning…</div>
+									<div className="font-display text-sm text-warning-300">cloning…</div>
 								)}
 								{project.status === "error" && project.error && (
-									<div className="text-xs text-danger-400">{project.error}</div>
+									<div className="font-display text-sm text-danger-300">{project.error}</div>
 								)}
 							</div>
 
@@ -139,7 +152,7 @@ export function ProjectPicker({ onSelect, onLogout }: ProjectPickerProps) {
 									event.stopPropagation();
 									setPendingDelete(project);
 								}}
-								className="mt-0.5 shrink-0 rounded px-1.5 py-0.5 text-[10px] text-neutral-500 hover:bg-danger-950 hover:text-danger-400"
+								className="mt-0.5 shrink-0 px-1.5 py-0.5 font-display text-xs text-ghost hover:bg-danger-950 hover:text-danger-400"
 								aria-label={`Delete ${project.name}`}
 							>
 								DEL
@@ -153,9 +166,9 @@ export function ProjectPicker({ onSelect, onLogout }: ProjectPickerProps) {
 				<button
 					type="button"
 					onClick={() => setAddOpen(true)}
-					className="rounded-md border border-dashed border-neutral-800 px-3 py-2 text-left text-sm text-neutral-400 hover:border-neutral-600 hover:text-neutral-200"
+					className="border-2 border-dashed border-border px-3 py-2 text-left font-display text-lg text-on-surface-muted hover:border-primary-500 hover:text-primary-300"
 				>
-					+ New project
+					+ NEW PROJECT
 				</button>
 			)}
 
@@ -163,21 +176,22 @@ export function ProjectPicker({ onSelect, onLogout }: ProjectPickerProps) {
 				isOpen={!!pendingDelete}
 				onClose={() => setPendingDelete(undefined)}
 				title={pendingDelete ? `Delete ${pendingDelete.name}?` : "Delete project?"}
-				className="w-full max-w-md"
+				className="w-full max-w-md pixel-border bg-surface"
 			>
-				<p className="text-sm text-neutral-400">
+				<p className="text-sm text-on-surface-muted">
 					Crush is stopped for managed projects. Files on disk are not touched.
 				</p>
 				<div className="mt-4 flex justify-end gap-2">
-					<Button variant="text" onClick={() => setPendingDelete(undefined)}>
-						Cancel
+					<Button variant="text" className="font-display" onClick={() => setPendingDelete(undefined)}>
+						CANCEL
 					</Button>
 					<Button
 						color="danger"
+						className="font-display"
 						onClick={confirmDelete}
 						isLoading={deleteProject.isPending}
 					>
-						Delete
+						DELETE
 					</Button>
 				</div>
 			</Dialog>

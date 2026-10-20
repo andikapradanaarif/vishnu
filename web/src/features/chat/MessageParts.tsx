@@ -1,4 +1,3 @@
-import { Icon } from "@iconify/react";
 import type { ContentPart, Message, ToolCall, ToolResult } from "@vishnu/api-contract";
 import { clamp, prettyJson } from "@/utils/format";
 import { Markdown } from "./Markdown";
@@ -12,16 +11,16 @@ export function MessagePart({ part, role }: { part: ContentPart; role: Message["
 			return role === "assistant" ? (
 				<Markdown>{text}</Markdown>
 			) : (
-				<p className="text-sm whitespace-pre-wrap">{text}</p>
+				<p className="text-sm whitespace-pre-wrap text-on-surface">{text}</p>
 			);
 		}
 		case "reasoning": {
 			const { thinking } = part.data as { thinking: string };
 			if (!thinking?.trim()) return null;
 			return (
-				<details className="rounded-md border border-neutral-800 bg-neutral-900/60 px-3 py-2 text-xs text-neutral-400">
-					<summary className="cursor-pointer text-neutral-500 select-none">
-						Thinking
+				<details className="border border-border bg-raised px-3 py-2 text-xs text-on-surface-muted">
+					<summary className="cursor-pointer font-display text-sm tracking-[0.15em] text-primary-400/80 select-none">
+						THINKING
 					</summary>
 					<p className="mt-2 font-mono whitespace-pre-wrap">{thinking}</p>
 				</details>
@@ -30,20 +29,22 @@ export function MessagePart({ part, role }: { part: ContentPart; role: Message["
 		case "tool_call": {
 			const call = part.data as ToolCall;
 			return (
-				<div className="rounded-md border border-neutral-800 bg-neutral-900/60 px-3 py-2">
-					<div className="flex items-center gap-1.5 text-xs font-medium text-neutral-300">
-						<Icon icon="ri:tools-line" width={13} />
+				<div className="border border-border bg-raised px-3 py-2">
+					<div className="flex items-center gap-1.5 font-display text-base text-info-300">
+						<span className="text-info-500">»</span>
 						<span className="font-mono">{call.name}</span>
 						{!call.finished && (
-							<span className="ml-auto text-[10px] text-amber-400">running</span>
+							<span className="blink ml-auto font-display text-xs text-warning-400">
+								running
+							</span>
 						)}
 					</div>
 					{call.input && (
 						<details className="mt-1">
-							<summary className="cursor-pointer text-[11px] text-neutral-500 select-none">
+							<summary className="cursor-pointer font-display text-xs text-ghost select-none">
 								input
 							</summary>
-							<pre className="mt-1 overflow-x-auto font-mono text-[11px] text-neutral-400">
+							<pre className="mt-1 overflow-x-auto font-mono text-[11px] text-on-surface-muted">
 								{clamp(prettyJson(call.input), 4000)}
 							</pre>
 						</details>
@@ -56,16 +57,16 @@ export function MessagePart({ part, role }: { part: ContentPart; role: Message["
 			if (!res.content?.trim()) return null;
 			return (
 				<details
-					className={`rounded-md border px-3 py-2 ${
+					className={`border px-3 py-2 ${
 						res.is_error
-							? "border-red-900/60 bg-red-950/40"
-							: "border-neutral-800 bg-neutral-900/60"
+							? "border-danger-500/60 bg-danger-950/30"
+							: "border-border bg-raised"
 					}`}
 				>
-					<summary className="cursor-pointer text-[11px] text-neutral-500 select-none">
+					<summary className="cursor-pointer font-display text-xs text-on-surface-muted select-none">
 						{res.name || "tool"} result{res.is_error ? " · error" : ""}
 					</summary>
-					<pre className="mt-1 max-h-64 overflow-auto font-mono text-[11px] whitespace-pre-wrap text-neutral-400">
+					<pre className="mt-1 max-h-64 overflow-auto font-mono text-[11px] whitespace-pre-wrap text-on-surface-muted">
 						{clamp(res.content, 6000)}
 					</pre>
 				</details>
@@ -74,10 +75,10 @@ export function MessagePart({ part, role }: { part: ContentPart; role: Message["
 		case "shell_command": {
 			const sh = part.data as { command: string; output: string };
 			return (
-				<div className="rounded-md border border-neutral-800 bg-neutral-950 px-3 py-2 font-mono text-xs">
-					<div className="text-emerald-400">$ {sh.command}</div>
+				<div className="border border-border bg-surface-alt px-3 py-2 font-mono text-xs">
+					<div className="text-success-400">$ {sh.command}</div>
 					{sh.output && (
-						<pre className="mt-1 overflow-x-auto whitespace-pre-wrap text-neutral-400">
+						<pre className="mt-1 overflow-x-auto whitespace-pre-wrap text-on-surface-muted">
 							{clamp(sh.output, 4000)}
 						</pre>
 					)}

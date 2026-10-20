@@ -97,13 +97,14 @@ export function AddProjectDialog({ isOpen, onClose }: AddProjectDialogProps) {
 			isOpen={isOpen}
 			onClose={close}
 			title="New project"
-			className="w-full max-w-md"
+			className="w-full max-w-md pixel-border bg-surface"
 		>
 			<form className="flex flex-col gap-4" onSubmit={submit}>
 				<Tabs
 					id="project-source"
 					items={SOURCE_TABS}
 					active={source}
+					className="font-display text-lg"
 					onChange={(value) => {
 						setSource(value);
 						setFieldError(undefined);
@@ -152,15 +153,23 @@ export function AddProjectDialog({ isOpen, onClose }: AddProjectDialogProps) {
 					onChange={(event) => setName(event.target.value)}
 				/>
 
-				{fieldError && <p className="text-xs text-danger-400">{fieldError}</p>}
-				{error && <p className="text-xs text-danger-400">{error}</p>}
+				{fieldError && (
+					<p className="font-display text-sm text-danger-400">{fieldError}</p>
+				)}
+				{error && <p className="font-display text-sm text-danger-400">{error}</p>}
 
 				<div className="flex justify-end gap-2">
-					<Button variant="text" type="button" onClick={close} disabled={create.isPending}>
-						Cancel
+					<Button
+						variant="text"
+						type="button"
+						className="font-display"
+						onClick={close}
+						disabled={create.isPending}
+					>
+						CANCEL
 					</Button>
-					<Button type="submit" isLoading={create.isPending}>
-						Create
+					<Button type="submit" className="font-display" isLoading={create.isPending}>
+						CREATE
 					</Button>
 				</div>
 			</form>

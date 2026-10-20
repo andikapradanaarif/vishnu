@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { LoadingSpinner } from "@vishnu/ui-component/loadingAnimation";
 import { LoginScreen } from "@/features/auth/LoginScreen";
 import { ProjectPicker } from "@/features/projects/ProjectPicker";
 import { ProjectError, StartingProject } from "@/features/projects/ProjectStates";
@@ -24,8 +23,8 @@ export default function App() {
 
 	if (me.isPending) {
 		return (
-			<div className="flex h-dvh items-center justify-center">
-				<LoadingSpinner size={28} />
+			<div className="flex h-dvh items-center justify-center bg-cabinet">
+				<span className="blink font-display text-xl text-primary-400">▊ LOADING</span>
 			</div>
 		);
 	}

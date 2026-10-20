@@ -8,7 +8,9 @@ import "./index.css";
 createRoot(document.getElementById("root")!).render(
 	<StrictMode>
 		<QueryClientProvider client={queryClient}>
-			<App />
+			<div className="crt-scanlines min-h-dvh bg-cabinet text-on-surface">
+				<App />
+			</div>
 		</QueryClientProvider>
 	</StrictMode>,
 );

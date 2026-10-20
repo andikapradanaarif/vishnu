@@ -1,5 +1,4 @@
 import { Button } from "@vishnu/ui-component/button";
-import { LoadingSpinner } from "@vishnu/ui-component/loadingAnimation";
 import { ApiError } from "@vishnu/api-contract/client";
 import type { Project } from "@vishnu/api-contract";
 
@@ -18,12 +17,15 @@ export function StartingProject({
 	onBack: () => void;
 }) {
 	return (
-		<div className="flex h-dvh flex-col items-center justify-center gap-3 px-6 text-center">
-			<LoadingSpinner size={26} />
-			<p className="text-sm text-neutral-300">{label}</p>
-			{project && <p className="text-xs text-neutral-500">{project.name}</p>}
-			<Button variant="text" size="sm" onClick={onBack}>
-				Back to projects
+		<div className="flex h-dvh flex-col items-center justify-center gap-3 bg-cabinet px-6 text-center">
+			<p className="font-display text-2xl text-primary-400">
+				<span className="blink">▊</span> {label}
+			</p>
+			{project && (
+				<p className="font-display text-lg text-on-surface-muted">{project.name}</p>
+			)}
+			<Button variant="text" size="sm" className="font-display" onClick={onBack}>
+				BACK TO PROJECTS
 			</Button>
 		</div>
 	);
@@ -44,20 +46,24 @@ export function ProjectError({
 	const detail = errorText(error);
 
 	return (
-		<div className="flex h-dvh flex-col items-center justify-center gap-3 px-6 text-center">
-			<p className="text-sm font-medium text-danger-400">
+		<div className="flex h-dvh flex-col items-center justify-center gap-3 bg-cabinet px-6 text-center">
+			<p className="glow font-display text-2xl text-danger-400">
 				{external ? "EXTERNAL DOWN" : "START FAILED"}
 			</p>
-			{project && <p className="text-sm text-neutral-200">{project.name}</p>}
-			<p className="max-w-md text-xs text-neutral-500">
+			{project && (
+				<p className="font-display text-lg text-on-surface">{project.name}</p>
+			)}
+			<p className="max-w-md text-xs text-on-surface-muted">
 				{external && project?.upstream
 					? `vishnu can't reach ${project.upstream}. ${detail}`
 					: detail}
 			</p>
 			<div className="mt-2 flex gap-2">
-				<Button onClick={onRetry}>Retry</Button>
-				<Button variant="text" onClick={onBack}>
-					Back to projects
+				<Button className="font-display" onClick={onRetry}>
+					RETRY
+				</Button>
+				<Button variant="text" className="font-display" onClick={onBack}>
+					BACK TO PROJECTS
 				</Button>
 			</div>
 		</div>
