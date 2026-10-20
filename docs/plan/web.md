@@ -2,10 +2,11 @@
 
 ## Scope
 
-Single-screen React SPA (no router): session sidebar + conversation
-pane + composer, with agent-controlled cards for permissions/questions
-and top-bar controls for model/agent switching. Mobile portrait-first
-per the main plan.
+Single-screen React SPA (no router): sign-in gate → project menu →
+session shell. The shell keeps the session sidebar + conversation pane
++ composer, with agent-controlled cards for permissions/questions and
+HUD controls for model/agent switching. Mobile portrait-first per the
+main plan.
 
 ## Layout & files
 
@@ -22,43 +23,51 @@ shared-ui/                   @vishnu/ui-component — vendored copy of
 
 web/
   package.json            react19, @tanstack/react-query, react-markdown,
-                          remark-gfm, @vishnu/ui-component (workspace:*);
-                          dev: vite8, ts, tailwind4, oxlint/oxfmt
-  vite.config.ts          plugins: react + tailwindcss; /v1 → $VITE_CRUSH_UPSTREAM
-                          (default http://127.0.0.1:9119); alias @ → src
+                          remark-gfm, @fontsource/* (mono/display/logo),
+                          @vishnu/api-contract, @vishnu/ui-component
+                          (workspace:*); dev: vite8, ts, tailwind4,
+                          oxlint/oxfmt
+  vite.config.ts          plugins: react + tailwindcss; /api and /p →
+                          http://127.0.0.1:8080 (dev proxy); alias @ → src
   tsconfig{,.app,.node}.json   nexus-style strict (verbatimModuleSyntax,
                           erasableSyntaxOnly, noUncheckedSideEffectImports)
   index.html              viewport-fit=cover, dark
   src/
-    main.tsx              QueryClientProvider + App
-    index.css             @import "tailwindcss" + @vishnu/ui-component/styles.css
-                          + .md markdown styles + safe-area helpers
-    App.tsx               project pick → workspace ensure → layout shell;
-                          owns activeSessionId, current-session reporting,
-                          drawer state
+    main.tsx              QueryClientProvider + crt-scanlines shell + App
+    index.css             @import tailwind + fonts + shared-ui styles;
+                          @theme palette/fonts/radii; CRT utilities; .md
+    App.tsx               me → project → workspace → shell state machine;
+                          binds the project clients, resets crush state
     services/clientId.ts  sessionStorage UUID — per-tab identity
-    services/api.ts       ApiClient wiring (/api registry + /p/{pid}/v1
-                          crush clients) + domain SDK singletons
-    services/queryClient.ts    4xx no-retry, 15s staleTime
+    services/api.ts       /api control client (auth/projects/users) +
+                          rebindable /p/{pid}/v1 crush clients
+    services/queryClient.ts    global 401 re-check + 4xx no-retry
     services/pendingStore.ts   useSyncExternalStore: pending permission/question
                                + busy sessions + SSE connection state
     hooks/useCrushEvents.ts    EventSource lifecycle + payload dispatch
-    hooks/queries.ts           useProjects/Sessions/Messages/AgentInfo/
-                               Providers/PermissionsSkip + mutations
+    hooks/queries.ts           useMe/Projects/ProjectWorkspace +
+                               useSessions/Messages/AgentInfo/Providers/
+                               PermissionsSkip + mutations
+    utils/errors.ts       ApiError → "[code] message" labels
     features/             feature modules (valo backoffice convention)
-      projects/                ProjectPicker (list + status + delete),
-                               AddProjectDialog (managed path | external url)
-      topbar/TopBar.tsx        project name + status, model select, agent
-                               select, skip-permissions toggle, conn dot,
-                               hamburger
-      sessions/SessionSidebar.tsx  list rows, new/delete session
-      chat/ChatPane.tsx        transcript + auto-scroll
+      auth/LoginScreen.tsx     title screen: email → six-cell OTP
+      projects/                ProjectPicker (menu + status + delete),
+                               AddProjectDialog (GitHub | link | external),
+                               ProjectStates (starting / error / external down)
+      shell/AppShell.tsx       HUD + save slots + transcript + prompts +
+                               composer; owns activeSessionId and
+                               current-session reporting
+      topbar/TopBar.tsx        project name + status LED, model select,
+                               agent select, skip toggle, projects, menu
+      sessions/SessionSidebar.tsx  SLOT rows, busy blink, new/delete session
+      chat/ChatPane.tsx        transcript + auto-scroll + retry
       chat/MessageParts.tsx    per-part renderers (text/reasoning/tool_call/
                                tool_result/shell_command)
       chat/Markdown.tsx        react-markdown + remark-gfm
-      chat/Composer.tsx        autosize textarea, Enter=send, cancel-while-busy
-      prompts/PermissionCard.tsx   tool, description, path; grant actions
-      prompts/QuestionCard.tsx     typed form (yes_no/single/multi/free_text)
+      chat/Composer.tsx        `>` prompt, autosize, Enter=send,
+                               cancel-while-busy
+      prompts/PermissionCard.tsx   P1 decision box; grant actions
+      prompts/QuestionCard.tsx     typed dialog menu (yes_no/single/multi/free_text)
 ```
 
 **Shared-UI usage**: primitives (`Button`, `Select`, `Drawer`, `Dialog`,

@@ -1,9 +1,9 @@
 # vishnu — personal web UI for crush sessions
 
-**Status** — built & verified: proxy + SPA v1 (sessions, chat, SSE,
-permissions/questions, model & agent switching). Planned next:
-multi-project registry ([`plan/projects.md`](plan/projects.md)), then
-email+OTP auth (Brevo service already in `api/`).
+**Status** — shipped: multi-project registry, email+OTP auth, and the
+web SPA (project picker, sessions, chat, SSE, permissions/questions,
+model & agent switching) in the vishnu retro-game theme. The manual
+end-to-end pass lives in [`SMOKE.md`](SMOKE.md).
 
 ## Goal
 

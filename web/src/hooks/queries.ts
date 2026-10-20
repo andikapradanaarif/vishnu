@@ -28,6 +28,7 @@ export const queryKeys = {
 	workspaces: ["workspaces"] as const,
 	sessions: (wid: string) => ["sessions", wid] as const,
 	messages: (wid: string, sid: string) => ["messages", wid, sid] as const,
+	messagesFor: (wid: string) => ["messages", wid] as const,
 	agent: (wid: string) => ["agent", wid] as const,
 	providers: (wid: string) => ["providers", wid] as const,
 	config: (wid: string) => ["config", wid] as const,

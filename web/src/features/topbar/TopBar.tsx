@@ -74,15 +74,15 @@ export function TopBar({
 			? "OFFLINE"
 			: conn === "open"
 				? "ONLINE"
-				: conn === "connecting"
-					? "STARTING"
-					: "OFFLINE";
+				: project.status === "up"
+					? "RECONNECTING"
+					: "STARTING";
 	const ledText =
 		led === "ONLINE"
 			? "text-success-400 glow"
-			: led === "STARTING"
-				? "text-warning-400 blink"
-				: "text-ghost";
+			: led === "OFFLINE"
+				? "text-ghost"
+				: "text-warning-400 blink";
 
 	return (
 		<header className="flex items-center gap-2 border-b-2 border-border bg-surface px-3 py-2">
@@ -122,7 +122,7 @@ export function TopBar({
 				options={agentOptions}
 				value={undefined}
 				onChange={(v) => setMainAgent.mutate(v)}
-				className="w-32 font-display"
+				className="w-24 font-display sm:w-32"
 				isLoading={setMainAgent.isPending}
 			/>
 

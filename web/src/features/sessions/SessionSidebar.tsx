@@ -132,7 +132,9 @@ function SessionRow({
 				</div>
 				<button
 					className={`shrink-0 p-0.5 transition-opacity hover:text-danger-400 ${
-						confirming ? "text-danger-400 opacity-100" : "text-ghost opacity-0 group-hover:opacity-100"
+						confirming
+							? "text-danger-400 opacity-100"
+							: "text-ghost opacity-100 md:opacity-0 md:group-hover:opacity-100"
 					}`}
 					onClick={(e) => {
 						e.stopPropagation();

@@ -26,8 +26,17 @@ export function useCrushEvents(workspaceId: string | undefined) {
 		if (!workspaceId) return;
 
 		const es = new EventSource(eventsClient.url(workspaceId));
-		es.onopen = () => pendingStore.setConn("open");
-		es.onerror = () => pendingStore.setConn("closed");
+		es.onopen = () => {
+			pendingStore.setConn("open");
+			// Catch up after a reconnect: runs continue server-side while
+			// the tab is suspended, so the stream alone may have missed
+			// messages.
+			queryClient.invalidateQueries({ queryKey: queryKeys.messagesFor(workspaceId) });
+			queryClient.invalidateQueries({ queryKey: queryKeys.sessions(workspaceId) });
+		};
+		// EventSource retries on its own; show that as reconnecting
+		// instead of a permanent disconnect.
+		es.onerror = () => pendingStore.setConn("connecting");
 
 		es.onmessage = (evt) => {
 			let envelope: EventPayload;

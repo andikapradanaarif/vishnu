@@ -4,6 +4,7 @@ import { Chip } from "@vishnu/ui-component/chip";
 import { Dialog } from "@vishnu/ui-component/dialog";
 import { EmptyState } from "@vishnu/ui-component/emptyState";
 import { useDeleteProject, useProjects } from "@/hooks/queries";
+import { errorLabel } from "@/utils/errors";
 import type { Project, ProjectMode, ProjectStatus } from "@vishnu/api-contract";
 import { AddProjectDialog } from "./AddProjectDialog";
 
@@ -35,7 +36,7 @@ function secondaryLine(project: Project): string | undefined {
 
 /** Main menu: the registered projects, with add and delete. */
 export function ProjectPicker({ onSelect, onLogout }: ProjectPickerProps) {
-	const { data: projects, isLoading, error } = useProjects();
+	const { data: projects, isLoading, error, refetch, isFetching } = useProjects();
 	const deleteProject = useDeleteProject();
 	const [addOpen, setAddOpen] = useState(false);
 	const [pendingDelete, setPendingDelete] = useState<Project>();
@@ -46,7 +47,7 @@ export function ProjectPicker({ onSelect, onLogout }: ProjectPickerProps) {
 		setActionError(undefined);
 		deleteProject.mutate(pendingDelete.id, {
 			onSuccess: () => setPendingDelete(undefined),
-			onError: (err) => setActionError(err.message),
+			onError: (err) => setActionError(errorLabel(err)),
 		});
 	};
 
@@ -66,7 +67,20 @@ export function ProjectPicker({ onSelect, onLogout }: ProjectPickerProps) {
 					<span className="blink text-primary-400">▊</span> loading projects…
 				</div>
 			)}
-			{error && <p className="font-display text-sm text-danger-400">{error.message}</p>}
+			{error && (
+				<div className="flex items-center gap-3">
+					<p className="font-display text-sm text-danger-400">{errorLabel(error)}</p>
+					<Button
+						size="sm"
+						variant="outlined"
+						className="font-display"
+						isLoading={isFetching}
+						onClick={() => refetch()}
+					>
+						RETRY
+					</Button>
+				</div>
+			)}
 			{actionError && (
 				<p className="font-display text-sm text-danger-400">{actionError}</p>
 			)}

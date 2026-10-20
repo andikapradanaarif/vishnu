@@ -10,16 +10,12 @@ import { Button } from "@vishnu/ui-component/button";
 import { Input } from "@vishnu/ui-component/input";
 import { ApiError } from "@vishnu/api-contract/client";
 import { useRequestOtp, useVerify } from "@/hooks/queries";
+import { errorLabel } from "@/utils/errors";
 
 const CODE_LENGTH = 6;
 const RESEND_SECONDS = 60;
 
 type Phase = "email" | "code";
-
-function messageOf(error: unknown, fallback: string): string {
-	if (error instanceof ApiError) return error.body.message || error.message;
-	return error instanceof Error ? error.message : fallback;
-}
 
 function codeOf(error: unknown): string | undefined {
 	return error instanceof ApiError ? error.code : undefined;
@@ -72,7 +68,7 @@ export function LoginScreen() {
 				}
 			},
 			onError: (error) =>
-				setBanner(`Couldn't send a code — ${messageOf(error, "try again")}`),
+				setBanner(`Couldn't send a code — ${errorLabel(error, "try again")}`),
 		});
 	};
 
@@ -115,7 +111,7 @@ export function LoginScreen() {
 							setEmailError("enter a valid email");
 							break;
 						default:
-							setBanner(messageOf(error, "sign-in failed — try again"));
+							setBanner(errorLabel(error, "sign-in failed — try again"));
 					}
 				},
 			},

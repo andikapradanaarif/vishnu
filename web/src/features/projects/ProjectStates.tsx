@@ -1,11 +1,6 @@
 import { Button } from "@vishnu/ui-component/button";
-import { ApiError } from "@vishnu/api-contract/client";
 import type { Project } from "@vishnu/api-contract";
-
-function errorText(error: unknown): string {
-	if (error instanceof ApiError) return error.body.message || error.message;
-	return error instanceof Error ? error.message : "unknown error";
-}
+import { errorLabel } from "@/utils/errors";
 
 export function StartingProject({
 	project,
@@ -43,7 +38,7 @@ export function ProjectError({
 	onBack: () => void;
 }) {
 	const external = project?.mode === "external";
-	const detail = errorText(error);
+	const detail = errorLabel(error);
 
 	return (
 		<div className="flex h-dvh flex-col items-center justify-center gap-3 bg-cabinet px-6 text-center">
