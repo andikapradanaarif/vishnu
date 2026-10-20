@@ -82,7 +82,7 @@ export const Button = (props: ButtonProps) => {
 							color === "custom"
 								? "text-inherit"
 								: variant === "filled"
-									? "text-white"
+									? "text-on-primary"
 									: variant === "outlined" && color === "danger"
 										? "text-danger-500"
 										: undefined
@@ -99,9 +99,9 @@ const buttonStyling = (variant: ButtonVariant, color: ButtonColor): string => {
 		case "filled":
 			switch (color) {
 				case "primary":
-					return "text-white bg-primary-500 border-transparent hover:bg-primary-600/95 transition-colors duration-200";
+					return "text-on-primary bg-primary-500 border-transparent hover:bg-primary-600/95 transition-colors duration-200";
 				case "danger":
-					return "text-white bg-danger-500 border-transparent hover:bg-danger-600/95 transition-colors duration-200";
+					return "text-on-primary bg-danger-500 border-transparent hover:bg-danger-600/95 transition-colors duration-200";
 				default:
 					// custom/other: the base border-[1px] would render in
 					// currentColor — suppress like the named colors do.

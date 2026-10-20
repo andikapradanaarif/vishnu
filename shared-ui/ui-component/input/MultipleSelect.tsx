@@ -78,7 +78,7 @@ const MultipleSelectTrigger = memo(function MultipleSelectTrigger({
 			}}
 			className={classNames(
 				"appearance-none flex items-center w-full px-3 py-2 border border-neutral-400/65 rounded-md focus:outline-none focus:shadow-none focus:border-[var(--color-primary)] text-sm text-left min-h-[38px]",
-				disabled ? "bg-neutral-100 cursor-not-allowed" : "bg-white cursor-pointer",
+				disabled ? "bg-neutral-100 cursor-not-allowed" : "bg-surface cursor-pointer",
 				isLoading ? "pr-14" : "pr-8",
 				prefixIcon ? "pl-9" : "",
 				error && "border-danger-500",
@@ -188,12 +188,12 @@ function SelectAllItem({state, onClick, size = "md", maxReached, language}: Sele
 					isAll
 						? "bg-primary-600 border-primary-600"
 						: isSome
-							? "bg-white border-primary-600"
-							: "border-neutral-300 bg-white",
+							? "bg-surface border-primary-600"
+							: "border-neutral-300 bg-surface",
 				)}
 			>
 				{isAll && (
-					<svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<svg className="w-2.5 h-2.5 text-on-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
 					</svg>
 				)}
@@ -369,7 +369,7 @@ export default function MultipleSelect<T = string>({
 				>
 					<div ref={listRef} className="flex flex-col w-full max-h-56 overflow-y-auto gap-1">
 						{isSearchable && (
-							<div className="sticky top-0 bg-white pb-1">
+							<div className="sticky top-0 bg-surface pb-1">
 								<SearchInput
 									ref={searchInputRef}
 									type="text"

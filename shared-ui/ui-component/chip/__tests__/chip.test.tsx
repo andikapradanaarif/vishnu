@@ -21,7 +21,7 @@ describe("Chip variant", () => {
 		const className = (container.firstElementChild as HTMLElement).className;
 
 		expect(className).toContain("bg-danger-600");
-		expect(className).toContain("text-white");
+		expect(className).toContain("text-on-primary");
 	});
 
 	it("invokes onRemove on Enter and Space keydown", () => {

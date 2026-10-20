@@ -48,7 +48,7 @@ export const Switch = (props: SwitchProps) => {
 				>
 					<span
 						className={classNames(
-							"relative inline-block w-5 h-5 transition-transform duration-200 ease-in-out bg-white shadow-sm rounded-full ring-0 border-solid border-[1px] border-neutral-300",
+							"relative inline-block w-5 h-5 transition-transform duration-200 ease-in-out bg-surface shadow-sm rounded-full ring-0 border-solid border-[1px] border-neutral-300",
 							{
 								"translate-x-5 before:bg-success-400 after:scale-100": checked,
 								"-translate-x-1": !checked,

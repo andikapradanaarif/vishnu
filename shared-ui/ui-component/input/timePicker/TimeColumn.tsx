@@ -23,7 +23,7 @@ export const TimeColumn = memo(function TimeColumn(props: TimeColumnProps) {
 
   return (
     <div className="flex flex-col flex-1 min-w-0">
-      <div className="text-xs text-neutral-400 font-medium text-center py-1 border-b border-neutral-100 sticky top-0 bg-white z-10">
+      <div className="text-xs text-neutral-400 font-medium text-center py-1 border-b border-neutral-100 sticky top-0 bg-surface z-10">
         {label}
       </div>
       <div ref={listRef} className="overflow-y-auto max-h-44 flex flex-col gap-0.5 p-1">

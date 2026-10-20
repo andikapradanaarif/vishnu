@@ -158,7 +158,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
 							disabled={disabled}
 							className={classNames(
 								"appearance-none flex items-center w-full px-3 py-2 border border-neutral-400/65 rounded-md focus:outline-none focus:shadow-none focus:border-[var(--color-primary)] text-sm text-left",
-								disabled ? "bg-neutral-100 cursor-not-allowed" : "bg-white cursor-pointer",
+								disabled ? "bg-neutral-100 cursor-not-allowed" : "bg-surface cursor-pointer",
 								error && "border-danger-500",
 								success && "border-success-600",
 							)}
