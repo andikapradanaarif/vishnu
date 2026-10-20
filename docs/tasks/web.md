@@ -85,9 +85,12 @@ shell).
   `GET /api/projects/{id}/workspace`, which lazily spawns crush — show
   an inline `STARTING…` state on that row while the call is in flight
   (it can take seconds on a cold spawn).
-- **Row states**: `cloning` → animated busy chip + poll
-  `useProject(id)` every ~2 s until it flips to ready/error (clone is
-  async — the row can't be entered yet). `error` → show the stored
+- **Row states**: `cloning` → animated busy chip + refetch the
+  projects query every ~2 s until the row flips to ready/error (clone
+  is async — the row can't be entered yet). Note: `ProjectsClient`
+  has no `get(id)` — poll `list()` and re-derive the row, or add the
+  method to the contract as a separate small PR (the API route
+  `GET /api/projects/{id}` exists). `error` → show the stored
   error text on a second line + `RETRY` is implicitly delete-and-
   re-add. `down` (external unreachable, reported at read) → row is
   dimmed; entering it shows the external-down screen instead.
@@ -408,6 +411,10 @@ login gate. Implements the **Auth model** section and screen **S0**.
 - `App.tsx`: gate on `useMe` — 401/`unauthorized` → `<LoginScreen/>`;
   `ApiError` 401 anywhere else forces re-check of `me` (expired
   session → login, not a dead screen).
+- `vite.config.ts`: dev proxy `"/api"` and `"/p"` →
+  `http://127.0.0.1:8080` (the running API; cookie + SSE both pass
+  through `server.proxy` — the old `/v1 → :9119` entry is dead, remove
+  it). Prod needs nothing — the binary serves the SPA same-origin.
 - Keep current visuals minimal — theme lands in PR 3.
 
 **Acceptance:** logged-out browser gets the gate; after verify, the
