@@ -28,7 +28,7 @@
 
 	/*
 	 * Neutral — inverted gruvbox ramp. Light shades are foreground text
-	 * (shared-ui writes `text-neutral-800`), dark shades are surfaces and
+	 * (shared-ui foreground utilities), dark shades are surfaces and
 	 * lines. The web app itself uses the semantic roles below.
 	 */
 	--color-neutral-50: #282828;
