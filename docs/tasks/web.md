@@ -77,8 +77,8 @@ shell).
 
 - **Layout**: `SELECT PROJECT` heading, menu list — one row per
   project: `▸` pointer on hover/selected, name, mode chip
-  (`MANAGED`/`EXT`), status chip (colored per the status map), right-
-  aligned `updated_at`/relative time, and a `DEL` glyph button.
+  (`MANAGED`/`EXT`), status chip (colored per the status map), `path`/
+  `upstream` as the dim secondary line, and a `DEL` glyph button.
   Footer row: `+ NEW PROJECT`.
 - **Data**: `useProjects()` → `GET /api/projects`. Selecting a managed
   project calls `useProjectWorkspace(id)` →

@@ -47,7 +47,7 @@ POST   /api/auth/request-otp   {email}        → 200 always (non-enumerating)
 POST   /api/auth/verify        {email, code}  → {user} + vishnu_session cookie
 POST   /api/auth/logout                         → 204
 GET    /api/auth/me                             → {user}
-GET    /api/projects                            → {projects: Project[]}
+GET    /api/projects                            → Project[] (bare array)
 POST   /api/projects         {name?} + one of {repo_url} | {path} | {upstream}
                                                 → 201 {project} or 202 (cloning)
 GET    /api/projects/{id}                       → {project}
