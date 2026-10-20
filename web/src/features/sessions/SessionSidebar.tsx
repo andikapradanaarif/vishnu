@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Icon } from "@iconify/react";
 import { Button } from "@vishnu/ui-component/button";
 import { EmptyState } from "@vishnu/ui-component/emptyState";
-import { LoadingSpinner } from "@vishnu/ui-component/loadingAnimation";
 import { usePendingState } from "@/services/pendingStore";
 import { useCreateSession, useDeleteSession, useSessions } from "@/hooks/queries";
 import { formatCost, relativeTime } from "@/utils/format";
@@ -25,13 +24,14 @@ export function SessionSidebar({ wid, activeId, onSelect }: SessionSidebarProps)
 
 	return (
 		<div className="flex h-full flex-col">
-			<div className="flex items-center justify-between px-3 py-2.5">
-				<span className="text-xs font-semibold tracking-wide text-neutral-400 uppercase">
-					Sessions
+			<div className="flex items-center justify-between border-b-2 border-border px-3 py-2.5">
+				<span className="font-display text-sm tracking-[0.25em] text-on-surface-muted">
+					SESSIONS
 				</span>
 				<Button
 					size="sm"
 					variant="text"
+					className="text-primary-400"
 					icon={<Icon icon="ri:add-line" width={18} />}
 					isLoading={createSession.isPending}
 					onClick={() => createSession.mutate(undefined, { onSuccess: (s) => onSelect(s.id) })}
@@ -39,21 +39,22 @@ export function SessionSidebar({ wid, activeId, onSelect }: SessionSidebarProps)
 				/>
 			</div>
 
-			<div className="flex-1 overflow-y-auto px-1.5 pb-2">
+			<div className="flex-1 overflow-y-auto px-1.5 py-2">
 				{isLoading && (
-					<div className="flex justify-center py-6">
-						<LoadingSpinner size={20} />
+					<div className="py-6 text-center font-display text-sm text-on-surface-muted">
+						<span className="blink text-primary-400">▊</span> loading…
 					</div>
 				)}
-				{error && <p className="px-2 py-4 text-xs text-red-400">{error.message}</p>}
+				{error && <p className="px-2 py-4 text-xs text-danger-400">{error.message}</p>}
 				{!isLoading && sorted.length === 0 && (
-					<EmptyState text="No sessions yet" className="py-8" />
+					<EmptyState text="No saves yet" className="py-8 font-display text-lg" />
 				)}
 
-				{sorted.map((s) => (
+				{sorted.map((s, index) => (
 					<SessionRow
 						key={s.id}
 						session={s}
+						slot={index + 1}
 						active={s.id === activeId}
 						busy={busy[s.id] ?? s.is_busy}
 						confirming={confirmingId === s.id}
@@ -76,6 +77,7 @@ export function SessionSidebar({ wid, activeId, onSelect }: SessionSidebarProps)
 
 interface SessionRowProps {
 	session: Session;
+	slot: number;
 	active: boolean;
 	busy: boolean;
 	confirming: boolean;
@@ -83,25 +85,54 @@ interface SessionRowProps {
 	onDelete: () => void;
 }
 
-function SessionRow({ session, active, busy, confirming, onSelect, onDelete }: SessionRowProps) {
+function SessionRow({
+	session,
+	slot,
+	active,
+	busy,
+	confirming,
+	onSelect,
+	onDelete,
+}: SessionRowProps) {
 	return (
 		<div
 			role="button"
 			tabIndex={0}
 			onClick={onSelect}
 			onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onSelect()}
-			className={`group mb-0.5 cursor-pointer rounded-lg px-2.5 py-2 transition-colors ${
-				active ? "bg-neutral-800" : "hover:bg-neutral-900"
+			className={`group mb-0.5 cursor-pointer border-l-2 px-2.5 py-2 ${
+				active
+					? "border-primary-500 bg-raised"
+					: "border-transparent hover:bg-raised"
 			}`}
 		>
-			<div className="flex items-center gap-2">
-				{busy && <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-emerald-400" />}
-				<span className="min-w-0 flex-1 truncate text-sm text-neutral-200">
-					{session.title || "New session"}
+			<div className="flex items-start gap-2">
+				<span className="mt-0.5 shrink-0 font-display text-lg text-primary-400">
+					{active ? "▸" : " "}
 				</span>
+				<div className="min-w-0 flex-1">
+					<div className="flex items-center justify-between gap-2">
+						<span className="font-display text-xs tracking-[0.15em] text-ghost">
+							SLOT {String(slot).padStart(2, "0")}
+						</span>
+						<span className="shrink-0 font-display text-[11px] text-on-surface-muted">
+							{relativeTime(session.updated_at)}
+						</span>
+					</div>
+					<div className="flex items-center gap-1.5">
+						{busy && <span className="blink text-primary-400">▊</span>}
+						<span className="min-w-0 flex-1 truncate text-sm text-on-surface">
+							{session.title || "New session"}
+						</span>
+					</div>
+					<div className="mt-0.5 flex items-center gap-2 font-display text-[11px] text-on-surface-muted">
+						{session.message_count > 0 && <span>{session.message_count} msgs</span>}
+						{session.cost > 0 && <span>{formatCost(session.cost)}</span>}
+					</div>
+				</div>
 				<button
-					className={`shrink-0 rounded p-0.5 text-neutral-500 transition-opacity hover:text-red-400 ${
-						confirming ? "text-red-400 opacity-100" : "opacity-0 group-hover:opacity-100"
+					className={`shrink-0 p-0.5 transition-opacity hover:text-danger-400 ${
+						confirming ? "text-danger-400 opacity-100" : "text-ghost opacity-0 group-hover:opacity-100"
 					}`}
 					onClick={(e) => {
 						e.stopPropagation();
@@ -112,11 +143,6 @@ function SessionRow({ session, active, busy, confirming, onSelect, onDelete }: S
 				>
 					<Icon icon={confirming ? "ri:check-line" : "ri:delete-bin-line"} width={15} />
 				</button>
-			</div>
-			<div className="mt-0.5 flex items-center gap-2 text-[11px] text-neutral-500">
-				<span>{relativeTime(session.updated_at)}</span>
-				{session.message_count > 0 && <span>· {session.message_count} msgs</span>}
-				{session.cost > 0 && <span>· {formatCost(session.cost)}</span>}
 			</div>
 		</div>
 	);

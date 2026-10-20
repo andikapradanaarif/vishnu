@@ -64,9 +64,9 @@ export function AppShell({ project, wid, onSwitchProject, onLogout }: AppShellPr
 	const sessionQuestions = questions.filter((q) => q.session_id === activeSessionId);
 
 	return (
-		<div className="flex h-dvh bg-neutral-950 text-neutral-200">
+		<div className="flex h-dvh bg-cabinet text-on-surface">
 			{/* Desktop sidebar */}
-			<aside className="hidden w-72 shrink-0 border-r border-neutral-800 md:block">
+			<aside className="hidden w-72 shrink-0 border-r-2 border-border bg-surface md:block">
 				<SessionSidebar wid={wid} activeId={activeSessionId} onSelect={selectSession} />
 			</aside>
 
@@ -77,26 +77,33 @@ export function AppShell({ project, wid, onSwitchProject, onLogout }: AppShellPr
 				position="left"
 				width="w-72"
 				name="sessions-drawer"
-				className="bg-neutral-950"
+				className="border-r-2 border-border bg-surface"
 			>
 				<div className="flex h-full flex-col">
 					<div className="min-h-0 flex-1">
 						<SessionSidebar wid={wid} activeId={activeSessionId} onSelect={selectSession} />
 					</div>
-					<div className="flex flex-col gap-1 border-t border-neutral-800 pt-3">
+					<div className="flex flex-col gap-1 border-t-2 border-border pt-3">
 						<Button
 							variant="outlined"
 							size="sm"
+							className="font-display"
 							icon={<Icon icon="ri:folder-line" width={16} />}
 							onClick={() => {
 								setDrawerOpen(false);
 								onSwitchProject();
 							}}
 						>
-							Switch project
+							SWITCH PROJECT
 						</Button>
-						<Button variant="text" size="sm" color="danger" onClick={onLogout}>
-							Log out
+						<Button
+							variant="text"
+							size="sm"
+							color="danger"
+							className="font-display"
+							onClick={onLogout}
+						>
+							LOG OUT
 						</Button>
 					</div>
 				</div>
@@ -124,7 +131,10 @@ export function AppShell({ project, wid, onSwitchProject, onLogout }: AppShellPr
 					</>
 				) : (
 					<div className="flex flex-1 items-center justify-center">
-						<EmptyState text="Pick a session or start a new one" className="py-16" />
+						<EmptyState
+							text="Pick a session or start a new one"
+							className="py-16 font-display text-lg"
+						/>
 					</div>
 				)}
 			</main>

@@ -161,13 +161,13 @@ export function LoginScreen() {
 	};
 
 	return (
-		<div className="flex min-h-dvh items-center justify-center px-4">
-			<div className="w-full max-w-sm">
+		<div className="flex min-h-dvh items-center justify-center bg-cabinet px-4">
+			<div className="w-full max-w-sm pixel-border bg-surface p-6">
 				<div className="text-center">
-					<h1 className="text-2xl font-semibold tracking-[0.35em] text-neutral-100">
+					<h1 className="glow font-logo text-xl tracking-[0.2em] text-primary-400">
 						VISHNU
 					</h1>
-					<p className="mt-2 text-sm text-neutral-400">
+					<p className="mt-4 font-display text-lg text-on-surface-muted">
 						{phase === "email"
 							? "Enter your email to continue"
 							: "Enter the six-digit code"}
@@ -175,7 +175,7 @@ export function LoginScreen() {
 				</div>
 
 				{banner && (
-					<p className="mt-4 rounded-md border border-danger-800 bg-danger-950/60 px-3 py-2 text-xs text-danger-200">
+					<p className="mt-4 border-2 border-danger-500 bg-danger-950/40 px-3 py-2 font-display text-sm text-danger-300">
 						{banner}
 					</p>
 				)}
@@ -193,17 +193,21 @@ export function LoginScreen() {
 							error={emailError}
 							required
 						/>
-						<Button type="submit" className="w-full" isLoading={requestOtp.isPending}>
-							Continue
+						<Button
+							type="submit"
+							className="w-full font-display text-lg tracking-[0.2em]"
+							isLoading={requestOtp.isPending}
+						>
+							CONTINUE
 						</Button>
 					</form>
 				) : (
 					<form className="mt-6 flex flex-col gap-4" onSubmit={submitCode}>
-						<div className="flex items-center justify-between gap-3 text-xs text-neutral-500">
+						<div className="flex items-center justify-between gap-3 font-display text-sm text-on-surface-muted">
 							<span className="truncate">{email}</span>
 							<button
 								type="button"
-								className="shrink-0 text-primary-400 hover:underline"
+								className="shrink-0 text-info-400 hover:text-info-300"
 								onClick={() => {
 									setPhase("email");
 									setBanner(undefined);
@@ -230,31 +234,31 @@ export function LoginScreen() {
 										onKeyDown={(event) => onCellKeyDown(index, event)}
 										onPaste={(event) => onCellPaste(index, event)}
 										aria-label={`Code digit ${index + 1}`}
-										className="h-12 w-full min-w-0 rounded-md border border-neutral-700 bg-neutral-900 text-center text-lg text-neutral-100 outline-none focus:border-primary-500"
+										className="h-14 w-full min-w-0 border-2 border-border bg-raised text-center font-display text-2xl text-on-surface outline-none focus:border-primary-500"
 									/>
 								))}
 							</div>
 							{codeError && (
-								<p className="mt-1.5 text-xs text-danger-400">{codeError}</p>
+								<p className="mt-2 font-display text-sm text-danger-400">{codeError}</p>
 							)}
 						</div>
 
 						<Button
 							type="submit"
-							className="w-full"
+							className="w-full font-display text-lg tracking-[0.2em]"
 							isLoading={verify.isPending}
 							disabled={digits.join("").length !== CODE_LENGTH}
 						>
-							Sign in
+							SIGN IN
 						</Button>
 
 						<button
 							type="button"
-							className="text-xs text-neutral-500 hover:text-neutral-300 disabled:cursor-not-allowed disabled:opacity-50"
+							className="font-display text-sm text-on-surface-muted hover:text-primary-400 disabled:cursor-not-allowed disabled:opacity-50"
 							disabled={cooldown > 0 || requestOtp.isPending}
 							onClick={() => sendCode(email.trim(), false)}
 						>
-							{cooldown > 0 ? `Resend (${cooldown})` : "Resend"}
+							{cooldown > 0 ? `RESEND (${cooldown})` : "RESEND"}
 						</button>
 					</form>
 				)}

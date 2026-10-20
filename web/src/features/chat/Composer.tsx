@@ -34,13 +34,14 @@ export function Composer({ wid, sid, busy }: ComposerProps) {
 	};
 
 	return (
-		<div className="safe-bottom border-t border-neutral-800 bg-neutral-950 px-3 pt-2 pb-3 sm:px-6">
+		<div className="safe-bottom border-t-2 border-border bg-surface px-3 pt-2 pb-3 sm:px-6">
 			<div className="mx-auto flex max-w-3xl items-end gap-2">
+				<span className="mb-2.5 shrink-0 font-display text-xl text-primary-400">&gt;</span>
 				<textarea
 					ref={areaRef}
 					rows={1}
 					value={value}
-					placeholder={busy ? "Agent is working…" : "Message the agent…"}
+					placeholder={busy ? "agent is working…" : "message the agent…"}
 					onChange={(e) => {
 						setValue(e.target.value);
 						autogrow();
@@ -51,31 +52,33 @@ export function Composer({ wid, sid, busy }: ComposerProps) {
 							send();
 						}
 					}}
-					className="max-h-[200px] min-h-[40px] flex-1 resize-none rounded-xl border border-neutral-800 bg-neutral-900 px-3 py-2.5 text-base text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600 sm:text-sm"
+					className="max-h-[200px] min-h-[40px] flex-1 resize-none border-2 border-border bg-raised px-3 py-2.5 text-base text-on-surface outline-none placeholder:text-ghost focus:border-primary-500 sm:text-sm"
 				/>
 				{busy ? (
 					<Button
 						size="md"
 						variant="outlined"
 						color="danger"
+						className="font-display"
 						onClick={() => cancelRun.mutate(sid)}
 						isLoading={cancelRun.isPending}
 					>
-						Stop
+						■ STOP
 					</Button>
 				) : (
 					<Button
 						size="md"
+						className="font-display"
 						onClick={send}
 						disabled={!value.trim()}
 						isLoading={sendPrompt.isPending}
 					>
-						Send
+						SEND
 					</Button>
 				)}
 			</div>
 			{sendPrompt.isError && (
-				<p className="mx-auto mt-1 max-w-3xl text-xs text-red-400">
+				<p className="mx-auto mt-1 max-w-3xl font-display text-xs text-danger-400">
 					Failed to send: {sendPrompt.error?.message}
 				</p>
 			)}

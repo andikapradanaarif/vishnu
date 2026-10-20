@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import { EmptyState } from "@vishnu/ui-component/emptyState";
-import { LoadingSpinner } from "@vishnu/ui-component/loadingAnimation";
 import { useMessages } from "@/hooks/queries";
 import { usePendingState } from "@/services/pendingStore";
 import type { Message } from "@vishnu/api-contract";
@@ -35,15 +34,20 @@ export function ChatPane({ wid, sid }: ChatPaneProps) {
 		<div ref={scrollRef} onScroll={onScroll} className="min-h-0 flex-1 overflow-y-auto">
 			<div className="mx-auto flex max-w-3xl flex-col gap-3 px-3 py-4 sm:px-6">
 				{isLoading && (
-					<div className="flex justify-center py-10">
-						<LoadingSpinner size={22} />
+					<div className="py-10 text-center font-display text-lg text-on-surface-muted">
+						<span className="blink text-primary-400">▊</span> loading transcript…
 					</div>
 				)}
 				{error && (
-					<p className="py-4 text-center text-sm text-red-400">{error.message}</p>
+					<p className="py-4 text-center font-display text-sm text-danger-400">
+						{error.message}
+					</p>
 				)}
 				{!isLoading && (messages ?? []).length === 0 && (
-					<EmptyState text="No messages yet — send a prompt to start" className="py-16" />
+					<EmptyState
+						text="No messages yet — send a prompt to start"
+						className="py-16 font-display text-lg"
+					/>
 				)}
 
 				{(messages ?? []).map((m) => (
@@ -51,8 +55,8 @@ export function ChatPane({ wid, sid }: ChatPaneProps) {
 				))}
 
 				{busy[sid] && (
-					<div className="flex items-center gap-2 text-xs text-neutral-500">
-						<LoadingSpinner size={14} />
+					<div className="flex items-center gap-2 font-display text-sm text-on-surface-muted">
+						<span className="blink text-primary-400">▊</span>
 						agent is working…
 					</div>
 				)}
@@ -64,7 +68,7 @@ export function ChatPane({ wid, sid }: ChatPaneProps) {
 function MessageView({ message }: { message: Message }) {
 	if (message.role === "user") {
 		return (
-			<div className="self-end max-w-[85%] rounded-2xl rounded-br-sm bg-primary-600/25 px-3.5 py-2">
+			<div className="self-end max-w-[85%] border-2 border-pink-500/60 bg-pink-500/10 px-3.5 py-2">
 				{message.parts.map((p, i) => (
 					<MessagePart key={i} part={p} role={message.role} />
 				))}
@@ -78,7 +82,7 @@ function MessageView({ message }: { message: Message }) {
 				<MessagePart key={i} part={p} role={message.role} />
 			))}
 			{message.model && (
-				<div className="mt-0.5 text-[10px] text-neutral-600">{message.model}</div>
+				<div className="mt-0.5 font-display text-[10px] text-ghost">{message.model}</div>
 			)}
 		</div>
 	);

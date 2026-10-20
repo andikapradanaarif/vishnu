@@ -1,5 +1,151 @@
 @import "tailwindcss";
+@import "@fontsource-variable/jetbrains-mono";
+@import "@fontsource/vt323";
+@import "@fontsource/press-start-2p";
 @import "@vishnu/ui-component/styles.css";
+
+/*
+ * Vishnu retro theme. This block is the only place hex literals live:
+ * every component reads these tokens, so the palette is swapped here.
+ */
+@theme {
+	--font-sans: "JetBrains Mono", ui-monospace, monospace;
+	--font-display: "VT323", "JetBrains Mono", monospace;
+	--font-logo: "Press Start 2P", "VT323", monospace;
+
+	/* Primary — gruvbox mustard */
+	--color-primary-50: #fef8e7;
+	--color-primary-100: #fdf0c4;
+	--color-primary-200: #fbe38b;
+	--color-primary-300: #f9d55e;
+	--color-primary-400: #facb3d;
+	--color-primary-500: #fabd2f;
+	--color-primary-600: #d9a01f;
+	--color-primary-700: #b07f14;
+	--color-primary-800: #8a6210;
+	--color-primary-900: #6b4b0c;
+	--color-primary-950: #3f2b05;
+
+	/*
+	 * Neutral — inverted gruvbox ramp. Light shades are foreground text
+	 * (shared-ui foreground utilities), dark shades are surfaces and
+	 * lines. The web app itself uses the semantic roles below.
+	 */
+	--color-neutral-50: #282828;
+	--color-neutral-100: #32302f;
+	--color-neutral-200: #3c3836;
+	--color-neutral-300: #504945;
+	--color-neutral-400: #665c54;
+	--color-neutral-500: #928374;
+	--color-neutral-600: #a89984;
+	--color-neutral-700: #bdae93;
+	--color-neutral-800: #d5c4a1;
+	--color-neutral-900: #ebdbb2;
+	--color-neutral-950: #fbf1c7;
+
+	--color-secondary-50: #282828;
+	--color-secondary-100: #32302f;
+	--color-secondary-200: #3c3836;
+	--color-secondary-300: #504945;
+	--color-secondary-400: #665c54;
+	--color-secondary-500: #7c6f64;
+	--color-secondary-600: #928374;
+	--color-secondary-700: #a89984;
+	--color-secondary-800: #bdae93;
+	--color-secondary-900: #d5c4a1;
+	--color-secondary-950: #ebdbb2;
+
+	/* Danger — gruvbox reds */
+	--color-danger-50: #fdeae7;
+	--color-danger-100: #fbd5cf;
+	--color-danger-200: #f7aca1;
+	--color-danger-300: #f48373;
+	--color-danger-400: #fb5c4a;
+	--color-danger-500: #fb4934;
+	--color-danger-600: #d93a28;
+	--color-danger-700: #b02c1e;
+	--color-danger-800: #832016;
+	--color-danger-900: #5c160f;
+	--color-danger-950: #350b07;
+
+	/* Success — gruvbox greens */
+	--color-success-50: #f6f7d9;
+	--color-success-100: #eef0b5;
+	--color-success-200: #dfe37b;
+	--color-success-300: #d0d64b;
+	--color-success-400: #c3c72e;
+	--color-success-500: #b8bb26;
+	--color-success-600: #949718;
+	--color-success-700: #717410;
+	--color-success-800: #4f520a;
+	--color-success-900: #303205;
+	--color-success-950: #191b02;
+
+	/* Warning — gruvbox oranges */
+	--color-warning-50: #fff0e5;
+	--color-warning-100: #ffdec4;
+	--color-warning-200: #fec38b;
+	--color-warning-300: #fea751;
+	--color-warning-400: #fe8f2e;
+	--color-warning-500: #fe8019;
+	--color-warning-600: #d9660f;
+	--color-warning-700: #b04e0b;
+	--color-warning-800: #833a08;
+	--color-warning-900: #5a2605;
+	--color-warning-950: #311302;
+
+	/* Info — gruvbox aquas */
+	--color-info-50: #edf4f2;
+	--color-info-100: #d7e7e3;
+	--color-info-200: #b6d3cc;
+	--color-info-300: #98beb5;
+	--color-info-400: #8db0a7;
+	--color-info-500: #83a598;
+	--color-info-600: #658579;
+	--color-info-700: #4d685f;
+	--color-info-800: #374c45;
+	--color-info-900: #23332e;
+	--color-info-950: #121c19;
+
+	/* Pink — gruvbox mauves (permissions, questions, user voice) */
+	--color-pink-50: #f9ecef;
+	--color-pink-100: #f2d8de;
+	--color-pink-200: #e7b5c0;
+	--color-pink-300: #dd99a8;
+	--color-pink-400: #d88fa0;
+	--color-pink-500: #d3869b;
+	--color-pink-600: #b0657c;
+	--color-pink-700: #8c4b60;
+	--color-pink-800: #663446;
+	--color-pink-900: #42202c;
+	--color-pink-950: #241016;
+
+	/* Semantic roles */
+	--color-primary: var(--color-primary-500);
+	--color-surface: #282828;
+	--color-surface-alt: #1d2021;
+	--color-raised: #32302f;
+	--color-cabinet: #1d2021;
+	--color-on-surface: #ebdbb2;
+	--color-on-surface-muted: #a89984;
+	--color-ghost: #665c54;
+	--color-border: #665c54;
+	--color-border-strong: #7c6f64;
+	--color-line: #504945;
+	--color-line-strong: #665c54;
+	--color-ink: #ebdbb2;
+	--color-ink-2: #a89984;
+	--color-on-primary: #1d2021;
+
+	/* Hard edges — shared-ui's rounded-md/lg collapse to 2px */
+	--radius-xs: 0px;
+	--radius-sm: 2px;
+	--radius-md: 2px;
+	--radius-lg: 2px;
+	--radius-xl: 2px;
+	--radius-2xl: 2px;
+	--radius-3xl: 2px;
+}
 
 html,
 body,
@@ -8,9 +154,20 @@ body,
 }
 
 body {
-	background-color: var(--color-neutral-950);
-	color: var(--color-neutral-200);
-	font-family: ui-sans-serif, system-ui, sans-serif;
+	background-color: var(--color-surface-alt);
+	color: var(--color-on-surface);
+	font-family: var(--font-sans);
+	font-variant-ligatures: none;
+}
+
+.font-display,
+.font-logo {
+	letter-spacing: 0.02em;
+}
+
+:focus-visible {
+	outline: 2px solid var(--color-primary-500);
+	outline-offset: 2px;
 }
 
 /* Safe-area padding for the sticky composer (iOS). */
@@ -24,6 +181,75 @@ body {
 }
 .no-scrollbar::-webkit-scrollbar {
 	display: none;
+}
+
+/* Retro chrome ------------------------------------------------------- */
+
+.crt-scanlines {
+	position: relative;
+}
+.crt-scanlines::after {
+	content: "";
+	position: fixed;
+	inset: 0;
+	z-index: 60;
+	pointer-events: none;
+	background: repeating-linear-gradient(
+		to bottom,
+		rgb(0 0 0 / 0.03) 0px,
+		rgb(0 0 0 / 0.03) 1px,
+		transparent 1px,
+		transparent 3px
+	);
+}
+
+.pixel-border {
+	border: 2px solid var(--color-border);
+}
+
+.pixel-border-accent {
+	border: 2px solid var(--color-primary-500);
+}
+
+.glow {
+	text-shadow: 0 0 8px currentColor;
+}
+
+.blink {
+	animation: vishnu-blink 1.1s steps(1, end) infinite;
+}
+
+.step-spin {
+	animation: vishnu-step-spin 0.9s steps(8, end) infinite;
+}
+
+@keyframes vishnu-blink {
+	50% {
+		opacity: 0;
+	}
+}
+
+@keyframes vishnu-step-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.blink,
+	.step-spin,
+	.animate-pulse {
+		animation: none !important;
+	}
+	.crt-scanlines::after {
+		display: none;
+	}
+}
+
+/* The drawer's backdrop uses a neutral shade that inverts with the
+   theme; pin it to the cabinet colour instead. */
+.shared-drawer-backdrop {
+	background-color: rgb(0 0 0 / 0.65) !important;
 }
 
 /* Markdown content (.md) — assistant text rendering. */
@@ -52,20 +278,20 @@ body {
 	list-style: decimal;
 }
 .md a {
-	color: var(--color-primary-400);
+	color: var(--color-info-400);
 	text-decoration: underline;
 }
 .md code {
-	font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+	font-family: var(--font-sans);
 	font-size: 0.8125rem;
-	background: var(--color-neutral-800);
-	border-radius: 0.25rem;
+	background: var(--color-raised);
+	border-radius: 0.125rem;
 	padding: 0.1em 0.35em;
 }
 .md pre {
-	background: var(--color-neutral-900);
-	border: 1px solid var(--color-neutral-800);
-	border-radius: 0.375rem;
+	background: var(--color-surface-alt);
+	border: 1px solid var(--color-border);
+	border-radius: 0.125rem;
 	padding: 0.625rem 0.75rem;
 	margin: 0.5em 0;
 	overflow-x: auto;
@@ -76,9 +302,9 @@ body {
 	font-size: 0.75rem;
 }
 .md blockquote {
-	border-left: 3px solid var(--color-neutral-700);
+	border-left: 3px solid var(--color-border);
 	padding-left: 0.75em;
-	color: var(--color-neutral-400);
+	color: var(--color-on-surface-muted);
 	margin: 0.5em 0;
 }
 .md table {
@@ -88,9 +314,9 @@ body {
 }
 .md th,
 .md td {
-	border: 1px solid var(--color-neutral-700);
+	border: 1px solid var(--color-border);
 	padding: 0.25em 0.6em;
 }
 .md th {
-	background: var(--color-neutral-800);
+	background: var(--color-raised);
 }
