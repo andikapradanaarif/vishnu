@@ -77,9 +77,9 @@ export function TopBar({
 				: project.status === "up"
 					? "RECONNECTING"
 					: "STARTING";
-	const ledText =
+	const ledDot =
 		led === "ONLINE"
-			? "text-success-400 glow"
+			? "text-success-400"
 			: led === "OFFLINE"
 				? "text-ghost"
 				: "text-warning-400 blink";
@@ -99,7 +99,15 @@ export function TopBar({
 					<span className="truncate font-display text-xl text-on-surface">
 						{project.name}
 					</span>
-					<span className={`shrink-0 font-display text-sm ${ledText}`}>● {led}</span>
+					<span
+						className={`shrink-0 text-xs leading-none ${ledDot}`}
+						title={`connection: ${led.toLowerCase()}`}
+					>
+						●
+					</span>
+					{led !== "ONLINE" && (
+						<span className={`shrink-0 font-display text-sm ${ledDot}`}>{led}</span>
+					)}
 				</div>
 				<div className="truncate text-xs text-on-surface-muted">
 					{sessionTitle ?? project.path ?? project.upstream ?? project.id}

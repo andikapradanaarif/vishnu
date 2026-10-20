@@ -68,7 +68,11 @@ export function useLogout() {
 	return useMutation({
 		mutationKey: ["auth", "logout"],
 		mutationFn: () => authClient.logout(),
-		onSuccess: () => qc.removeQueries({ queryKey: queryKeys.me }),
+		// Drop the session locally no matter what the server says — a
+		// failed or hung logout must not leave the app half-signed-in.
+		// Writing null (instead of removing the query) sends the app to
+		// the login screen immediately without a refetch flash.
+		onSettled: () => qc.setQueryData(queryKeys.me, null),
 	});
 }
 

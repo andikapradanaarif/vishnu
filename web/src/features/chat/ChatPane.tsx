@@ -3,6 +3,7 @@ import { Button } from "@vishnu/ui-component/button";
 import { EmptyState } from "@vishnu/ui-component/emptyState";
 import { useMessages } from "@/hooks/queries";
 import { usePendingState } from "@/services/pendingStore";
+import { Spinner } from "@/components/Spinner";
 import { errorLabel } from "@/utils/errors";
 import type { Message } from "@vishnu/api-contract";
 import { MessagePart } from "./MessageParts";
@@ -36,8 +37,8 @@ export function ChatPane({ wid, sid }: ChatPaneProps) {
 		<div ref={scrollRef} onScroll={onScroll} className="min-h-0 flex-1 overflow-y-auto">
 			<div className="mx-auto flex max-w-3xl flex-col gap-3 px-3 py-4 sm:px-6">
 				{isLoading && (
-					<div className="py-10 text-center font-display text-lg text-on-surface-muted">
-						<span className="blink text-primary-400">▊</span> loading transcript…
+					<div className="flex items-center justify-center gap-3 py-10 text-center font-display text-lg text-on-surface-muted">
+						<Spinner className="text-primary-400" /> loading transcript…
 					</div>
 				)}
 				{error && (
@@ -67,7 +68,7 @@ export function ChatPane({ wid, sid }: ChatPaneProps) {
 
 				{busy[sid] && (
 					<div className="flex items-center gap-2 font-display text-sm text-on-surface-muted">
-						<span className="blink text-primary-400">▊</span>
+						<Spinner size="sm" className="text-primary-400" />
 						agent is working…
 					</div>
 				)}

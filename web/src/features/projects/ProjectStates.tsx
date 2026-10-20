@@ -1,5 +1,6 @@
 import { Button } from "@vishnu/ui-component/button";
 import type { Project } from "@vishnu/api-contract";
+import { Spinner } from "@/components/Spinner";
 import { errorLabel } from "@/utils/errors";
 
 export function StartingProject({
@@ -13,8 +14,8 @@ export function StartingProject({
 }) {
 	return (
 		<div className="flex h-dvh flex-col items-center justify-center gap-3 bg-cabinet px-6 text-center">
-			<p className="font-display text-2xl text-primary-400">
-				<span className="blink">▊</span> {label}
+			<p className="flex items-center gap-3 font-display text-2xl text-primary-400">
+				<Spinner /> {label}
 			</p>
 			{project && (
 				<p className="font-display text-lg text-on-surface-muted">{project.name}</p>

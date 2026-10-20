@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Spinner } from "@/components/Spinner";
 import { LoginScreen } from "@/features/auth/LoginScreen";
 import { ProjectPicker } from "@/features/projects/ProjectPicker";
 import { ProjectError, StartingProject } from "@/features/projects/ProjectStates";
@@ -23,8 +24,9 @@ export default function App() {
 
 	if (me.isPending) {
 		return (
-			<div className="flex h-dvh items-center justify-center bg-cabinet">
-				<span className="blink font-display text-xl text-primary-400">▊ LOADING</span>
+			<div className="flex h-dvh items-center justify-center gap-3 bg-cabinet">
+				<Spinner size="lg" className="text-primary-400" />
+				<span className="font-display text-xl text-primary-400">LOADING</span>
 			</div>
 		);
 	}

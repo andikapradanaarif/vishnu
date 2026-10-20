@@ -4,6 +4,7 @@ import { Chip } from "@vishnu/ui-component/chip";
 import { Dialog } from "@vishnu/ui-component/dialog";
 import { EmptyState } from "@vishnu/ui-component/emptyState";
 import { useDeleteProject, useProjects } from "@/hooks/queries";
+import { Spinner } from "@/components/Spinner";
 import { errorLabel } from "@/utils/errors";
 import type { Project, ProjectMode, ProjectStatus } from "@vishnu/api-contract";
 import { AddProjectDialog } from "./AddProjectDialog";
@@ -63,8 +64,8 @@ export function ProjectPicker({ onSelect, onLogout }: ProjectPickerProps) {
 			</div>
 
 			{isLoading && (
-				<div className="py-12 text-center font-display text-lg text-on-surface-muted">
-					<span className="blink text-primary-400">▊</span> loading projects…
+				<div className="flex items-center justify-center gap-3 py-12 text-center font-display text-lg text-on-surface-muted">
+					<Spinner className="text-primary-400" /> loading projects…
 				</div>
 			)}
 			{error && (

@@ -3,6 +3,7 @@ import { Icon } from "@iconify/react";
 import { Button } from "@vishnu/ui-component/button";
 import { EmptyState } from "@vishnu/ui-component/emptyState";
 import { usePendingState } from "@/services/pendingStore";
+import { Spinner } from "@/components/Spinner";
 import { useCreateSession, useDeleteSession, useSessions } from "@/hooks/queries";
 import { formatCost, relativeTime } from "@/utils/format";
 import type { Session } from "@vishnu/api-contract";
@@ -41,8 +42,8 @@ export function SessionSidebar({ wid, activeId, onSelect }: SessionSidebarProps)
 
 			<div className="flex-1 overflow-y-auto px-1.5 py-2">
 				{isLoading && (
-					<div className="py-6 text-center font-display text-sm text-on-surface-muted">
-						<span className="blink text-primary-400">▊</span> loading…
+					<div className="flex items-center justify-center gap-2 py-6 text-center font-display text-sm text-on-surface-muted">
+						<Spinner size="sm" className="text-primary-400" /> loading…
 					</div>
 				)}
 				{error && <p className="px-2 py-4 text-xs text-danger-400">{error.message}</p>}
