@@ -66,6 +66,7 @@
 	"scripts": {
 		"build": "./scripts/build.sh",
 		"lint": "oxlint .",
+		"test": "bun test",
 		"typecheck": "tsc -b",
 		"prepare": "bun run build"
 	},
