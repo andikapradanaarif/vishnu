@@ -61,6 +61,9 @@ export const pendingStore = {
 	setConn(conn: ConnState) {
 		set({ conn });
 	},
+	reset() {
+		set({ permissions: [], questions: [], busy: {}, conn: "connecting" });
+	},
 };
 
 export function usePendingState(): PendingState {

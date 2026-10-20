@@ -75,6 +75,10 @@ export function useProjects() {
 	return useQuery({
 		queryKey: queryKeys.projects,
 		queryFn: () => projectsClient.list(),
+		// Clone rows flip asynchronously; keep the list fresh until the
+		// server has finished cloning.
+		refetchInterval: (query) =>
+			query.state.data?.some((project) => project.status === "cloning") ? 2000 : false,
 	});
 }
 
