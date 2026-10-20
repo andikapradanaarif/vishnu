@@ -1,7 +1,9 @@
 import { useEffect, useRef } from "react";
+import { Button } from "@vishnu/ui-component/button";
 import { EmptyState } from "@vishnu/ui-component/emptyState";
 import { useMessages } from "@/hooks/queries";
 import { usePendingState } from "@/services/pendingStore";
+import { errorLabel } from "@/utils/errors";
 import type { Message } from "@vishnu/api-contract";
 import { MessagePart } from "./MessageParts";
 
@@ -11,7 +13,7 @@ interface ChatPaneProps {
 }
 
 export function ChatPane({ wid, sid }: ChatPaneProps) {
-	const { data: messages, isLoading, error } = useMessages(wid, sid);
+	const { data: messages, isLoading, error, refetch, isRefetching } = useMessages(wid, sid);
 	const { busy } = usePendingState();
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const pinned = useRef(true);
@@ -39,9 +41,18 @@ export function ChatPane({ wid, sid }: ChatPaneProps) {
 					</div>
 				)}
 				{error && (
-					<p className="py-4 text-center font-display text-sm text-danger-400">
-						{error.message}
-					</p>
+					<div className="flex flex-col items-center gap-2 py-4 text-center">
+						<p className="font-display text-sm text-danger-400">{errorLabel(error)}</p>
+						<Button
+							size="sm"
+							variant="outlined"
+							className="font-display"
+							isLoading={isRefetching}
+							onClick={() => refetch()}
+						>
+							RETRY
+						</Button>
+					</div>
 				)}
 				{!isLoading && (messages ?? []).length === 0 && (
 					<EmptyState

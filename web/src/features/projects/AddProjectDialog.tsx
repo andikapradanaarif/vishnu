@@ -5,6 +5,7 @@ import { Input } from "@vishnu/ui-component/input";
 import { Tabs, type Tab } from "@vishnu/ui-component/tabs";
 import { ApiError } from "@vishnu/api-contract/client";
 import { useCreateProject } from "@/hooks/queries";
+import { errorLabel } from "@/utils/errors";
 import type { CreateProjectRequest } from "@vishnu/api-contract";
 
 type Source = "github" | "link" | "external";
@@ -22,12 +23,13 @@ interface AddProjectDialogProps {
 
 function createError(error: unknown): string {
 	if (error instanceof ApiError) {
-		if (error.status === 409) return "already registered";
-		if (error.status === 403) return "server can't reach that repo — check its git auth";
-		if (error.code === "invalid_path") return "directory not found on the server";
-		return error.body.message || error.message;
+		if (error.status === 409) return "[conflict] already registered";
+		if (error.status === 403)
+			return "[forbidden] server can't reach that repo — check its git auth";
+		if (error.code === "invalid_path")
+			return "[invalid_path] directory not found on the server";
 	}
-	return error instanceof Error ? error.message : "couldn't create the project — try again";
+	return errorLabel(error, "couldn't create the project — try again");
 }
 
 /** Three source tabs; exactly one source field is sent per create. */

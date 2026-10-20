@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { Button } from "@vishnu/ui-component/button";
 import { useCancelRun, useSendPrompt } from "@/hooks/queries";
+import { errorLabel } from "@/utils/errors";
 
 interface ComposerProps {
 	wid: string;
@@ -79,7 +80,7 @@ export function Composer({ wid, sid, busy }: ComposerProps) {
 			</div>
 			{sendPrompt.isError && (
 				<p className="mx-auto mt-1 max-w-3xl font-display text-xs text-danger-400">
-					Failed to send: {sendPrompt.error?.message}
+					Failed to send: {errorLabel(sendPrompt.error)}
 				</p>
 			)}
 		</div>
