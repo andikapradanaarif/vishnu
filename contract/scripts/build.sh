@@ -20,7 +20,7 @@ bun build src/client.ts --outfile dist/client.js --format esm
 bun build src/paths.ts --outfile dist/paths.js --format esm
 bun build src/types.ts --outfile dist/types.js --format esm
 
-for d in workspaces sessions agent config permissions questions events; do
+for d in auth projects users workspaces sessions agent config permissions questions events; do
 	bun build "src/$d/index.ts" --outfile "dist/$d/index.js" --format esm
 done
 

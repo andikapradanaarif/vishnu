@@ -51,3 +51,19 @@ export const vishnuProjectBase = "/p/{pid}/v1";
 export function projectBaseUrl(projectId: string): string {
 	return buildPath(vishnuProjectBase, { pid: projectId });
 }
+
+// ---------- vishnu API (baseUrl `/api`) ----------
+
+export const vishnuAuthRequestOtp = "/auth/request-otp";
+export const vishnuAuthVerify = "/auth/verify";
+export const vishnuAuthLogout = "/auth/logout";
+export const vishnuAuthMe = "/auth/me";
+
+export const vishnuProjects = "/projects";
+export const vishnuProjectById = "/projects/{id}";
+export const vishnuProjectWorkspace = "/projects/{id}/workspace";
+
+export const vishnuUsers = "/users";
+
+/** Public liveness probe — root-relative, so it sits outside the `/api` base. */
+export const vishnuHealthz = "/healthz";
