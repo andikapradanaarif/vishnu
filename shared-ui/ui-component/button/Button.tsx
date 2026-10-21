@@ -1,6 +1,6 @@
 import classNames from "classnames";
-import {useRef, type MouseEventHandler} from "react";
-import LoadingAnimation from "../loadingAnimation/LoadingDots";
+import {useRef, type MouseEventHandler, type PointerEventHandler} from "react";
+import LoadingSpinner from "../loadingAnimation/LoadingSpinner";
 import type {ButtonColor, ButtonProps, ButtonSize, ButtonVariant} from "./type";
 import {createRipple, type RipplePointer} from "../../utils/ripple";
 
@@ -20,18 +20,32 @@ export const Button = (props: ButtonProps) => {
 		icon,
 		iconPosition = "left",
 		rounded = "md",
+		onPointerDown,
 		...restProps
 	} = props;
 
 	const buttonRef = useRef<HTMLButtonElement>(null);
 
-	const handleClick: MouseEventHandler<HTMLButtonElement> = (event) => {
-		if (disabled || isLoading) return;
+	// Ripple fires on pointerdown so presses flash the moment they land
+	// instead of waiting for the release. Keyboard activation has no
+	// pointerdown — the click handler covers it via detail === 0.
+	const handlePointerDown: PointerEventHandler<HTMLButtonElement> = (event) => {
+		onPointerDown?.(event);
+		if (disabled || isLoading || event.button !== 0) return;
 
 		const button = buttonRef.current;
 		if (button) {
 			const pointer: RipplePointer = {clientX: event.clientX, clientY: event.clientY};
 			createRipple(button, pointer);
+		}
+	};
+
+	const handleClick: MouseEventHandler<HTMLButtonElement> = (event) => {
+		if (disabled || isLoading) return;
+
+		if (event.detail === 0 && buttonRef.current) {
+			const pointer: RipplePointer = {clientX: event.clientX, clientY: event.clientY};
+			createRipple(buttonRef.current, pointer);
 		}
 
 		onClick?.(event);
@@ -61,6 +75,7 @@ export const Button = (props: ButtonProps) => {
 				colorClassName,
 			)}
 			onClick={disabled || isLoading ? undefined : handleClick}
+			onPointerDown={handlePointerDown}
 			disabled={disabled}
 			form={form}
 		>
@@ -74,20 +89,9 @@ export const Button = (props: ButtonProps) => {
 			{icon && iconPosition === "right" && <span className="ml-1.5 inline-flex items-center">{icon}</span>}
 
 			{/* loading */}
-			{isLoading && variant !== "text" && (
-				<span className="ml-2 mt-1 inline-flex items-center">
-					<LoadingAnimation
-						className="w-4 h-4"
-						colorClassName={
-							color === "custom"
-								? "text-inherit"
-								: variant === "filled"
-									? "text-on-primary"
-									: variant === "outlined" && color === "danger"
-										? "text-danger-500"
-										: undefined
-						}
-					/>
+			{isLoading && (
+				<span className="ml-2 inline-flex items-center">
+					<LoadingSpinner size={14} />
 				</span>
 			)}
 		</button>
@@ -99,7 +103,7 @@ const buttonStyling = (variant: ButtonVariant, color: ButtonColor): string => {
 		case "filled":
 			switch (color) {
 				case "primary":
-					return "text-on-primary bg-primary-500 border-transparent hover:bg-primary-600/95 transition-colors duration-200";
+					return "text-on-primary bg-primary-500 border-transparent hover:bg-primary-700/95 transition-colors duration-200";
 				case "danger":
 					return "text-on-primary bg-danger-500 border-transparent hover:bg-danger-600/95 transition-colors duration-200";
 				default:
@@ -110,7 +114,7 @@ const buttonStyling = (variant: ButtonVariant, color: ButtonColor): string => {
 		case "outlined":
 			switch (color) {
 				case "primary":
-					return "border-primary-500 text-primary-500 bg-transparent hover:bg-primary-500/20 transition-colors duration-200";
+					return "border-primary-400 text-primary-400 bg-transparent hover:border-primary-300 hover:bg-primary-500/20 transition-colors duration-200";
 				case "danger":
 					return "border-danger-500 text-danger-500 bg-transparent hover:bg-danger-500/20 transition-colors duration-200";
 				default:
@@ -119,11 +123,11 @@ const buttonStyling = (variant: ButtonVariant, color: ButtonColor): string => {
 		case "text":
 			switch (color) {
 				case "primary":
-					return "bg-primary-800 hover:opacity-80 border-transparent p-0 transition-colors duration-200";
+					return "bg-transparent text-primary-400 hover:text-primary-300 border-transparent transition-colors duration-200";
 				case "danger":
-					return "bg-danger-500 hover:opacity-90 border-transparent p-0 transition-colors duration-200";
+					return "bg-transparent text-danger-500 hover:text-danger-400 border-transparent transition-colors duration-200";
 				default:
-					return "border-transparent p-0 transition-colors duration-200";
+					return "bg-transparent border-transparent transition-colors duration-200";
 			}
 		default:
 			return "";
@@ -134,11 +138,11 @@ const buttonSize = (variant: ButtonVariant, size: ButtonSize): string => {
 	if (variant === "text") {
 		switch (size) {
 			case "sm":
-				return "font-normal text-xs";
+				return "py-0 px-3 font-normal text-sm";
 			case "md":
-				return "font-normal text-sm";
+				return "py-0 px-4 font-normal text-base";
 			case "lg":
-				return "font-normal text-base";
+				return "py-0 px-6 font-normal text-lg";
 			default:
 				return "";
 		}
@@ -146,11 +150,11 @@ const buttonSize = (variant: ButtonVariant, size: ButtonSize): string => {
 
 	switch (size) {
 		case "sm":
-			return "py-1 px-3 text-xs";
+			return "py-1.5 px-3 text-sm";
 		case "md":
-			return "py-2 px-4 text-sm";
+			return "py-2 px-4 text-base";
 		case "lg":
-			return "py-3 px-6 text-base";
+			return "py-3 px-6 text-lg";
 		default:
 			return "";
 	}

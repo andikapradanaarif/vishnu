@@ -166,7 +166,7 @@
 	left: var(--shared-ripple-x, 0px);
 	top: var(--shared-ripple-y, 0px);
 	transform: translate(-50%, -50%) scale(0);
-	animation: shared-ripple 400ms steps(4, end);
+	animation: shared-ripple 300ms steps(5, start);
 }
 
 @media (prefers-reduced-motion: reduce) {
