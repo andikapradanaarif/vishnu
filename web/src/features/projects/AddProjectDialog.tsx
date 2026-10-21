@@ -13,7 +13,7 @@ type Source = "github" | "link" | "external";
 const SOURCE_TABS: [Tab<Source>, Tab<Source>, Tab<Source>] = [
 	{ value: "github", label: "GitHub" },
 	{ value: "link", label: "Link" },
-	{ value: "external", label: "External" },
+	{ value: "external", label: "Remote" },
 ];
 
 interface AddProjectDialogProps {

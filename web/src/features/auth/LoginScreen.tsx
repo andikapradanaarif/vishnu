@@ -22,7 +22,7 @@ function codeOf(error: unknown): string | undefined {
 }
 
 /** Title screen: email, then a one-time code. */
-export function LoginScreen() {
+export function LoginScreen({ onSuccess }: { onSuccess?: () => void }) {
 	const [phase, setPhase] = useState<Phase>("email");
 	const [email, setEmail] = useState("");
 	const [digits, setDigits] = useState<string[]>(() =>
@@ -95,6 +95,7 @@ export function LoginScreen() {
 		verify.mutate(
 			{ email: email.trim(), code },
 			{
+				onSuccess: () => onSuccess?.(),
 				onError: (error) => {
 					switch (codeOf(error)) {
 						case "invalid_code":
@@ -188,6 +189,7 @@ export function LoginScreen() {
 							onChange={(event) => setEmail(event.target.value)}
 							error={emailError}
 							required
+							className="text-lg! px-4! py-3!"
 						/>
 						<Button
 							type="submit"
@@ -199,18 +201,18 @@ export function LoginScreen() {
 					</form>
 				) : (
 					<form className="mt-6 flex flex-col gap-4" onSubmit={submitCode}>
-						<div className="flex items-center justify-between gap-3 font-display text-sm text-on-surface-muted">
+						<div className="flex items-center justify-between gap-3 font-display text-lg text-on-surface">
 							<span className="truncate">{email}</span>
 							<button
 								type="button"
-								className="shrink-0 text-info-400 hover:text-info-300"
+								className="shrink-0 border-b-2 border-info-500/60 px-1 text-info-400 hover:border-info-300 hover:text-info-200"
 								onClick={() => {
 									setPhase("email");
 									setBanner(undefined);
 									setCodeError(undefined);
 								}}
 							>
-								edit
+								EDIT
 							</button>
 						</div>
 

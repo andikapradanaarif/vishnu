@@ -14,13 +14,19 @@ interface ProjectPickerProps {
 	onLogout: () => void;
 }
 
-const MODE_CLASS: Record<ProjectMode, string> = {
-	managed: "!rounded-sm border border-info-500/50 bg-info-500/10 text-info-300",
-	external: "!rounded-sm border border-pink-500/50 bg-pink-500/10 text-pink-300",
+const MODE_META: Record<ProjectMode, { label: string; className: string }> = {
+	managed: {
+		label: "LOCAL",
+		className: "!rounded-sm border border-info-500/50 bg-info-500/10 text-info-300",
+	},
+	external: {
+		label: "REMOTE",
+		className: "!rounded-sm border border-pink-500/50 bg-pink-500/10 text-pink-300",
+	},
 };
 
 function isSelectable(project: Project): boolean {
-	return project.status !== "cloning" && project.status !== "error";
+	return project.status !== "error";
 }
 
 function secondaryLine(project: Project): string | undefined {
@@ -84,6 +90,7 @@ export function ProjectPicker({ onSelect, onLogout }: ProjectPickerProps) {
 					<EmptyState text="INSERT COIN" className="py-4 font-display text-2xl" />
 					<Button
 						className="font-display text-lg tracking-[0.2em]"
+						onMouseDown={(event) => event.stopPropagation()}
 						onClick={() => setAddOpen(true)}
 					>
 						+ NEW PROJECT
@@ -121,9 +128,9 @@ export function ProjectPicker({ onSelect, onLogout }: ProjectPickerProps) {
 									<Chip
 										size="sm"
 										color="custom"
-										colorClassName={MODE_CLASS[project.mode]}
+										colorClassName={MODE_META[project.mode].className}
 									>
-										{project.mode.toUpperCase()}
+										{MODE_META[project.mode].label}
 									</Chip>
 								</div>
 								{secondary && (
@@ -156,8 +163,11 @@ export function ProjectPicker({ onSelect, onLogout }: ProjectPickerProps) {
 			{(projects ?? []).length > 0 && (
 				<button
 					type="button"
-					onClick={() => setAddOpen(true)}
-					className="border-2 border-dashed border-border px-3 py-2 text-left font-display text-lg text-on-surface-muted hover:border-primary-500 hover:text-primary-300"
+					onMouseDown={(event) => event.stopPropagation()}
+					onClick={() => {
+						setAddOpen(true);
+					}}
+					className="border-2 border-dashed border-border px-3 py-2 text-left font-display text-lg text-on-surface-muted hover:border-primary-500 hover:text-primary-600"
 				>
 					+ NEW PROJECT
 				</button>
@@ -187,7 +197,9 @@ export function ProjectPicker({ onSelect, onLogout }: ProjectPickerProps) {
 				</div>
 			</Dialog>
 
-			<AddProjectDialog isOpen={addOpen} onClose={() => setAddOpen(false)} />
+			{addOpen && (
+				<AddProjectDialog isOpen onClose={() => setAddOpen(false)} />
+			)}
 		</div>
 	);
 }
