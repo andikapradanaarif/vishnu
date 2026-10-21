@@ -4,6 +4,11 @@
 @import "@fontsource/press-start-2p";
 @import "@vishnu/ui-component/styles.css";
 
+/* shared-ui lives outside web/, so Tailwind's automatic content detection
+   never sees the utility classes its components use (fixed, inset-0,
+   z-50, etc.). Register the package source explicitly. */
+@source "../../shared-ui/ui-component";
+
 /*
  * Vishnu retro theme. This block is the only place hex literals live:
  * every component reads these tokens, so the palette is swapped here.
@@ -13,129 +18,131 @@
 	--font-display: "VT323", "JetBrains Mono", monospace;
 	--font-logo: "Press Start 2P", "VT323", monospace;
 
-	/* Primary — monokai yellow */
-	--color-primary-50: #fdfbe8;
-	--color-primary-100: #faf5c6;
-	--color-primary-200: #f4ed9c;
-	--color-primary-300: #eee576;
-	--color-primary-400: #ece286;
-	--color-primary-500: #e6db74;
-	--color-primary-600: #cfc14f;
-	--color-primary-700: #ab9e3a;
-	--color-primary-800: #877c2b;
-	--color-primary-900: #645c1f;
-	--color-primary-950: #3b3711;
+	/* Primary — deep violet with a pink lean (crush accent). 500 stays
+	   dark enough that white labels remain legible on solid buttons. */
+	--color-primary-50: #150e24;
+	--color-primary-100: #1d1330;
+	--color-primary-200: #2a1a45;
+	--color-primary-300: #3b2263;
+	--color-primary-400: #c084fc;
+	--color-primary-500: #9333ea;
+	--color-primary-600: #c084fc;
+	--color-primary-700: #7e22ce;
+	--color-primary-800: #6b21a8;
+	--color-primary-900: #581c87;
+	--color-primary-950: #2a0f45;
 
 	/*
-	 * Neutral — inverted monokai ramp. Light shades are foreground text
-	 * (shared-ui foreground utilities), dark shades are surfaces and
-	 * lines. The web app itself uses the semantic roles below.
+	 * Neutral — inverted near-black ramp with only a hint of violet.
+	 * Light shades are foreground text (shared-ui foreground utilities),
+	 * dark shades are surfaces and lines. The web app itself uses the
+	 * semantic roles below.
 	 */
-	--color-neutral-50: #272822;
-	--color-neutral-100: #2f302a;
-	--color-neutral-200: #3e3f36;
-	--color-neutral-300: #494a3f;
-	--color-neutral-400: #5e5f50;
-	--color-neutral-500: #75715e;
-	--color-neutral-600: #8a8772;
-	--color-neutral-700: #a1a08e;
-	--color-neutral-800: #c6c5b4;
-	--color-neutral-900: #e6e6da;
-	--color-neutral-950: #f8f8f2;
+	--color-neutral-50: #0d0c10;
+	--color-neutral-100: #14131a;
+	--color-neutral-200: #1c1a24;
+	--color-neutral-300: #2a2733;
+	--color-neutral-400: #3a3645;
+	--color-neutral-500: #6b6678;
+	--color-neutral-600: #8e899c;
+	--color-neutral-700: #b0abbf;
+	--color-neutral-800: #d3cfdd;
+	--color-neutral-900: #ece9f2;
+	--color-neutral-950: #faf9fd;
 
-	--color-secondary-50: #272822;
-	--color-secondary-100: #2f302a;
-	--color-secondary-200: #3e3f36;
-	--color-secondary-300: #494a3f;
-	--color-secondary-400: #5e5f50;
-	--color-secondary-500: #6b6a57;
-	--color-secondary-600: #8a8772;
-	--color-secondary-700: #a1a08e;
-	--color-secondary-800: #c6c5b4;
-	--color-secondary-900: #e6e6da;
-	--color-secondary-950: #f8f8f2;
+	--color-secondary-50: #0d0c10;
+	--color-secondary-100: #14131a;
+	--color-secondary-200: #1c1a24;
+	--color-secondary-300: #2a2733;
+	--color-secondary-400: #3a3645;
+	--color-secondary-500: #6b6678;
+	--color-secondary-600: #8e899c;
+	--color-secondary-700: #b0abbf;
+	--color-secondary-800: #d3cfdd;
+	--color-secondary-900: #ece9f2;
+	--color-secondary-950: #faf9fd;
 
-	/* Danger — monokai hot pink/red */
-	--color-danger-50: #fde7f0;
-	--color-danger-100: #fbcbe0;
-	--color-danger-200: #f799c4;
-	--color-danger-300: #f364a5;
-	--color-danger-400: #ee3f88;
-	--color-danger-500: #f92672;
-	--color-danger-600: #d61260;
-	--color-danger-700: #ad0e4e;
-	--color-danger-800: #840b3b;
-	--color-danger-900: #5b0729;
-	--color-danger-950: #360418;
+	/* Danger — rose, kept clear of the fuchsia accent hue */
+	--color-danger-50: #fff1f2;
+	--color-danger-100: #ffe4e6;
+	--color-danger-200: #fecdd3;
+	--color-danger-300: #fda4af;
+	--color-danger-400: #fb7185;
+	--color-danger-500: #f43f5e;
+	--color-danger-600: #e11d48;
+	--color-danger-700: #be123c;
+	--color-danger-800: #9f1239;
+	--color-danger-900: #881337;
+	--color-danger-950: #3b0716;
 
-	/* Success — monokai green */
-	--color-success-50: #f4fcdf;
-	--color-success-100: #e9f8b8;
-	--color-success-200: #d8f280;
-	--color-success-300: #c7ec4f;
-	--color-success-400: #b5e737;
-	--color-success-500: #a6e22e;
-	--color-success-600: #8ac121;
-	--color-success-700: #6b9818;
-	--color-success-800: #4e7011;
-	--color-success-900: #354c0b;
-	--color-success-950: #1e2c05;
+	/* Success — emerald */
+	--color-success-50: #ecfdf5;
+	--color-success-100: #d1fae5;
+	--color-success-200: #a7f3d0;
+	--color-success-300: #6ee7b7;
+	--color-success-400: #34d399;
+	--color-success-500: #10b981;
+	--color-success-600: #059669;
+	--color-success-700: #047857;
+	--color-success-800: #065f46;
+	--color-success-900: #064e3b;
+	--color-success-950: #022c22;
 
-	/* Warning — monokai orange */
-	--color-warning-50: #fef1e2;
-	--color-warning-100: #fee3c2;
-	--color-warning-200: #fdc887;
-	--color-warning-300: #fbae4f;
-	--color-warning-400: #fda231;
-	--color-warning-500: #fd971f;
-	--color-warning-600: #dc7c0d;
-	--color-warning-700: #b76109;
-	--color-warning-800: #8c4807;
-	--color-warning-900: #613106;
-	--color-warning-950: #391c04;
+	/* Warning — amber */
+	--color-warning-50: #fffbeb;
+	--color-warning-100: #fef3c7;
+	--color-warning-200: #fde68a;
+	--color-warning-300: #fcd34d;
+	--color-warning-400: #fbbf24;
+	--color-warning-500: #f59e0b;
+	--color-warning-600: #d97706;
+	--color-warning-700: #b45309;
+	--color-warning-800: #92400e;
+	--color-warning-900: #78350f;
+	--color-warning-950: #451a03;
 
-	/* Info — monokai cyan */
-	--color-info-50: #e9fbfe;
-	--color-info-100: #d0f4fc;
-	--color-info-200: #aaeaf9;
-	--color-info-300: #84e0f6;
-	--color-info-400: #66d9ef;
-	--color-info-500: #4dcee9;
-	--color-info-600: #2cb1d3;
-	--color-info-700: #238eaa;
-	--color-info-800: #1c6a80;
-	--color-info-900: #144a59;
-	--color-info-950: #0b2c36;
+	/* Info — soft cyan */
+	--color-info-50: #ecfeff;
+	--color-info-100: #cffafe;
+	--color-info-200: #a5f3fc;
+	--color-info-300: #67e8f9;
+	--color-info-400: #22d3ee;
+	--color-info-500: #06b6d4;
+	--color-info-600: #0891b2;
+	--color-info-700: #0e7490;
+	--color-info-800: #155e75;
+	--color-info-900: #164e63;
+	--color-info-950: #083344;
 
-	/* Pink — monokai purple (permissions, questions, user voice) */
-	--color-pink-50: #f3eeff;
-	--color-pink-100: #e7dcff;
-	--color-pink-200: #d5c0ff;
-	--color-pink-300: #c1a4ff;
-	--color-pink-400: #b18efc;
-	--color-pink-500: #ae81ff;
-	--color-pink-600: #9163f0;
-	--color-pink-700: #7547d4;
-	--color-pink-800: #5933a4;
-	--color-pink-900: #3e2274;
-	--color-pink-950: #25144a;
+	/* Pink — fuchsia (permissions, questions, user voice) */
+	--color-pink-50: #fdf4ff;
+	--color-pink-100: #fae8ff;
+	--color-pink-200: #f5d0fe;
+	--color-pink-300: #f0abfc;
+	--color-pink-400: #e879f9;
+	--color-pink-500: #d946ef;
+	--color-pink-600: #c026d3;
+	--color-pink-700: #a21caf;
+	--color-pink-800: #86198f;
+	--color-pink-900: #701a75;
+	--color-pink-950: #4a044e;
 
 	/* Semantic roles */
 	--color-primary: var(--color-primary-500);
-	--color-surface: #272822;
-	--color-surface-alt: #1e1f1c;
-	--color-raised: #33342c;
-	--color-cabinet: #191a16;
-	--color-on-surface: #f8f8f2;
-	--color-on-surface-muted: #a1a08e;
-	--color-ghost: #5e5f50;
-	--color-border: #494a3f;
-	--color-border-strong: #5e5f50;
-	--color-line: #3e3f36;
-	--color-line-strong: #494a3f;
-	--color-ink: #f8f8f2;
-	--color-ink-2: #b8b7a5;
-	--color-on-primary: #1e1f1c;
+	--color-surface: #14131a;
+	--color-surface-alt: #0d0c10;
+	--color-raised: #1c1a24;
+	--color-cabinet: #09080b;
+	--color-on-surface: #ece9f2;
+	--color-on-surface-muted: #a9a4b8;
+	--color-ghost: #6f6a7d;
+	--color-border: #2a2733;
+	--color-border-strong: #3a3645;
+	--color-line: #1c1a24;
+	--color-line-strong: #2a2733;
+	--color-ink: #ece9f2;
+	--color-ink-2: #b6b1c4;
+	--color-on-primary: #ffffff;
 
 	/* Hard edges — shared-ui's rounded-md/lg collapse to 2px */
 	--radius-xs: 0px;
@@ -160,6 +167,16 @@ body {
 	font-variant-ligatures: none;
 }
 
+/* Tailwind v4 preflight no longer gives buttons a pointer cursor.
+   Interactive elements should always read as clickable in this UI. */
+button:not(:disabled),
+[role="button"] {
+	cursor: pointer;
+}
+button:disabled {
+	cursor: not-allowed;
+}
+
 .font-display,
 .font-logo {
 	letter-spacing: 0.02em;
@@ -172,7 +189,7 @@ body {
 
 /* Safe-area padding for the sticky composer (iOS). */
 .safe-bottom {
-	padding-bottom: env(safe-area-inset-bottom);
+	padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
 }
 
 .no-scrollbar {
