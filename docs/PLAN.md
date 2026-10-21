@@ -73,7 +73,9 @@ Detailed plans: [`plan/api.md`](plan/api.md) (API),
 [`plan/projects.md`](plan/projects.md) (multi-project registry +
 per-project crush servers — **decided**),
 [`plan/data.md`](plan/data.md) (persistence — Postgres/GORM, migrations,
-schema — **decided**).
+schema — **decided**),
+[`plan/auth.md`](plan/auth.md) (email-OTP sign-in + eligibility store —
+**shipped**).
 
 Task docs (agent-assignment breakdowns): [`tasks/api.md`](tasks/api.md)
 (api — 6 PRs).
