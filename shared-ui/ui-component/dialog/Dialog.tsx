@@ -40,6 +40,7 @@ export function Dialog({
 	}, [onClose]);
 
 	useEffect(() => {
+		if (!isOpen) return;
 		const onClickOutside = () => {
 			if (!disableClickOutside) handleClose();
 		};
@@ -75,7 +76,7 @@ export function Dialog({
 		return () => {
 			document.removeEventListener("mousedown", handleClickOutside);
 		};
-	}, [disableClickOutside, handleClose]);
+	}, [disableClickOutside, handleClose, isOpen]);
 
 	if (!isOpen && !isExiting) return null;
 

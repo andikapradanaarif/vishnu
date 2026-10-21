@@ -44,7 +44,7 @@
 
 /* Entrance */
 .shared-dialog-backdrop {
-	opacity: 0;
+	opacity: 0.4;
 	will-change: opacity;
 	animation-name: sharedDialogBackdropIn;
 	animation-duration: var(--shared-dialog-duration, 60ms);
@@ -53,8 +53,8 @@
 }
 
 .shared-dialog-panel {
-	opacity: 0;
-	transform: scale(0.95);
+	opacity: 1;
+	transform: scale(1);
 	will-change: opacity, transform;
 	animation-name: sharedDialogPanelIn;
 	animation-duration: var(--shared-dialog-duration, 60ms);
