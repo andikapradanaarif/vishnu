@@ -3,10 +3,12 @@ import { Button } from "@vishnu/ui-component/button";
 import { EmptyState } from "@vishnu/ui-component/emptyState";
 import { useMessages } from "@/hooks/queries";
 import { usePendingState } from "@/services/pendingStore";
-import { Spinner } from "@/components/Spinner";
+import { LoadingSpinner } from "@vishnu/ui-component/loadingAnimation";
 import { errorLabel } from "@/utils/errors";
 import type { Message } from "@vishnu/api-contract";
 import { MessagePart } from "./MessageParts";
+import { PermissionCard } from "@/features/prompts/PermissionCard";
+import { QuestionCard } from "@/features/prompts/QuestionCard";
 
 interface ChatPaneProps {
 	wid: string;
@@ -15,17 +17,20 @@ interface ChatPaneProps {
 
 export function ChatPane({ wid, sid }: ChatPaneProps) {
 	const { data: messages, isLoading, error, refetch, isRefetching } = useMessages(wid, sid);
-	const { busy } = usePendingState();
+	const { busy, permissions, questions } = usePendingState();
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const pinned = useRef(true);
 
-	// Keep the transcript pinned to the bottom while streaming unless the
-	// user has scrolled up.
+	const sessionPermissions = permissions.filter((p) => p.session_id === sid);
+	const sessionQuestions = questions.filter((q) => q.session_id === sid);
+
+	// Keep the transcript pinned to the bottom while streaming or when a
+	// prompt arrives, unless the user has scrolled up.
 	useEffect(() => {
 		if (pinned.current && scrollRef.current) {
 			scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
 		}
-	}, [messages]);
+	}, [messages, sessionPermissions.length, sessionQuestions.length]);
 
 	const onScroll = () => {
 		const el = scrollRef.current;
@@ -34,11 +39,11 @@ export function ChatPane({ wid, sid }: ChatPaneProps) {
 	};
 
 	return (
-		<div ref={scrollRef} onScroll={onScroll} className="min-h-0 flex-1 overflow-y-auto">
+		<div ref={scrollRef} onScroll={onScroll} className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
 			<div className="mx-auto flex max-w-3xl flex-col gap-3 px-3 py-4 sm:px-6">
 				{isLoading && (
 					<div className="flex items-center justify-center gap-3 py-10 text-center font-display text-lg text-on-surface-muted">
-						<Spinner className="text-primary-400" /> loading transcript…
+						<LoadingSpinner size={16} className="text-primary-400" /> loading transcript…
 					</div>
 				)}
 				{error && (
@@ -68,10 +73,17 @@ export function ChatPane({ wid, sid }: ChatPaneProps) {
 
 				{busy[sid] && (
 					<div className="flex items-center gap-2 font-display text-sm text-on-surface-muted">
-						<Spinner size="sm" className="text-primary-400" />
+						<LoadingSpinner size={14} className="text-primary-400" />
 						agent is working…
 					</div>
 				)}
+
+				{sessionPermissions.map((request) => (
+					<PermissionCard key={request.id} wid={wid} request={request} />
+				))}
+				{sessionQuestions.map((request) => (
+					<QuestionCard key={request.id} wid={wid} request={request} />
+				))}
 			</div>
 		</div>
 	);
@@ -93,9 +105,6 @@ function MessageView({ message }: { message: Message }) {
 			{message.parts.map((p, i) => (
 				<MessagePart key={i} part={p} role={message.role} />
 			))}
-			{message.model && (
-				<div className="mt-0.5 font-display text-[10px] text-ghost">{message.model}</div>
-			)}
 		</div>
 	);
 }

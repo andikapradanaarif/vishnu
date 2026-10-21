@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { Icon } from "@iconify/react";
 import { Button } from "@vishnu/ui-component/button";
 import { useCancelRun, useSendPrompt } from "@/hooks/queries";
 import { errorLabel } from "@/utils/errors";
@@ -35,9 +36,8 @@ export function Composer({ wid, sid, busy }: ComposerProps) {
 	};
 
 	return (
-		<div className="safe-bottom border-t-2 border-border bg-surface px-3 pt-2 pb-3 sm:px-6">
-			<div className="mx-auto flex max-w-3xl items-end gap-2">
-				<span className="mb-2.5 shrink-0 font-display text-xl text-primary-400">&gt;</span>
+		<div className="safe-bottom border-t-2 border-border bg-surface px-3 pt-3 pb-6 sm:px-6">
+			<div className="mx-auto flex w-full min-w-0 items-end gap-2">
 				<textarea
 					ref={areaRef}
 					rows={1}
@@ -53,7 +53,7 @@ export function Composer({ wid, sid, busy }: ComposerProps) {
 							send();
 						}
 					}}
-					className="max-h-[200px] min-h-[40px] flex-1 resize-none border-2 border-border bg-raised px-3 py-2.5 text-base text-on-surface outline-none placeholder:text-ghost focus:border-primary-500 sm:text-sm"
+					className="max-h-[200px] min-h-[40px] min-w-0 flex-1 resize-none border-2 border-border bg-raised px-3 py-2.5 text-sm text-on-surface outline-none placeholder:text-ghost focus:border-primary-500"
 				/>
 				{busy ? (
 					<Button
@@ -61,25 +61,27 @@ export function Composer({ wid, sid, busy }: ComposerProps) {
 						variant="outlined"
 						color="danger"
 						className="font-display"
+						icon={<Icon icon="ri:stop-fill" width={14} />}
 						onClick={() => cancelRun.mutate(sid)}
 						isLoading={cancelRun.isPending}
 					>
-						■ STOP
+						STOP
 					</Button>
 				) : (
 					<Button
 						size="md"
-						className="font-display"
+						className="px-3"
 						onClick={send}
 						disabled={!value.trim()}
 						isLoading={sendPrompt.isPending}
+						aria-label="Send message"
 					>
-						SEND
+						<Icon icon="ri:send-plane-2-fill" width={18} />
 					</Button>
 				)}
 			</div>
 			{sendPrompt.isError && (
-				<p className="mx-auto mt-1 max-w-3xl font-display text-xs text-danger-400">
+				<p className="mt-1 w-full font-display text-xs text-danger-400">
 					Failed to send: {errorLabel(sendPrompt.error)}
 				</p>
 			)}
