@@ -1,73 +1,88 @@
 import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
+import { Outlet, useNavigate, useParams } from "@tanstack/react-router";
 import { Button } from "@vishnu/ui-component/button";
 import { Drawer } from "@vishnu/ui-component/drawer";
-import { EmptyState } from "@vishnu/ui-component/emptyState";
 import { useCrushEvents } from "@/hooks/useCrushEvents";
-import { useReportCurrentSession, useSessions } from "@/hooks/queries";
-import { usePendingState } from "@/services/pendingStore";
+import { useLogout, useSessions } from "@/hooks/queries";
+import { resetCrushState } from "@/services/crushState";
 import { TopBar } from "@/features/topbar/TopBar";
+import { ProjectSwitcher } from "@/features/topbar/ProjectSwitcher";
+import { SettingsDialog } from "@/features/settings/SettingsDialog";
 import { SessionSidebar } from "@/features/sessions/SessionSidebar";
-import { ChatPane } from "@/features/chat/ChatPane";
-import { Composer } from "@/features/chat/Composer";
-import { PermissionCard } from "@/features/prompts/PermissionCard";
-import { QuestionCard } from "@/features/prompts/QuestionCard";
 import type { Project } from "@vishnu/api-contract";
 
 interface AppShellProps {
 	project: Project;
 	wid: string;
-	onSwitchProject: () => void;
-	onLogout: () => void;
 }
 
-/** Session HUD: topbar, save slots, transcript and composer. */
-export function AppShell({ project, wid, onSwitchProject, onLogout }: AppShellProps) {
-	const { data: sessions } = useSessions(wid);
-	const [activeSessionId, setActiveSessionId] = useState<string>();
+/** Session HUD layout: topbar, save slots, drawer and routed content. */
+export function AppShell({ project, wid }: AppShellProps) {
+	const { data: sessions, isFetching } = useSessions(wid);
 	const [drawerOpen, setDrawerOpen] = useState(false);
-	const { permissions, questions, busy } = usePendingState();
-	const reportCurrent = useReportCurrentSession(wid);
+	const [settingsOpen, setSettingsOpen] = useState(false);
+	const navigate = useNavigate();
+	const logout = useLogout();
+	const params = useParams({ strict: false }) as { sessionId?: string };
+	const activeSessionId = params.sessionId;
 
 	useCrushEvents(wid);
 
-	// Default to the most recently touched session once the list loads.
+	// If the URL points at a deleted session, fall back to the project home.
 	useEffect(() => {
-		if (!activeSessionId && sessions && sessions.length > 0) {
-			const latest = [...sessions].sort((a, b) => b.updated_at - a.updated_at)[0];
-			setActiveSessionId(latest.id);
-		}
-	}, [sessions, activeSessionId]);
-
-	// Drop the active id if that session disappeared (deleted elsewhere).
-	useEffect(() => {
+		if (isFetching) return;
 		if (activeSessionId && sessions && !sessions.some((s) => s.id === activeSessionId)) {
-			setActiveSessionId(undefined);
+			navigate({
+				to: "/projects/$projectId",
+				params: { projectId: project.id },
+				replace: true,
+			});
 		}
-	}, [sessions, activeSessionId]);
-
-	// Tell the server which session this tab is viewing so permission and
-	// question prompts are scoped to it.
-	useEffect(() => {
-		if (activeSessionId) reportCurrent.mutate(activeSessionId);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [activeSessionId]);
-
-	const activeSession = sessions?.find((s) => s.id === activeSessionId);
+	}, [activeSessionId, sessions, isFetching, navigate, project.id]);
 
 	const selectSession = (id: string) => {
-		setActiveSessionId(id);
 		setDrawerOpen(false);
+		navigate({
+			to: "/projects/$projectId/sessions/$sessionId",
+			params: { projectId: project.id, sessionId: id },
+		});
 	};
 
-	const sessionPermissions = permissions.filter((p) => p.session_id === activeSessionId);
-	const sessionQuestions = questions.filter((q) => q.session_id === activeSessionId);
+	const switchProject = () => {
+		resetCrushState();
+		navigate({ to: "/projects" });
+	};
+
+	const selectProject = (id: string) => {
+		if (id === project.id) return;
+		resetCrushState();
+		navigate({ to: "/projects/$projectId", params: { projectId: id } });
+	};
+
+	const signOut = () => {
+		resetCrushState();
+		logout.mutate(undefined, {
+			onSuccess: () => navigate({ to: "/login", replace: true }),
+		});
+	};
 
 	return (
-		<div className="flex h-dvh bg-cabinet text-on-surface">
+		<div className="flex h-dvh overflow-x-hidden bg-cabinet text-on-surface">
 			{/* Desktop sidebar */}
 			<aside className="hidden w-72 shrink-0 border-r-2 border-border bg-surface md:block">
-				<SessionSidebar wid={wid} activeId={activeSessionId} onSelect={selectSession} />
+				<SessionSidebar
+					wid={wid}
+					activeId={activeSessionId}
+					onSelect={selectSession}
+					header={
+						<ProjectSwitcher
+							project={project}
+							onBack={switchProject}
+							onSelectProject={selectProject}
+						/>
+					}
+				/>
 			</aside>
 
 			{/* Menu / mobile sessions drawer */}
@@ -76,32 +91,42 @@ export function AppShell({ project, wid, onSwitchProject, onLogout }: AppShellPr
 				onClose={() => setDrawerOpen(false)}
 				position="left"
 				width="w-72"
-				name="sessions-drawer"
+				name="menu-drawer"
+				title="Menu"
 				className="border-r-2 border-border bg-surface"
 			>
 				<div className="flex h-full flex-col">
-					<div className="min-h-0 flex-1">
-						<SessionSidebar wid={wid} activeId={activeSessionId} onSelect={selectSession} />
+					<div className="min-h-0 flex-1 md:hidden">
+						<SessionSidebar
+							wid={wid}
+							activeId={activeSessionId}
+							onSelect={selectSession}
+							header={
+								<ProjectSwitcher
+									project={project}
+									onBack={() => {
+										setDrawerOpen(false);
+										switchProject();
+									}}
+									onSelectProject={(id) => {
+										setDrawerOpen(false);
+										selectProject(id);
+									}}
+								/>
+							}
+						/>
 					</div>
-					<div className="flex flex-col gap-1 border-t-2 border-border pt-3">
+					<div className="flex flex-col gap-1 border-t-2 border-border pt-3 md:border-t-0 md:pt-0">
 						<Button
 							variant="outlined"
-							size="sm"
-							className="font-display"
-							icon={<Icon icon="ri:folder-line" width={16} />}
+							size="md"
+							color="danger"
+							className="w-full justify-start font-display"
+							icon={<Icon icon="ri:logout-box-line" width={16} />}
 							onClick={() => {
 								setDrawerOpen(false);
-								onSwitchProject();
+								signOut();
 							}}
-						>
-							SWITCH PROJECT
-						</Button>
-						<Button
-							variant="text"
-							size="sm"
-							color="danger"
-							className="font-display"
-							onClick={onLogout}
 						>
 							LOG OUT
 						</Button>
@@ -109,35 +134,26 @@ export function AppShell({ project, wid, onSwitchProject, onLogout }: AppShellPr
 				</div>
 			</Drawer>
 
-			<main className="flex min-w-0 flex-1 flex-col">
+			<main className="flex min-w-0 flex-1 flex-col overflow-x-hidden">
 				<TopBar
 					project={project}
 					workspaceId={wid}
-					onMenu={() => setDrawerOpen(true)}
-					onSwitchProject={onSwitchProject}
-					sessionTitle={activeSession?.title}
+					menuOpen={drawerOpen}
+					onMenu={() => setDrawerOpen((open) => !open)}
+					onSwitchProject={switchProject}
+					onSelectProject={selectProject}
+					onSettings={() => setSettingsOpen(true)}
 				/>
-
-				{activeSessionId ? (
-					<>
-						<ChatPane wid={wid} sid={activeSessionId} />
-						{sessionPermissions.map((request) => (
-							<PermissionCard key={request.id} wid={wid} request={request} />
-						))}
-						{sessionQuestions.map((request) => (
-							<QuestionCard key={request.id} wid={wid} request={request} />
-						))}
-						<Composer wid={wid} sid={activeSessionId} busy={!!busy[activeSessionId]} />
-					</>
-				) : (
-					<div className="flex flex-1 items-center justify-center">
-						<EmptyState
-							text="Pick a session or start a new one"
-							className="py-16 font-display text-lg"
-						/>
-					</div>
-				)}
+				<Outlet />
 			</main>
+
+			{settingsOpen && (
+				<SettingsDialog
+					wid={wid}
+					isOpen
+					onClose={() => setSettingsOpen(false)}
+				/>
+			)}
 		</div>
 	);
 }

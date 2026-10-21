@@ -19,6 +19,20 @@ export function formatCost(cost: number): string {
 	return `$${cost.toFixed(2)}`;
 }
 
+/** Session timestamp → clock time within a day, else day/month/year. */
+export function sessionTime(epochSeconds: number): string {
+	const date = new Date(epochSeconds * 1000);
+	const withinDay = Math.abs(Date.now() - date.getTime()) < 24 * 60 * 60 * 1000;
+	if (withinDay) {
+		return date.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+	}
+	return date.toLocaleDateString(undefined, {
+		day: "2-digit",
+		month: "short",
+		year: "numeric",
+	});
+}
+
 /** Truncate a string for inline previews. */
 export function clamp(s: string, max = 300): string {
 	return s.length > max ? `${s.slice(0, max)}…` : s;
