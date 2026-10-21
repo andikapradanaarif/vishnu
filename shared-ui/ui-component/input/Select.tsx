@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import {useState, useEffect, useRef, memo, useMemo} from "react";
-import LoadingAnimation from "../loadingAnimation/LoadingDots";
+import LoadingSpinner from "../loadingAnimation/LoadingSpinner";
 import {Popover} from "../popover/Popover";
 import type {SelectOption, SelectProps} from "./types";
 import SearchInput from "./SearchInput";
@@ -52,6 +52,7 @@ const SelectTrigger = memo(function SelectTrigger({
 				type="button"
 				id={`select-${name}`}
 				disabled={disabled}
+				title={selectedLabel || placeholder}
 				className={classNames(
 					"relative appearance-none flex items-center w-full min-w-0 px-3 py-2 border border-neutral-400/65 rounded-md focus:outline-none focus:shadow-none focus:border-[var(--color-primary)] text-sm text-left",
 					disabled ? "bg-neutral-100 cursor-not-allowed" : "bg-surface cursor-pointer",
@@ -88,7 +89,7 @@ const SelectTrigger = memo(function SelectTrigger({
 							!selectedLabel && "text-neutral-400",
 							disabled && "text-neutral-700",
 							!disabled && "text-neutral-800",
-							size === "sm" ? "text-xs" : "text-sm",
+							size === "sm" ? "text-sm" : "text-base",
 						)}
 					>
 						{selectedLabel || placeholder}
@@ -110,7 +111,7 @@ const SelectTrigger = memo(function SelectTrigger({
 
 				{isLoading && (
 					<span className="absolute right-3 inline-flex items-center justify-center text-neutral-500">
-						<LoadingAnimation className="w-4 h-4" />
+						<LoadingSpinner size={14} />
 					</span>
 				)}
 			</button>
@@ -344,7 +345,7 @@ function SelectItem<T>(props: SelectItemProps<T>) {
 				className={classNames(
 					"w-full px-3 py-2 text-left transition-colors rounded-md flex items-center justify-between",
 					option.disabled ? "cursor-disabled" : "hover:bg-primary-50 cursor-pointer",
-					isSelected && "bg-primary-100 text-primary-700",
+					isSelected && "bg-primary-500/15 text-primary-600",
 					!isSelected && !option.disabled && "text-neutral-800",
 					size === "sm" ? "text-xs" : "text-sm",
 					hasSubMenu && "hover:bg-neutral-100 cursor-pointer",
@@ -358,14 +359,20 @@ function SelectItem<T>(props: SelectItemProps<T>) {
 			>
 				<button
 					type="button"
-					className={classNames(option.disabled && !hasSubMenu && "text-neutral-400", "flex items-center justify-center")}
+					title={typeof option.label === "string" ? option.label : undefined}
+					className={classNames(
+						option.disabled && !hasSubMenu && "text-neutral-400",
+						"flex min-w-0 flex-1 items-center text-left",
+					)}
 				>
-					{option.icon && <span className="inline-flex items-center mr-2 text-neutral-500">{option.icon}</span>}
-					{option.label}
+					{option.icon && (
+						<span className="inline-flex shrink-0 items-center mr-2 text-neutral-500">{option.icon}</span>
+					)}
+					<span className="truncate">{option.label}</span>
 				</button>
 
 				{hasSubMenu && (
-					<div className="rounded-full hover:bg-primary-50 w-[20px] h-[20px] flex items-center justify-center">
+					<div className="shrink-0 rounded-full hover:bg-primary-50 w-[20px] h-[20px] flex items-center justify-center">
 						<svg
 							className={classNames("w-4 h-4 transition-transform", isOpen ? "" : "rotate-180")}
 							fill="none"

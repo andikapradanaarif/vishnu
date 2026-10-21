@@ -215,11 +215,13 @@ export function Popover({
 							position: "fixed",
 							top: `${popoverPosition.top}px`,
 							left: `${popoverPosition.left}px`,
-							width: fullWidth && popoverWidth ? `${popoverWidth}px` : undefined,
+							// min-width (not width) so long options can widen the
+							// popover past the trigger instead of being cropped.
+							minWidth: fullWidth && popoverWidth ? `${popoverWidth}px` : undefined,
 						}}
 						className={classNames(
 							// Base styles
-							"z-50 bg-surface rounded-lg border border-neutral-100",
+							"z-50 bg-surface rounded-lg border border-neutral-100 max-w-[calc(100vw-16px)]",
 							// Custom lighter and more diffuse shadow
 							"shadow-[0_2px_8px_0_rgba(0,0,0,0.04)]",
 

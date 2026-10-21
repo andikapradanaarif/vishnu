@@ -67,8 +67,9 @@ export const getPopoverPosition = (
 
 	const triggerRect = triggerRef.current.getBoundingClientRect();
 
-	// Use actual popover dimensions if available, otherwise use estimates
-	const popoverWidth = fullWidth ? triggerRect.width : popoverRef?.current?.offsetWidth || 160;
+	// Prefer the measured popover size (content can exceed the trigger
+	// width); fall back to the trigger width, then a rough estimate.
+	const popoverWidth = popoverRef?.current?.offsetWidth || (fullWidth ? triggerRect.width : 160);
 	const popoverHeight = popoverRef?.current?.offsetHeight || 200;
 
 	const gap = 8; // gap between trigger and popover (equivalent to mt-2, mb-2, etc.)
@@ -119,6 +120,10 @@ export const getPopoverPosition = (
 			left = triggerRect.right + gap;
 			break;
 	}
+
+	// Keep the popover inside the viewport horizontally.
+	const vw = window.innerWidth;
+	left = Math.min(Math.max(left, 8), Math.max(8, vw - popoverWidth - 8));
 
 	return {top, left, resolvedPosition};
 };
