@@ -14,6 +14,7 @@ const PORT = Number(process.env.MOCK_PORT ?? 8081);
 
 const user = { id: "u1", email: "demo@vishnu.local", name: "Demo", role: "admin" };
 let loggedIn = false;
+let skipPermissions = false;
 
 const now = () => Math.floor(Date.now() / 1000);
 
@@ -458,8 +459,15 @@ function crush(_pid: string, _wid: string, rest: string, method: string, req: Re
 			},
 		]);
 	}
-	if (rest === "/permissions/skip" && method === "GET") return json({ skip: false });
-	if (rest === "/permissions/skip" && method === "POST") return noContent();
+	if (rest === "/permissions/skip" && method === "GET") {
+		return json({ skip: skipPermissions });
+	}
+	if (rest === "/permissions/skip" && method === "POST") {
+		return body(req).then((input) => {
+			skipPermissions = Boolean(input.skip);
+			return noContent();
+		});
+	}
 	if (rest === "/permissions/grant" && method === "POST") return json({ resolved: true });
 	if (rest === "/questions/answer" && method === "POST") return json({ resolved: true });
 	if (rest === "/questions/cancel" && method === "POST") return json({ resolved: true });

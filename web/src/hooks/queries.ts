@@ -265,7 +265,20 @@ export function useSetPermissionsSkip(wid: string | undefined) {
 	return useMutation({
 		mutationKey: ["permissions", "skip"],
 		mutationFn: (skip: boolean) => permissionsClient.setSkip(wid!, skip),
-		onSuccess: () =>
+		onMutate: async (skip) => {
+			await qc.cancelQueries({ queryKey: queryKeys.permissionsSkip(wid!) });
+			const previous = qc.getQueryData<{ skip: boolean }>(
+				queryKeys.permissionsSkip(wid!),
+			);
+			qc.setQueryData(queryKeys.permissionsSkip(wid!), { skip });
+			return { previous };
+		},
+		onError: (_error, _skip, context) => {
+			if (context?.previous) {
+				qc.setQueryData(queryKeys.permissionsSkip(wid!), context.previous);
+			}
+		},
+		onSettled: () =>
 			qc.invalidateQueries({ queryKey: queryKeys.permissionsSkip(wid!) }),
 	});
 }
