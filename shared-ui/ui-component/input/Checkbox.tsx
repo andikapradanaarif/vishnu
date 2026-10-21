@@ -17,8 +17,8 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>((props, forwardedRe
 			<span
 				className={classNames(
 					"w-4 h-4 rounded border flex items-center justify-center transition-colors",
-					!disabled && checked && !indeterminate && "bg-primary-600 border-primary-600",
-					!disabled && indeterminate && "bg-surface border-primary-600",
+					!disabled && checked && !indeterminate && "bg-primary-500 border-primary-500",
+					!disabled && indeterminate && "bg-surface border-primary-500",
 					!disabled && !checked && !indeterminate && "border-neutral-300 bg-surface",
 					disabled && "bg-surface-alt border-neutral-200 cursor-not-allowed",
 					!disabled && "cursor-pointer",
@@ -27,7 +27,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>((props, forwardedRe
 				onClick={handleChange}
 			>
 				{indeterminate ? (
-					<span className={classNames("w-2 h-0.5 rounded-sm block", disabled ? "bg-neutral-400" : "bg-primary-600")} />
+					<span className={classNames("w-2 h-0.5 rounded-sm block", disabled ? "bg-neutral-400" : "bg-primary-500")} />
 				) : checked ? (
 					<svg
 						className={classNames("w-2.5 h-2.5", disabled ? "text-neutral-400" : "text-on-primary")}

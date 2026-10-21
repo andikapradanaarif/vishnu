@@ -77,7 +77,7 @@ export const SegmentedControl = <T extends string | number>(props: SegmentedCont
                 isSelected
                   ? isOptionDisabled
                     ? 'bg-surface text-neutral-300 shadow-sm'
-                    : 'bg-surface text-primary-700 shadow-sm'
+                    : 'bg-surface text-primary-600 shadow-sm'
                   : isOptionDisabled
                     ? 'text-neutral-300'
                     : 'text-neutral-500 hover:text-primary-600'

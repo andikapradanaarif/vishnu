@@ -1,13 +1,11 @@
-export default function LoadingSpinner({ size = 40, className }: { size?: number; className?: string }) {
+export default function LoadingSpinner({ size = 16, className }: { size?: number; className?: string }) {
   return (
     <svg
-      className={`animate-spin text-primary-500 ${className || ''}`}
+      className={`animate-spin ${className || ''}`}
       viewBox="0 0 24 24"
-      style={{
-        width: `${size}px`,
-        height: `${size}px`,
-        animationDuration: '0.8s',
-      }}
+      width={size}
+      height={size}
+      style={{ animationDuration: '0.8s' }}
     >
       <circle
         cx="12"

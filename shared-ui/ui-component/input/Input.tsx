@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import {forwardRef} from "react";
-import LoadingAnimation from "../loadingAnimation/LoadingDots";
+import LoadingSpinner from "../loadingAnimation/LoadingSpinner";
 import type {InputProps} from "./types";
 import Caption from "../text/Caption";
 
@@ -112,7 +112,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 								"inline-flex items-center justify-center text-neutral-500",
 							)}
 						>
-							<LoadingAnimation className="w-4 h-4" />
+							<LoadingSpinner size={14} />
 						</span>
 					)}
 					{suffixIcon && (

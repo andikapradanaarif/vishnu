@@ -62,7 +62,7 @@ const Radio = forwardRef<HTMLDivElement, RadioProps>((props, forwardedRef) => {
 						<span
 							className={classNames(
 								"w-4 h-4 rounded-full border flex items-center justify-center transition-colors flex-shrink-0 cursor-pointer",
-								!(disabled || option.disabled) && value === option.value && "border-primary-600",
+								!(disabled || option.disabled) && value === option.value && "border-primary-500",
 								!(disabled || option.disabled) && value !== option.value && "border-neutral-300 bg-surface",
 								(disabled || option.disabled) && "bg-surface-alt border-neutral-200 cursor-not-allowed",
 							)}
@@ -72,7 +72,7 @@ const Radio = forwardRef<HTMLDivElement, RadioProps>((props, forwardedRef) => {
 								<span
 									className={classNames(
 										"w-2 h-2 rounded-full",
-										disabled || option.disabled ? "bg-neutral-400" : "bg-primary-600",
+										disabled || option.disabled ? "bg-neutral-400" : "bg-primary-500",
 									)}
 								/>
 							)}

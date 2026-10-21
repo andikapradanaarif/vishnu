@@ -87,9 +87,9 @@ const fontColorMap: Record<ChipColorsType, string> = {
   blue: 'text-info-600',
   green: 'text-success-800',
   grey: 'text-neutral-600',
-  default: 'text-primary-700',
+  default: 'text-primary-600',
   orange: 'text-warning-700',
-  indigo: 'text-primary-700',
+  indigo: 'text-primary-600',
   pink: 'text-pink-700',
   custom: '',
 };

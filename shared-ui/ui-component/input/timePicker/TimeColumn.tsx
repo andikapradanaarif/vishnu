@@ -42,7 +42,7 @@ export const TimeColumn = memo(function TimeColumn(props: TimeColumnProps) {
                 isDisabled
                   ? 'opacity-40 cursor-not-allowed'
                   : isSelected
-                    ? 'bg-primary-100 text-primary-700 font-medium'
+                    ? 'bg-primary-500/15 text-primary-600 font-medium'
                     : 'text-neutral-800 hover:bg-primary-50'
               )}
             >

@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import {useState, useEffect, useRef, memo, useMemo} from "react";
-import LoadingAnimation from "../loadingAnimation/LoadingDots";
+import LoadingSpinner from "../loadingAnimation/LoadingSpinner";
 import {Popover} from "../popover/Popover";
 import type {MultipleSelectProps, SelectOption} from "./types";
 import SearchInput from "./SearchInput";
@@ -147,7 +147,7 @@ const MultipleSelectTrigger = memo(function MultipleSelectTrigger({
 
 			{isLoading && (
 				<span className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-neutral-500">
-					<LoadingAnimation className="w-4 h-4" />
+					<LoadingSpinner size={14} />
 				</span>
 			)}
 		</div>
@@ -459,7 +459,7 @@ function MultipleSelectItem<T>({handleSelect, option, size, value}: MultipleSele
 				className={classNames(
 					"w-full px-3 py-2 text-left transition-colors rounded-md flex items-center justify-between gap-2",
 					option.disabled ? "cursor-disabled" : hasSubMenu ? "cursor-default" : "hover:bg-primary-50 cursor-pointer",
-					isSelected && "bg-primary-100 text-primary-700",
+					isSelected && "bg-primary-500/15 text-primary-600",
 					!isSelected && !option.disabled && "text-neutral-800",
 					size === "sm" ? "text-xs" : "text-sm",
 					hasSubMenu && "hover:bg-neutral-100 cursor-pointer",
