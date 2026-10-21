@@ -4,7 +4,21 @@ package config
 import (
 	"os"
 	"time"
+
+	"github.com/joho/godotenv"
 )
+
+// Load .env files when present — CWD's first, then api/.env so
+// `bin/vishnu-api` run from the repo root still picks it up. godotenv
+// aborts on the first missing file, so stat before loading. Real
+// environment variables always win: godotenv never overrides env.
+func init() {
+	for _, name := range []string{".env", "api/.env"} {
+		if _, err := os.Stat(name); err == nil {
+			_ = godotenv.Load(name)
+		}
+	}
+}
 
 // Brevo holds the Brevo transactional-email configuration.
 type Brevo struct {

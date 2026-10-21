@@ -1,0 +1,4 @@
+# Nested ignore for the API module (root .gitignore covers these too).
+bin/
+tmp/
+.env

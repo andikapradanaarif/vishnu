@@ -1,5 +1,9 @@
 .PHONY: db migrate migratedown migratestatus dev build test lint format tidy up logs
 
+# Host-side targets read api/.env via godotenv (internal/config init) —
+# no env plumbing needed here. deploy/.env stays compose-only so its
+# VISHNU_ENV=production never leaks into dev (Secure cookies on http).
+
 dev:
 	VISHNU_WEB_DIR=../web/dist go run cmd/server/main.go
 

@@ -17,3 +17,6 @@ api/tmp/
 
 # macOS
 .DS_Store
+
+# TanStack Router plugin temp
+web/.tanstack/
