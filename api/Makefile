@@ -1,4 +1,4 @@
-.PHONY: db migrate migratedown migratestatus dev build test lint format tidy up logs
+.PHONY: db migrate migratedown migratestatus dev build test lint format tidy up logs deploy push-api push-web
 
 # Host-side targets read api/.env via godotenv (internal/config init) —
 # no env plumbing needed here. deploy/.env stays compose-only so its
@@ -23,7 +23,18 @@ up:
 	docker compose -f deploy/docker-compose.yml up -d --build
 
 logs:
-	docker compose -f deploy/docker-compose.yml logs -f vishnu
+	docker compose -f deploy/docker-compose.yml logs -f
+
+# Prod flow: build+push GHCR images (push-api / push-web), then on the
+# server run `make deploy` — pulls, migrates, recreates, health-checks.
+deploy:
+	./deploy/deploy.sh
+
+push-api:
+	./scripts/deploy-ghcr.sh
+
+push-web:
+	cd ../web && ./scripts/deploy-ghcr.sh
 
 migrate:
 	go run ./cmd/migrate up

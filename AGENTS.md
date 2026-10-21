@@ -14,10 +14,12 @@ Monorepo, bun workspaces — style/stack follows valo & nexus-bo-api.
   to that project's upstream (SSE via SendStreamWriter, no upstream
   timeout), serves embedded SPA. `api/Dockerfile` (root context) +
   `api/deploy/docker-compose.yml` run the whole stack in docker —
-  postgres + app incl. a baked-in `crush` binary.
+  postgres + api (baked-in `crush` binary) + web (nginx SPA front).
 - `web/` — Vite + React 19 + TS strict, TanStack Query, Tailwind v4,
   components from `@vishnu/ui-component` (`shared-ui/`), feature code in
-  `src/features/<domain>/`.
+  `src/features/<domain>/`. `web/Dockerfile` + `web/nginx.conf` build a
+  standalone nginx image that serves the SPA and reverse-proxies `/api`
+  and `/p` to the api container (SSE-safe).
 - `contract/` — `@vishnu/api-contract`: crush `/v1` wire types + per-domain
   SDK clients (`src/<domain>/{sdk,index.ts}`, nexus-contract style). `ApiClient`
   takes `defaultQuery` carrying `client_id`.
@@ -32,7 +34,8 @@ Monorepo, bun workspaces — style/stack follows valo & nexus-bo-api.
 - `web/`: `bun run dev` (vite, proxies `/v1` → `127.0.0.1:9119`), `bun run lint`, `bun run build`.
 - `api/`: `make dev` (VISHNU_WEB_DIR=../web/dist), `make build` (embeds web/dist → bin/vishnu-api), `make test`, `make lint`.
 - `api/` database: `make db` (compose Postgres on 5432), `make migrate`, `make migratedown`, `make migratestatus`. The server applies pending migrations on boot and exits with the fix-it command when Postgres is unreachable.
-- `api/` docker stack: `make up` (`docker compose -f deploy/docker-compose.yml up -d --build`) brings up postgres + the app image (SPA, api and a pinned `crush` binary baked in); `make logs`; `docker compose -f deploy/docker-compose.yml run --rm vishnu migrate status|down`. Settings live in `api/deploy/.env` (copy `api/deploy/.env.example`) — compose interpolates it for postgres and hands it to the app, so `DB_*` configure both.
+- `api/` docker stack: `make up` (`docker compose -f deploy/docker-compose.yml up -d --build`) brings up postgres + the api image (api + a pinned `crush` binary) + the web image (nginx SPA on `VISHNU_HOST_PORT`, proxying `/api` + `/p` to the api on loopback `VISHNU_API_PORT`); `make logs`; `docker compose -f deploy/docker-compose.yml run --rm vishnu migrate status|down`. Settings live in `api/deploy/.env` (copy `api/deploy/.env.example`) — compose interpolates it for postgres and hands it to the app, so `DB_*` configure both.
+- `api/` prod deploy (valo-style GHCR flow): `make push-api` / `make push-web` build linux/amd64 images and push `ghcr.io/andikapradanaarif/vishnu-{api,web}` (`*/scripts/deploy-ghcr.sh`); on the server, `make deploy` runs `deploy/deploy.sh` — pulls both images, runs migrations, recreates `deploy/docker-compose.prod.yml`, health-checks `/healthz` through the web front, and rolls back on failure.
 - `api/` tests: repository tests need a real Postgres — set `VISHNU_TEST_DB_DSN="host=127.0.0.1 port=5432 user=vishnu password=vishnu dbname=vishnu sslmode=disable"`, otherwise they skip.
 
 ## Runtime
