@@ -17,7 +17,7 @@ interface ChatPaneProps {
 
 export function ChatPane({ wid, sid }: ChatPaneProps) {
 	const { data: messages, isLoading, error, refetch, isRefetching } = useMessages(wid, sid);
-	const { busy, permissions, questions } = usePendingState();
+	const { busy, permissions, questions, conn } = usePendingState();
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const pinned = useRef(true);
 	const hadMessages = useRef(false);
@@ -90,6 +90,13 @@ export function ChatPane({ wid, sid }: ChatPaneProps) {
 						text="No messages yet — send a prompt to start"
 						className="py-16 font-display text-lg"
 					/>
+				)}
+
+				{conn !== "open" && (
+					<div className="flex items-center justify-center gap-2 border border-dashed border-warning-500/50 bg-warning-950/20 px-3 py-1.5 font-display text-xs text-warning-400">
+						<LoadingSpinner size={12} className="text-warning-400" />
+						{conn === "closed" ? "event stream closed — reconnecting…" : "reconnecting to event stream…"}
+					</div>
 				)}
 
 				{(messages ?? []).map((m) => (

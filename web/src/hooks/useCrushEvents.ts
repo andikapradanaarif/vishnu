@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { useRouter } from "@tanstack/react-router";
 import { useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { eventsClient } from "@/services/api";
 import { pendingStore } from "@/services/pendingStore";
@@ -21,7 +22,9 @@ import { queryKeys, useSessions } from "@/hooks/queries";
  */
 export function useCrushEvents(workspaceId: string | undefined) {
 	const queryClient = useQueryClient();
+	const router = useRouter();
 	const sessions = useSessions(workspaceId);
+	const lastHeal = useRef(0);
 
 	// The busy map is optimistic: if the stream drops mid-run (proxy
 	// timeout, tab suspend) run_complete is never seen and the flag
@@ -49,7 +52,16 @@ export function useCrushEvents(workspaceId: string | undefined) {
 		};
 		// EventSource retries on its own; show that as reconnecting
 		// instead of a permanent disconnect.
-		es.onerror = () => pendingStore.setConn("connecting");
+		es.onerror = () => {
+			pendingStore.setConn("connecting");
+			// A workspace dies with its crush child and is re-created under
+			// a fresh id — the loader-cached wid then 404s forever. Re-run
+			// the route loader (throttled) so a stale wid self-heals.
+			if (Date.now() - lastHeal.current > 15_000) {
+				lastHeal.current = Date.now();
+				void router.invalidate();
+			}
+		};
 
 		es.onmessage = (evt) => {
 			let envelope: EventPayload;
@@ -146,6 +158,8 @@ function dispatch(
 			queryClient.invalidateQueries({ queryKey: queryKeys.agent(workspaceId) });
 			queryClient.invalidateQueries({ queryKey: queryKeys.providers(workspaceId) });
 			queryClient.invalidateQueries({ queryKey: queryKeys.config(workspaceId) });
+			queryClient.invalidateQueries({ queryKey: queryKeys.permissionsSkip(workspaceId) });
+			queryClient.invalidateQueries({ queryKey: queryKeys.needsInit(workspaceId) });
 			break;
 		default:
 			break;
