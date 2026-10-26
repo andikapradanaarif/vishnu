@@ -43,7 +43,7 @@ export function MessagePart({ part, role }: { part: ContentPart; role: Message["
 			const plan = call.name === "todos" ? parsePlan(call.input) : null;
 			return (
 				<div className="border border-border bg-raised px-3 py-2">
-					<div className="flex items-center gap-1.5 font-display text-base text-info-300">
+					<div className="flex items-center gap-1.5 font-display text-sm text-info-300">
 						<span className="font-mono">{call.name}</span>
 						{!call.finished && (
 							<span className="blink ml-auto font-display text-xs text-warning-400">
