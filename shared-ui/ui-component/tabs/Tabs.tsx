@@ -31,7 +31,7 @@ function Tabs<T>({items, active, className, onChange, id, isLoading}: TabsProps<
 						onClick={() => handleTabClick(tab)}
 						disabled={tab.disabled}
 						className={classNames(
-							"relative shrink-0 whitespace-nowrap p-3 text-sm transition-all cursor-pointer flex items-center gap-2 font-medium",
+							"relative shrink-0 whitespace-nowrap p-3 transition-all cursor-pointer flex items-center gap-2 font-medium",
 							"after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:transition-all after:duration-300",
 							isActive
 								? "text-primary-600 after:w-2/3 after:bg-primary-500"
