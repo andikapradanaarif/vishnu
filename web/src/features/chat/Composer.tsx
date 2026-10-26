@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { Icon } from "@iconify/react";
 import { Button } from "@vishnu/ui-component/button";
@@ -53,6 +53,16 @@ export function Composer({ wid, sid, busy }: ComposerProps) {
 	const navigate = useNavigate();
 	const { projectId } = useParams({ strict: false }) as { projectId?: string };
 	const areaRef = useRef<HTMLTextAreaElement>(null);
+
+	// The composer isn't remounted on session switches — drop per-session
+	// scratch state (draft, notices, shell output) so nothing from the
+	// previous session leaks into the next.
+	useEffect(() => {
+		setValue("");
+		setCmdMsg(null);
+		setShellOut(null);
+		setMenuDismissed(false);
+	}, [sid]);
 
 	const autogrow = () => {
 		const el = areaRef.current;
