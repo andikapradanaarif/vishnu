@@ -10,6 +10,9 @@ local/
 api/bin/
 api/tmp/
 
+# Crush's own per-project data (sessions, dbs, logs) — never commit
+.crush/
+
 # macOS
 .DS_Store
 
