@@ -57,7 +57,7 @@ export function MessagePart({ part, role }: { part: ContentPart; role: Message["
 							<summary className="cursor-pointer font-display text-xs text-ghost select-none">
 								input
 							</summary>
-							<pre className="mt-1 overflow-x-auto font-mono text-xs text-on-surface-muted">
+							<pre className="mt-1 overflow-x-auto font-mono text-sm text-on-surface-muted">
 								{clamp(prettyJson(call.input), 4000)}
 							</pre>
 						</details>
@@ -79,7 +79,7 @@ export function MessagePart({ part, role }: { part: ContentPart; role: Message["
 					<summary className="cursor-pointer font-display text-xs text-on-surface-muted select-none">
 						{res.name || "tool"} result{res.is_error ? " · error" : ""}
 					</summary>
-					<pre className="mt-1 max-h-64 overflow-auto font-mono text-xs whitespace-pre-wrap text-on-surface-muted">
+					<pre className="mt-1 max-h-64 overflow-auto font-mono text-sm whitespace-pre-wrap text-on-surface-muted">
 						{clamp(res.content, 6000)}
 					</pre>
 				</details>
@@ -88,7 +88,7 @@ export function MessagePart({ part, role }: { part: ContentPart; role: Message["
 		case "shell_command": {
 			const sh = part.data as { command: string; output: string };
 			return (
-				<div className="border border-border bg-surface-alt px-3 py-2 font-mono text-xs">
+				<div className="border border-border bg-surface-alt px-3 py-2 font-mono text-sm">
 					<div className="text-success-400">$ {sh.command}</div>
 					{sh.output && (
 						<pre className="mt-1 overflow-x-auto whitespace-pre-wrap text-on-surface-muted">
