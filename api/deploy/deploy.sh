@@ -62,8 +62,10 @@ echo "  Done."
 echo ""
 
 # --- 4. Recreate the stack ---
+# --force-recreate: a re-pulled :latest keeps the same tag, so plain
+# `up -d` can decide "no config change" and leave the old image running.
 echo "[3/4] Recreating containers..."
-docker compose -f "$COMPOSE_FILE" up -d
+docker compose -f "$COMPOSE_FILE" up -d --force-recreate
 echo "  Done."
 echo ""
 
@@ -95,7 +97,7 @@ else
         docker tag "$WEB_IMAGE:rollback" "$WEB_IMAGE:latest"
     fi
     if [ -n "$OLD_API_ID$OLD_WEB_ID" ]; then
-        docker compose -f "$COMPOSE_FILE" up -d
+        docker compose -f "$COMPOSE_FILE" up -d --force-recreate
         echo "Rolled back to previous images."
     else
         echo "No previous images to roll back to. Check logs:"
