@@ -305,7 +305,7 @@ export function Composer({ wid, sid, busy }: ComposerProps) {
 					/>
 					{busy ? (
 						<Button
-							size="md"
+							size="sm"
 							variant="outlined"
 							color="danger"
 							className="font-display"
