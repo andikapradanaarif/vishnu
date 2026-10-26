@@ -73,8 +73,8 @@ vishnu/
                 permissions, questions, events)
   shared-ui/    @vishnu/ui-component — vendored React component
                 library consumed by web via workspace dependency
-  docs/         PLAN.md (grand plan) · plan/ (design docs) ·
-                tasks/ (agent-assignment breakdowns)
+  docs/         ARCHITECTURE.md (system reference) · PLAN.md +
+                plan/ (design docs) · tasks/ (agent assignments)
 ```
 
 ## Prerequisites
@@ -195,7 +195,8 @@ chat with todos/plan rendering, permission + question prompts with
 reconnect-safe replay and reconciliation, model/agent switcher,
 email-OTP auth, production GHCR deploy pipeline.
 
-Full roadmap and design docs in [`docs/`](docs/PLAN.md).
+The full system reference is [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md);
+original design docs in [`docs/`](docs/PLAN.md).
 
 ## License
 

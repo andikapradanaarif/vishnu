@@ -1,7 +1,8 @@
 # Vishnu
 
 Browser UI + thin proxy for driving `crush server` (`/v1` HTTP API incl. SSE).
-Monorepo, bun workspaces — style/stack follows valo & nexus-bo-api.
+Monorepo, bun workspaces. `docs/ARCHITECTURE.md` is the full system
+reference — keep it in sync with structural changes.
 
 ## Layout
 
@@ -25,10 +26,12 @@ Monorepo, bun workspaces — style/stack follows valo & nexus-bo-api.
   `http://vishnu:8080`, or any URL on another host/domain),
   `VISHNU_DNS_RESOLVER` overrides docker's `127.0.0.11`.
 - `contract/` — `@vishnu/api-contract`: crush `/v1` wire types + per-domain
-  SDK clients (`src/<domain>/{sdk,index.ts}`, nexus-contract style). `ApiClient`
-  takes `defaultQuery` carrying `client_id`.
-- `shared-ui/` — vendored copy of nexus `shared-ts` (`@vishnu/ui-component`).
-- `docs/PLAN.md`, `docs/plan/{api,web,projects,data}.md` — architecture plans.
+  SDK clients (`src/<domain>/{sdk,index.ts}`). `ApiClient` takes
+  `defaultQuery` carrying `client_id`.
+- `shared-ui/` — vendored React component library (`@vishnu/ui-component`).
+- `docs/ARCHITECTURE.md` — current-state system reference;
+  `docs/PLAN.md`, `docs/plan/{api,web,projects,data}.md` — original
+  design docs (historical).
 
 ## Commands
 
@@ -39,7 +42,7 @@ Monorepo, bun workspaces — style/stack follows valo & nexus-bo-api.
 - `api/`: `make dev`, `make build` (→ bin/vishnu-api), `make test`, `make lint`.
 - `api/` database: `make db` (compose Postgres on 5432), `make migrate`, `make migratedown`, `make migratestatus`. The server applies pending migrations on boot and exits with the fix-it command when Postgres is unreachable.
 - `api/` docker stack: `make up` (`docker compose -f deploy/docker-compose.yml up -d --build`) brings up postgres + the api image (api + a pinned `crush` binary) + the web image (nginx SPA on `VISHNU_HOST_PORT`, proxying `/api` + `/p` to the api on loopback `VISHNU_API_PORT`); `make logs`; `docker compose -f deploy/docker-compose.yml run --rm vishnu migrate status|down`. Settings live in `api/deploy/.env` (copy `api/deploy/.env.example`) — compose interpolates it for postgres and hands it to the app, so `DB_*` configure both.
-- `api/` prod deploy (valo-style GHCR flow): `make push-api` / `make push-web` build linux/amd64 images and push `ghcr.io/andikapradanaarif/vishnu-{api,web}` (`*/scripts/deploy-ghcr.sh`); on the server, `make deploy` runs `deploy/deploy.sh` — pulls both images, runs migrations, recreates `deploy/docker-compose.prod.yml`, health-checks `/healthz` through the web front, and rolls back on failure.
+- `api/` prod deploy (GHCR flow): `make push-api` / `make push-web` build linux/amd64 images and push `ghcr.io/andikapradanaarif/vishnu-{api,web}` (`*/scripts/deploy-ghcr.sh`); on the server, `make deploy` runs `deploy/deploy.sh` — pulls both images, runs migrations, force-recreates `deploy/docker-compose.prod.yml`, health-checks `/healthz` through the web front, and rolls back on failure.
 - `api/` tests: repository tests need a real Postgres — set `VISHNU_TEST_DB_DSN="host=127.0.0.1 port=5432 user=vishnu password=vishnu dbname=vishnu sslmode=disable"`, otherwise they skip.
 
 ## Runtime
@@ -92,6 +95,15 @@ slide forward on use, so revoking means deleting the row.
 - Other mutating endpoints take `?client_id=<uuid>` query param.
 - Events: `GET /v1/workspaces/{id}/events?client_id=<uuid>` (SSE).
 - Content parts are `{type, data}` envelopes; SSE payloads are `{type, payload}`.
+- The image bakes a pinned `andikapradanaarif/crush` fork commit
+  (`CRUSH_REF`/`CRUSH_VERSION` args in `api/Dockerfile` — bump both
+  together); fork-only `crushrc` keys fail upstream.
+- Pending prompts: server republishes pending permission/question
+  requests on `POST …/current-session` (the web reports it on room
+  mount); `GET …/sessions/{sid}/permissions/pending` is the truth
+  source the web reconciles cards against on mount/focus/SSE reopen —
+  a `permission_notification` with `granted:false,denied:false` is a
+  raise, not a resolution.
 - `.crush/` data dirs are locked per process — never share a project
   path between two crush processes.
 
