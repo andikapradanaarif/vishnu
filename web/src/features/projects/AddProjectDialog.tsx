@@ -99,7 +99,7 @@ export function AddProjectDialog({ isOpen, onClose }: AddProjectDialogProps) {
 			isOpen={isOpen}
 			onClose={close}
 			title="New project"
-			className="mx-3 w-full max-w-lg pixel-border bg-surface"
+			className="mx-3 w-full max-w-xl pixel-border bg-surface"
 		>
 			<form className="flex flex-col gap-5" onSubmit={submit}>
 				<Tabs
