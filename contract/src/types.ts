@@ -301,6 +301,29 @@ export interface QuestionNotification {
 	session_id: string;
 }
 
+// ---------- Project init ----------
+
+export interface ProjectNeedsInitResponse {
+	needs_init: boolean;
+}
+
+export interface ProjectInitPromptResponse {
+	prompt: string;
+}
+
+// ---------- Shell ----------
+
+export interface ShellCommandRequest {
+	session_id: string;
+	command: string;
+	term_width?: number;
+}
+
+export interface ShellCommandResponse {
+	output: string;
+	exit_code: number;
+}
+
 // ---------- SSE event envelope ----------
 
 export type EventPayloadType =

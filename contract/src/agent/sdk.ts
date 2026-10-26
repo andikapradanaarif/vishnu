@@ -3,8 +3,11 @@ import {
 	v1WorkspaceAgent,
 	v1WorkspaceAgentMain,
 	v1WorkspaceAgentSessionCancel,
+	v1WorkspaceAgentSessionPromptsClear,
+	v1WorkspaceAgentSessionShell,
+	v1WorkspaceAgentSessionSummarize,
 } from "../paths";
-import type { AgentInfo, AgentMessage } from "../types";
+import type { AgentInfo, AgentMessage, ShellCommandResponse } from "../types";
 
 /**
  * SDK client for the `/workspaces/{id}/agent` endpoints — detached runs,
@@ -42,6 +45,37 @@ export class AgentClient {
 		return this.api.post<void>(
 			buildPath(v1WorkspaceAgentMain, { id: workspaceId }),
 			{ agent_id: agentId },
+		);
+	}
+
+	/** POST `/workspaces/{id}/agent/sessions/{session_id}/summarize` — compact the session. */
+	summarize(workspaceId: string, sessionId: string): Promise<void> {
+		return this.api.post<void>(
+			buildPath(v1WorkspaceAgentSessionSummarize, {
+				id: workspaceId,
+				session_id: sessionId,
+			}),
+		);
+	}
+
+	/**
+	 * POST `/workspaces/{id}/agent/sessions/{session_id}/shell` — run a
+	 * shell command in the workspace and get `{output, exit_code}` back.
+	 */
+	runShell(workspaceId: string, sessionId: string, command: string): Promise<ShellCommandResponse> {
+		return this.api.post<ShellCommandResponse>(
+			buildPath(v1WorkspaceAgentSessionShell, { id: workspaceId, session_id: sessionId }),
+			{ session_id: sessionId, command },
+		);
+	}
+
+	/** POST `/workspaces/{id}/agent/sessions/{session_id}/prompts/clear` — drop queued prompts. */
+	clearPrompts(workspaceId: string, sessionId: string): Promise<void> {
+		return this.api.post<void>(
+			buildPath(v1WorkspaceAgentSessionPromptsClear, {
+				id: workspaceId,
+				session_id: sessionId,
+			}),
 		);
 	}
 }

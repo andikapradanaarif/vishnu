@@ -1,2 +1,7 @@
 export * from "./sdk";
-export type { CreateWorkspaceRequest, Workspace } from "../types";
+export type {
+	CreateWorkspaceRequest,
+	ProjectInitPromptResponse,
+	ProjectNeedsInitResponse,
+	Workspace,
+} from "../types";
