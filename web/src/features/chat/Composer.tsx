@@ -64,19 +64,17 @@ export function Composer({ wid, sid, busy }: ComposerProps) {
 	const cmdNotice = (ok: boolean, text: string) => setCmdMsg({ ok, text });
 
 	const commands: SlashCommand[] = [
-		...(needsInit.data?.needs_init
-			? [
-					{
-						name: "init",
-						desc: "scan the project and write agent guidance",
-						run: () =>
-							initProject.mutate(sid, {
-								onSuccess: () => cmdNotice(true, "init run started"),
-								onError: (e) => cmdNotice(false, `init failed: ${errorLabel(e)}`),
-							}),
-					},
-				]
-			: []),
+		{
+			name: "init",
+			desc: needsInit.data?.needs_init
+				? "scan the project and write agent guidance"
+				: "re-run the project scan — a context file already exists",
+			run: () =>
+				initProject.mutate(sid, {
+					onSuccess: () => cmdNotice(true, "init run started"),
+					onError: (e) => cmdNotice(false, `init failed: ${errorLabel(e)}`),
+				}),
+		},
 		{
 			name: "summarize",
 			desc: "compact this session's history",
