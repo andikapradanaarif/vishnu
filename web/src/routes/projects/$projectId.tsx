@@ -1,4 +1,5 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { ProjectError, StartingProject } from "@/features/projects/ProjectStates";
 import { AppShell } from "@/features/shell/AppShell";
 import { useProjects } from "@/hooks/queries";
@@ -26,6 +27,13 @@ function ProjectRouteError({ error }: { error: unknown }) {
 	const { data: projects } = useProjects();
 	const { projectId } = Route.useParams();
 	const project = projects?.find((p) => p.id === projectId);
+
+	// After a long idle the crush child may still be respawning when the
+	// loader runs — retry on a timer so the page recovers on its own.
+	useEffect(() => {
+		const t = setInterval(() => router.invalidate(), 5000);
+		return () => clearInterval(t);
+	}, [router]);
 
 	return (
 		<ProjectError
