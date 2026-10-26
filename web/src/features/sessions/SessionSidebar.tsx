@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { Icon } from "@iconify/react";
 import { Button } from "@vishnu/ui-component/button";
+import { Dialog } from "@vishnu/ui-component/dialog";
 import { EmptyState } from "@vishnu/ui-component/emptyState";
 import { usePendingState } from "@/services/pendingStore";
 import { LoadingSpinner } from "@vishnu/ui-component/loadingAnimation";
@@ -21,7 +22,8 @@ export function SessionSidebar({ wid, activeId, onSelect, header }: SessionSideb
 	const createSession = useCreateSession(wid);
 	const deleteSession = useDeleteSession(wid);
 	const { busy } = usePendingState();
-	const [confirmingId, setConfirmingId] = useState<string | null>(null);
+	const [deletingId, setDeletingId] = useState<string | null>(null);
+	const deleting = sessions?.find((s) => s.id === deletingId);
 
 	const sorted = [...(sessions ?? [])].sort((a, b) => b.updated_at - a.updated_at);
 
@@ -62,20 +64,44 @@ export function SessionSidebar({ wid, activeId, onSelect, header }: SessionSideb
 						session={s}
 						active={s.id === activeId}
 						busy={busy[s.id] ?? s.is_busy}
-						confirming={confirmingId === s.id}
 						onSelect={() => onSelect(s.id)}
-						onDelete={() => {
-							if (confirmingId === s.id) {
-								deleteSession.mutate(s.id);
-								setConfirmingId(null);
-							} else {
-								setConfirmingId(s.id);
-								setTimeout(() => setConfirmingId((c) => (c === s.id ? null : c)), 2500);
-							}
-						}}
+						onDelete={() => setDeletingId(s.id)}
 					/>
 				))}
 			</div>
+
+			<Dialog
+				isOpen={deletingId !== null}
+				onClose={() => setDeletingId(null)}
+				title="DELETE SESSION"
+			>
+				<p className="text-sm text-on-surface-muted">
+					Delete “{deleting?.title || "New session"}”? Its messages and plan are
+					removed permanently.
+				</p>
+				<div className="mt-4 flex justify-end gap-2">
+					<Button
+						variant="outlined"
+						size="sm"
+						className="font-display"
+						onClick={() => setDeletingId(null)}
+					>
+						CANCEL
+					</Button>
+					<Button
+						color="danger"
+						size="sm"
+						className="font-display"
+						isLoading={deleteSession.isPending}
+						onClick={() =>
+							deletingId &&
+							deleteSession.mutate(deletingId, { onSuccess: () => setDeletingId(null) })
+						}
+					>
+						DELETE
+					</Button>
+				</div>
+			</Dialog>
 		</div>
 	);
 }
@@ -84,19 +110,11 @@ interface SessionRowProps {
 	session: Session;
 	active: boolean;
 	busy: boolean;
-	confirming: boolean;
 	onSelect: () => void;
 	onDelete: () => void;
 }
 
-function SessionRow({
-	session,
-	active,
-	busy,
-	confirming,
-	onSelect,
-	onDelete,
-}: SessionRowProps) {
+function SessionRow({ session, active, busy, onSelect, onDelete }: SessionRowProps) {
 	return (
 		<div
 			role="button"
@@ -143,19 +161,15 @@ function SessionRow({
 					</div>
 				</div>
 				<button
-					className={`shrink-0 p-0.5 transition-opacity hover:text-danger-400 ${
-						confirming
-							? "text-danger-400 opacity-100"
-							: "text-ghost opacity-100 md:opacity-0 md:group-hover:opacity-100"
-					}`}
+					className="shrink-0 p-0.5 text-ghost opacity-100 transition-opacity hover:text-danger-400 md:opacity-0 md:group-hover:opacity-100"
 					onClick={(e) => {
 						e.stopPropagation();
 						onDelete();
 					}}
-					title={confirming ? "Click again to confirm delete" : "Delete session"}
+					title="Delete session"
 					aria-label="Delete session"
 				>
-					<Icon icon={confirming ? "ri:check-line" : "ri:delete-bin-line"} width={15} />
+					<Icon icon="ri:delete-bin-line" width={15} />
 				</button>
 			</div>
 		</div>
