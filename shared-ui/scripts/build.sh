@@ -28,6 +28,9 @@ else
   echo "📦 Bundling with Bun..."
 fi
 
+# --production selects production JSX (react/jsx-runtime), not
+# jsx-dev-runtime: rolldown-vite mis-bundles jsxDEV calls inside
+# &&/?: expressions (vitejs/vite#21843), so dev-JSX dist crashes.
 bun build \
   ./index.ts \
   ./ui-component/actionBar/index.ts \
@@ -71,6 +74,7 @@ bun build \
   --format esm \
   --splitting \
   --target node \
+  --production \
   --external react \
   --external react-dom \
   --external react/jsx-runtime \
