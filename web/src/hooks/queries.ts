@@ -33,6 +33,8 @@ export const queryKeys = {
 	providers: (wid: string) => ["providers", wid] as const,
 	config: (wid: string) => ["config", wid] as const,
 	permissionsSkip: (wid: string) => ["permissions-skip", wid] as const,
+	pendingPermissions: (wid: string, sid?: string) =>
+		sid ? (["pending-permissions", wid, sid] as const) : (["pending-permissions", wid] as const),
 	needsInit: (wid: string) => ["needs-init", wid] as const,
 };
 
@@ -364,5 +366,22 @@ export function useReportCurrentSession(wid: string | undefined) {
 	return useMutation<void, Error, string>({
 		mutationKey: ["client", "current-session"],
 		mutationFn: (sid) => sessionsClient.setCurrent(wid!, sid),
+	});
+}
+
+/**
+ * Authoritative pending-permission list for a session (incl. its
+ * sub-agent sessions). Pairs with the SSE-driven pending store: replay
+ * re-adds live prompts on reconnect but cannot remove cards whose
+ * resolution event was missed — this query is the truth source for
+ * both directions. Refetches on mount and when the stream reopens
+ * (invalidated in useCrushEvents).
+ */
+export function usePendingPermissions(wid: string | undefined, sid: string | undefined) {
+	return useQuery({
+		queryKey: queryKeys.pendingPermissions(wid!, sid!),
+		queryFn: () => permissionsClient.pending(wid!, sid!),
+		enabled: !!wid && !!sid,
+		staleTime: 0,
 	});
 }

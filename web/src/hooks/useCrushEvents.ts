@@ -49,6 +49,10 @@ export function useCrushEvents(workspaceId: string | undefined) {
 			// messages.
 			queryClient.invalidateQueries({ queryKey: queryKeys.messagesFor(workspaceId) });
 			queryClient.invalidateQueries({ queryKey: queryKeys.sessions(workspaceId) });
+			// Reconcile pending permission cards against server truth —
+			// any resolution event missed while disconnected leaves a
+			// zombie card only the pending endpoint can clear.
+			queryClient.invalidateQueries({ queryKey: queryKeys.pendingPermissions(workspaceId) });
 		};
 		// EventSource retries on its own; show that as reconnecting
 		// instead of a permanent disconnect.

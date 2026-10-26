@@ -49,6 +49,24 @@ export const pendingStore = {
 	removePermission(toolCallId: string) {
 		set({ permissions: state.permissions.filter((p) => p.tool_call_id !== toolCallId) });
 	},
+	/**
+	 * Authoritative reconcile for one session tree against the pending
+	 * endpoint's response: upsert live requests and drop stored cards
+	 * under `coveredIds` (the session plus its descendants — the
+	 * endpoint reports sub-agent requests too) that the server no
+	 * longer lists. Cards for other sessions are untouched.
+	 */
+	reconcilePermissions(coveredIds: ReadonlySet<string>, requests: PermissionRequest[]) {
+		const live = new Set(requests.map((r) => r.id));
+		const byId = new Map(state.permissions.map((p) => [p.id, p]));
+		for (const r of requests) byId.set(r.id, r);
+		const next = [...byId.values()].filter(
+			(p) => !coveredIds.has(p.session_id) || live.has(p.id),
+		);
+		if (next.length !== state.permissions.length || next.some((p, i) => p !== state.permissions[i])) {
+			set({ permissions: next });
+		}
+	},
 	addQuestion(req: QuestionRequest) {
 		set({ questions: [...state.questions.filter((q) => q.id !== req.id), req] });
 	},

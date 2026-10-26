@@ -2,6 +2,7 @@ import { buildPath, type ApiClient } from "../client";
 import {
 	v1WorkspacePermissionsGrant,
 	v1WorkspacePermissionsSkip,
+	v1WorkspaceSessionPermissionsPending,
 } from "../paths";
 import type {
 	PermissionAction,
@@ -32,6 +33,19 @@ export class PermissionsClient {
 		return this.api.post<ResolvedResponse>(
 			buildPath(v1WorkspacePermissionsGrant, { id: workspaceId }),
 			{ permission, action },
+		);
+	}
+
+	/**
+	 * GET `/workspaces/{id}/sessions/{sid}/permissions/pending` — every
+	 * request parked for the session, including its sub-agent sessions.
+	 * The authoritative reconcile source for the SSE-driven pending
+	 * store: replay re-adds live prompts but can't remove cards whose
+	 * resolution event was missed.
+	 */
+	pending(workspaceId: string, sessionId: string): Promise<PermissionRequest[]> {
+		return this.api.get<PermissionRequest[]>(
+			buildPath(v1WorkspaceSessionPermissionsPending, { id: workspaceId, sid: sessionId }),
 		);
 	}
 

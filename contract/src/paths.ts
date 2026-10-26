@@ -33,6 +33,8 @@ export const v1WorkspaceProjectInitPrompt = "/workspaces/{id}/project/init-promp
 export const v1WorkspaceConfig = "/workspaces/{id}/config";
 export const v1WorkspaceConfigModel = "/workspaces/{id}/config/model";
 export const v1WorkspaceProviders = "/workspaces/{id}/providers";
+export const v1WorkspaceSessionPermissionsPending =
+	"/workspaces/{id}/sessions/{sid}/permissions/pending";
 export const v1WorkspacePermissionsGrant = "/workspaces/{id}/permissions/grant";
 export const v1WorkspacePermissionsSkip = "/workspaces/{id}/permissions/skip";
 export const v1WorkspaceQuestionsAnswer = "/workspaces/{id}/questions/answer";
