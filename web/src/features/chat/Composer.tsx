@@ -301,7 +301,7 @@ export function Composer({ wid, sid, busy }: ComposerProps) {
 								send();
 							}
 						}}
-						className="max-h-[200px] min-h-[40px] min-w-0 flex-1 resize-none border-2 border-border bg-raised px-3 py-2 text-sm text-on-surface outline-none placeholder:text-ghost focus:border-primary-500"
+						className="max-h-[200px] min-h-[36px] min-w-0 flex-1 resize-none border-2 border-border bg-raised px-3 py-1.5 text-sm text-on-surface outline-none placeholder:text-ghost focus:border-primary-500"
 					/>
 					{busy ? (
 						<Button
