@@ -225,6 +225,7 @@ export function useSetMainAgent(wid: string | undefined) {
 }
 
 export function useGrantPermission(wid: string | undefined) {
+	const qc = useQueryClient();
 	return useMutation<
 		ResolvedResponse,
 		Error,
@@ -232,7 +233,17 @@ export function useGrantPermission(wid: string | undefined) {
 	>({
 		mutationKey: ["permissions", "grant"],
 		mutationFn: ({ permission, action }) => permissionsClient.grant(wid!, permission, action),
-		onSuccess: (_d, { permission }) => pendingStore.removePermission(permission.tool_call_id),
+		onSuccess: (d, { permission }) => {
+			pendingStore.removePermission(permission.tool_call_id);
+			// resolved:false means the waiter was already gone — the run
+			// died while the card sat on screen. Refetch so is_busy
+			// reconciliation drops the spinner right away instead of on
+			// the next poll.
+			if (!d.resolved && wid) {
+				qc.invalidateQueries({ queryKey: queryKeys.sessions(wid) });
+				qc.invalidateQueries({ queryKey: queryKeys.messages(wid, permission.session_id) });
+			}
+		},
 	});
 }
 

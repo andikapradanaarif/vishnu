@@ -83,6 +83,11 @@ export function PermissionCard({ wid, request }: PermissionCardProps) {
 							DENY
 						</Button>
 					</div>
+					{grant.isError && (
+						<p className="mt-2 text-xs text-error-400">
+							couldn't send the answer — {grant.error?.message}
+						</p>
+					)}
 				</div>
 			</details>
 		</div>

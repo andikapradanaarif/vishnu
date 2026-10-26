@@ -136,9 +136,14 @@ function dispatch(
 		case "permission_request":
 			pendingStore.addPermission(payload as PermissionRequest);
 			break;
-		case "permission_notification":
-			pendingStore.removePermission((payload as PermissionNotification).tool_call_id);
+		case "permission_notification": {
+			// A notification is also emitted when a request is raised
+			// (granted:false, denied:false) — only a grant/deny resolves
+			// and removes the card.
+			const n = payload as PermissionNotification;
+			if (n.granted || n.denied) pendingStore.removePermission(n.tool_call_id);
 			break;
+		}
 		case "question_batch_request":
 			pendingStore.addQuestion(payload as QuestionRequest);
 			break;
