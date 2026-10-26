@@ -101,7 +101,7 @@ export function AddProjectDialog({ isOpen, onClose }: AddProjectDialogProps) {
 			title="New project"
 			className="w-full max-w-md pixel-border bg-surface"
 		>
-			<form className="flex flex-col gap-4" onSubmit={submit}>
+			<form className="flex flex-col gap-5" onSubmit={submit}>
 				<Tabs
 					id="project-source"
 					items={SOURCE_TABS}
@@ -160,7 +160,7 @@ export function AddProjectDialog({ isOpen, onClose }: AddProjectDialogProps) {
 				)}
 				{error && <p className="font-display text-sm text-danger-400">{error}</p>}
 
-				<div className="flex justify-end gap-2">
+				<div className="mt-1 flex justify-end gap-2">
 					<Button
 						variant="text"
 						type="button"
