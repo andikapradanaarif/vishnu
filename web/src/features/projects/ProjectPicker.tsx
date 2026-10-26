@@ -177,7 +177,8 @@ export function ProjectPicker({ onSelect, onLogout }: ProjectPickerProps) {
 				isOpen={!!pendingDelete}
 				onClose={() => setPendingDelete(undefined)}
 				title={pendingDelete ? `Delete ${pendingDelete.name}?` : "Delete project?"}
-				className="w-full max-w-md pixel-border bg-surface"
+				containerClassName="mx-3 w-full max-w-md"
+				className="w-full pixel-border bg-surface"
 			>
 				<p className="text-sm text-on-surface-muted">
 					Crush is stopped for managed projects. Files on disk are not touched.

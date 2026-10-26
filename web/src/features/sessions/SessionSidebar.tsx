@@ -74,6 +74,8 @@ export function SessionSidebar({ wid, activeId, onSelect, header }: SessionSideb
 				isOpen={deletingId !== null}
 				onClose={() => setDeletingId(null)}
 				title="DELETE SESSION"
+				containerClassName="mx-3 w-full max-w-sm"
+				className="w-full"
 			>
 				<p className="text-sm text-on-surface-muted">
 					Delete “{deleting?.title || "New session"}”? Its messages and plan are

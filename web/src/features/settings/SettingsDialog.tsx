@@ -21,7 +21,8 @@ export function SettingsDialog({ wid, isOpen, onClose }: SettingsDialogProps) {
 			isOpen={isOpen}
 			onClose={onClose}
 			title="Settings"
-			className="w-full max-w-md pixel-border bg-surface"
+			containerClassName="mx-3 w-full max-w-md"
+			className="w-full pixel-border bg-surface"
 		>
 			<section>
 				<h3 className="font-display text-lg text-on-surface">Agent &amp; model</h3>
