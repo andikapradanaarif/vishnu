@@ -76,7 +76,7 @@ export function MessagePart({ part, role }: { part: ContentPart; role: Message["
 							: "border-border bg-raised"
 					}`}
 				>
-					<summary className="cursor-pointer font-display text-xs text-on-surface-muted select-none">
+					<summary className="cursor-pointer font-display text-sm text-on-surface-muted select-none">
 						{res.name || "tool"} result{res.is_error ? " · error" : ""}
 					</summary>
 					<pre className="mt-1 max-h-64 overflow-auto font-mono text-sm whitespace-pre-wrap text-on-surface-muted">
