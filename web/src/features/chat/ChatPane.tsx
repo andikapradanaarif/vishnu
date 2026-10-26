@@ -1,12 +1,13 @@
 import { useEffect, useRef } from "react";
 import { Button } from "@vishnu/ui-component/button";
 import { EmptyState } from "@vishnu/ui-component/emptyState";
-import { useMessages } from "@/hooks/queries";
+import { useMessages, useSessions } from "@/hooks/queries";
 import { usePendingState } from "@/services/pendingStore";
 import { LoadingSpinner } from "@vishnu/ui-component/loadingAnimation";
 import { errorLabel } from "@/utils/errors";
 import type { Message } from "@vishnu/api-contract";
 import { MessagePart } from "./MessageParts";
+import { TodoList } from "./TodoList";
 import { PermissionCard } from "@/features/prompts/PermissionCard";
 import { QuestionCard } from "@/features/prompts/QuestionCard";
 
@@ -17,6 +18,7 @@ interface ChatPaneProps {
 
 export function ChatPane({ wid, sid }: ChatPaneProps) {
 	const { data: messages, isLoading, error, refetch, isRefetching } = useMessages(wid, sid);
+	const { data: sessions } = useSessions(wid);
 	const { busy, permissions, questions, conn } = usePendingState();
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const pinned = useRef(true);
@@ -24,6 +26,8 @@ export function ChatPane({ wid, sid }: ChatPaneProps) {
 
 	const sessionPermissions = permissions.filter((p) => p.session_id === sid);
 	const sessionQuestions = questions.filter((q) => q.session_id === sid);
+	const todos = sessions?.find((s) => s.id === sid)?.todos;
+	const doneCount = todos?.filter((t) => t.status === "completed").length ?? 0;
 
 	// Opening a session lands on the latest message — the scroll must
 	// re-run a frame later because web fonts and images settle layout
@@ -102,6 +106,17 @@ export function ChatPane({ wid, sid }: ChatPaneProps) {
 				{(messages ?? []).map((m) => (
 					<MessageView key={m.id} message={m} />
 				))}
+
+				{todos && todos.length > 0 && (
+					<details className="border border-border bg-raised" open={busy[sid]}>
+						<summary className="cursor-pointer px-3 py-2 font-display text-sm tracking-[0.15em] text-on-surface-muted select-none">
+							PLAN {doneCount}/{todos.length}
+						</summary>
+						<div className="border-t border-border px-3 py-2">
+							<TodoList todos={todos} stale={!busy[sid]} />
+						</div>
+					</details>
+				)}
 
 				{busy[sid] && (
 					<div className="flex items-center gap-2 font-display text-sm text-on-surface-muted">
