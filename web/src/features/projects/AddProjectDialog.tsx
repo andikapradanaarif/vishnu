@@ -114,38 +114,40 @@ export function AddProjectDialog({ isOpen, onClose }: AddProjectDialogProps) {
 					}}
 				/>
 
-				{source === "github" && (
-					<Input
-						name="repo_url"
-						label="Repository"
-						placeholder="owner/repo"
-						value={repoUrl}
-						onChange={(event) => setRepoUrl(event.target.value)}
-						message="Access is checked on the server first."
-					/>
-				)}
+				<div className="min-h-[96px]">
+					{source === "github" && (
+						<Input
+							name="repo_url"
+							label="Repository"
+							placeholder="owner/repo"
+							value={repoUrl}
+							onChange={(event) => setRepoUrl(event.target.value)}
+							message="Access is checked on the server first."
+						/>
+					)}
 
-				{source === "link" && (
-					<Input
-						name="path"
-						label="Path"
-						placeholder="/srv/repos/my-project"
-						value={path}
-						onChange={(event) => setPath(event.target.value)}
-						message="Absolute path to a directory on the server."
-					/>
-				)}
+					{source === "link" && (
+						<Input
+							name="path"
+							label="Path"
+							placeholder="/srv/repos/my-project"
+							value={path}
+							onChange={(event) => setPath(event.target.value)}
+							message="Absolute path to a directory on the server."
+						/>
+					)}
 
-				{source === "external" && (
-					<Input
-						name="upstream"
-						label="Upstream"
-						placeholder="http://127.0.0.1:9201"
-						value={upstream}
-						onChange={(event) => setUpstream(event.target.value)}
-						message="vishnu routes to it; it never starts or stops it."
-					/>
-				)}
+					{source === "external" && (
+						<Input
+							name="upstream"
+							label="Upstream"
+							placeholder="http://127.0.0.1:9201"
+							value={upstream}
+							onChange={(event) => setUpstream(event.target.value)}
+							message="vishnu routes to it; it never starts or stops it."
+						/>
+					)}
+				</div>
 
 				<Input
 					name="name"
