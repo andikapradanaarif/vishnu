@@ -3,8 +3,8 @@
 # Build context is the repository root (for .dockerignore + api/ sources).
 # api-only image — the SPA ships in the separate vishnu-web nginx image.
 # Pinned fork commit + its `git describe` version — bump both together.
-ARG CRUSH_REF=55cade493eed76429179567b1d45881f8f59b9db
-ARG CRUSH_VERSION=v0.98.3-fork-4-g55cade493
+ARG CRUSH_REF=f91fbe8bf77afab1d40ede414a1f41c372382912
+ARG CRUSH_VERSION=v0.98.3-fork-5-gf91fbe8bf
 
 FROM golang:1.26-alpine AS api
 ENV GOTOOLCHAIN=local CGO_ENABLED=0
