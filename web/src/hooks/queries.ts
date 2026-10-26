@@ -272,8 +272,13 @@ export function useSetModel(wid: string | undefined) {
 		unknown
 	>({
 		mutationKey: ["config", "set-model"],
-		mutationFn: ({ modelType, model }) => configClient.setModel(wid!, modelType, model),
-		onSuccess: () => {
+		mutationFn: async ({ modelType, model }) => {
+			await configClient.setModel(wid!, modelType, model);
+			// config/model only persists the selection — the coordinator's
+			// live model (what GET /agent reports) is rebuilt by agent/update.
+			await agentClient.updateModel(wid!);
+		},
+		onSettled: () => {
 			qc.invalidateQueries({ queryKey: queryKeys.agent(wid!) });
 			qc.invalidateQueries({ queryKey: queryKeys.config(wid!) });
 		},

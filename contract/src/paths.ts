@@ -19,6 +19,7 @@ export const v1WorkspaceEvents = "/workspaces/{id}/events";
 export const v1WorkspaceCurrentSession = "/workspaces/{id}/current-session";
 export const v1WorkspaceAgent = "/workspaces/{id}/agent";
 export const v1WorkspaceAgentMain = "/workspaces/{id}/agent/main";
+export const v1WorkspaceAgentUpdate = "/workspaces/{id}/agent/update";
 export const v1WorkspaceAgentSessionCancel = "/workspaces/{id}/agent/sessions/{session_id}/cancel";
 export const v1WorkspaceAgentSessionSummarize =
 	"/workspaces/{id}/agent/sessions/{session_id}/summarize";

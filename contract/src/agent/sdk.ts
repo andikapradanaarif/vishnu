@@ -6,6 +6,7 @@ import {
 	v1WorkspaceAgentSessionPromptsClear,
 	v1WorkspaceAgentSessionShell,
 	v1WorkspaceAgentSessionSummarize,
+	v1WorkspaceAgentUpdate,
 } from "../paths";
 import type { AgentInfo, AgentMessage, ShellCommandResponse } from "../types";
 
@@ -38,6 +39,16 @@ export class AgentClient {
 	/** GET `/workspaces/{id}/agent` — busy state + selected model. */
 	info(workspaceId: string): Promise<AgentInfo> {
 		return this.api.get<AgentInfo>(buildPath(v1WorkspaceAgent, { id: workspaceId }));
+	}
+
+	/**
+	 * POST `/workspaces/{id}/agent/update` — rebuild the coordinator's
+	 * models from the persisted config. Required after `config/model`:
+	 * the write only persists the selection, so the live agent (and
+	 * `GET /agent`) keeps the old model until this runs.
+	 */
+	updateModel(workspaceId: string): Promise<void> {
+		return this.api.post<void>(buildPath(v1WorkspaceAgentUpdate, { id: workspaceId }));
 	}
 
 	/** POST `/workspaces/{id}/agent/main` — switch the main agent (coder/plan/task). */
