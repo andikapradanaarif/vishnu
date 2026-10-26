@@ -39,7 +39,22 @@ func externalProject(id, upstream string, status domain.ProjectStatus) *domain.P
 	}
 }
 
+type fakeAgents struct {
+	calls chan string
+}
+
+func (f *fakeAgents) EnsureAgent(_ context.Context, _, workspaceID string) error {
+	if f.calls != nil {
+		f.calls <- workspaceID
+	}
+	return nil
+}
+
 func proxyApp(projects ...*domain.Project) *fiber.App {
+	return proxyAppWithAgents(&fakeAgents{}, projects...)
+}
+
+func proxyAppWithAgents(agents AgentEnsurer, projects ...*domain.Project) *fiber.App {
 	locator := &fakeLocator{projects: map[string]*domain.Project{}}
 	for _, project := range projects {
 		locator.projects[project.ID] = project
@@ -53,7 +68,7 @@ func proxyApp(projects ...*domain.Project) *fiber.App {
 	})
 
 	app := fiber.New()
-	app.All("/p/:pid/v1/*", NewProxyHandler(locator, manager, service.NewProxy()).Forward)
+	app.All("/p/:pid/v1/*", NewProxyHandler(locator, manager, agents, service.NewProxy()).Forward)
 	return app
 }
 
@@ -117,6 +132,44 @@ func TestForwardRoutesEachProjectToItsOwnUpstream(t *testing.T) {
 	}
 	if body != "second /v1/workspaces/w1/sessions?" {
 		t.Fatalf("the project prefix was not stripped: %q", body)
+	}
+}
+
+func TestForwardSessionsListEnsuresAgent(t *testing.T) {
+	upstream := echoUpstream(t, "first")
+	defer upstream.Close()
+
+	agents := &fakeAgents{calls: make(chan string, 1)}
+	app := proxyAppWithAgents(agents, externalProject("a", upstream.URL, domain.ProjectStatusReady))
+
+	status, _, body := get(t, app, "/p/a/v1/workspaces/w1/sessions?client_id=c1")
+	if status != fiber.StatusOK {
+		t.Fatalf("got %d, want 200: %s", status, body)
+	}
+	select {
+	case wid := <-agents.calls:
+		if wid != "w1" {
+			t.Fatalf("agent ensure got workspace %q, want w1", wid)
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("sessions list did not trigger an agent ensure")
+	}
+
+	// A second request right behind the first must not queue a duplicate
+	// while one is in flight — and unrelated paths never trigger it.
+	if _, _, body = get(t, app, "/p/a/v1/workspaces/w1/sessions"); status != fiber.StatusOK {
+		t.Fatalf("got %d: %s", status, body)
+	}
+	if _, _, body = get(t, app, "/p/a/v1/workspaces/w1/sessions/s1/messages"); status != fiber.StatusOK {
+		t.Fatalf("got %d: %s", status, body)
+	}
+	if _, _, body = get(t, app, "/p/a/v1/workspaces"); status != fiber.StatusOK {
+		t.Fatalf("got %d: %s", status, body)
+	}
+	select {
+	case wid := <-agents.calls:
+		t.Fatalf("unexpected extra agent ensure for %q", wid)
+	case <-time.After(200 * time.Millisecond):
 	}
 }
 

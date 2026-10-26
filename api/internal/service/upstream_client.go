@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -31,6 +32,10 @@ type CrushClient struct {
 type Workspace struct {
 	ID   string `json:"id"`
 	Path string `json:"path"`
+}
+
+type AgentInfo struct {
+	IsReady bool `json:"is_ready"`
 }
 
 func NewCrushClient() *CrushClient {
@@ -61,6 +66,21 @@ func (c *CrushClient) EnsureWorkspace(ctx context.Context, upstream, path string
 		return "", fmt.Errorf("%w: %s has no workspaces", ErrUpstreamBadResponse, upstream)
 	}
 	return workspaces[0].ID, nil
+}
+
+// EnsureAgent initializes the workspace's agent coordinator when crush
+// hasn't yet — the TUI does this on workspace open; without it the agent
+// endpoint answers "agent coordinator not initialized".
+func (c *CrushClient) EnsureAgent(ctx context.Context, upstream, workspaceID string) error {
+	var info AgentInfo
+	if err := c.call(ctx, upstream, http.MethodGet, "/v1/workspaces/"+workspaceID+"/agent", nil, &info); err != nil {
+		return err
+	}
+	if info.IsReady {
+		return nil
+	}
+	path := fmt.Sprintf("/v1/workspaces/%s/agent/init?client_id=%s", workspaceID, c.clientID)
+	return c.call(ctx, upstream, http.MethodPost, path, nil, nil)
 }
 
 func (c *CrushClient) listWorkspaces(ctx context.Context, upstream string) ([]Workspace, error) {
@@ -110,6 +130,12 @@ func (c *CrushClient) call(ctx context.Context, upstream, method, path string, b
 	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		// Crush's error body carries the actionable detail (e.g. "model
+		// provider not configured") — keep a bounded snippet in the error.
+		detail, _ := io.ReadAll(io.LimitReader(resp.Body, 4<<10))
+		if msg := strings.TrimSpace(string(detail)); msg != "" {
+			return fmt.Errorf("%w: %s %s returned %d: %s", ErrUpstreamBadResponse, method, path, resp.StatusCode, msg)
+		}
 		return fmt.Errorf("%w: %s %s returned %d", ErrUpstreamBadResponse, method, path, resp.StatusCode)
 	}
 	if out == nil {

@@ -34,6 +34,7 @@ type Cloner interface {
 
 type Workspaces interface {
 	EnsureWorkspace(ctx context.Context, upstream, path string, create bool) (string, error)
+	EnsureAgent(ctx context.Context, upstream, workspaceID string) error
 }
 
 type ProjectUsecase struct {
@@ -124,6 +125,10 @@ func (u *ProjectUsecase) EnsureWorkspace(ctx context.Context, id string) (dto.Wo
 
 	workspaceID, err := u.workspaces.EnsureWorkspace(ctx, upstream, path, project.Mode == domain.ProjectModeManaged)
 	if err != nil {
+		return dto.WorkspaceResponse{}, err
+	}
+
+	if err := u.workspaces.EnsureAgent(ctx, upstream, workspaceID); err != nil {
 		return dto.WorkspaceResponse{}, err
 	}
 

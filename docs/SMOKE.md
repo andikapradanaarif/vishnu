@@ -3,9 +3,9 @@
 Prerequisites:
 
 - Postgres: `cd api && make db && make migrate`
-- API + SPA: `make dev` (`VISHNU_WEB_DIR=../web/dist`) or the docker
-  stack via `make up`.
-- Dev SPA: `cd web && bun run dev` — the dev proxy forwards `/api` and
+- API: `cd api && make dev` on `http://127.0.0.1:8080` (or the docker
+  stack via `make up`). The api serves no SPA.
+- SPA: `cd web && bun run dev` — the dev proxy forwards `/api` and
   `/p` to `http://127.0.0.1:8080`.
 - Sign-in codes go through Brevo when it is configured; otherwise the
   server logs the code. `VISHNU_BOOTSTRAP_EMAIL` seeds the first admin.

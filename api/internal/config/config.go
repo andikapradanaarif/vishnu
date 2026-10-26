@@ -33,9 +33,6 @@ type Brevo struct {
 type Config struct {
 	// ListenAddr is the address the web server binds to.
 	ListenAddr string
-	// WebDir, when set, serves the SPA from this directory instead of the
-	// embedded build output.
-	WebDir string
 	// Environment prefixes email subjects unless "production"/"prod".
 	Environment string
 	// Brevo configures transactional email (auth OTP codes).
@@ -52,7 +49,6 @@ type Config struct {
 func Load() *Config {
 	return &Config{
 		ListenAddr:  getenv("VISHNU_LISTEN_ADDR", "127.0.0.1:8080"),
-		WebDir:      os.Getenv("VISHNU_WEB_DIR"),
 		Environment: getenv("VISHNU_ENV", "development"),
 		Brevo: Brevo{
 			APIKey:         os.Getenv("BREVO_API_KEY"),

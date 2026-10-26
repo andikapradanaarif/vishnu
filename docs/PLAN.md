@@ -59,7 +59,7 @@ and nexus (`backend/` + `backoffice/` + `contract/` + `shared-ts/`):
 - **`api/`** — Go + Fiber v3 + **Postgres/GORM**, nexus-style clean
   architecture (`cmd/` → `internal/{domain,repository,usecase,dto,
   handler,service}` + embedded SQL `migration/`). Registry, process
-  manager, `/p/{pid}/v1/*` streaming proxy, embedded SPA, Brevo email
+  manager, `/p/{pid}/v1/*` streaming proxy, Brevo email
   service.
 - **`web/`** — Vite + React 19 + TS strict, TanStack Query, Tailwind
   v4, oxlint/oxfmt. Single screen, `src/features/<domain>/` modules;
@@ -101,10 +101,8 @@ vishnu/
     internal/service/cloner/            git eligibility check + async clone
     internal/handler/proxy_handler.go   /p/{pid}/v1/* streaming proxy
     internal/handler/project_handler.go /api/projects* CRUD + lifecycle
-    internal/handler/web_handler.go     SPA + index.html fallback
-    internal/webui/                     go:embed dist/
-    Dockerfile              multi-stage: bun → go → alpine+git+crush
-    deploy/docker-compose.yml           postgres + vishnu services
+    Dockerfile              multi-stage: go → crush → alpine (api-only)
+    deploy/docker-compose.yml           postgres + web + vishnu services
     entrypoint.sh  Makefile
   shared-ui/              @vishnu/ui-component — vendored nexus shared-ts
   contract/               @vishnu/api-contract — crush /v1 types + SDK
@@ -141,11 +139,11 @@ vishnu/
 # dev (host-native): postgres in docker, api + crush on the host
 cd vishnu/api && make db && make migrate && make dev
 
-# prod: everything in docker — image builds web + api + crush binary,
-# compose runs postgres + vishnu (restart: unless-stopped)
+# prod: docker — web image (nginx SPA + proxy) + api image (go + crush
+# binary); compose runs postgres + web + vishnu (restart: unless-stopped)
 docker compose -f api/deploy/docker-compose.yml up -d --build
 # env: VISHNU_LISTEN_ADDR, DB_*, VISHNU_DATA_DIR, VISHNU_PROJECTS_DIR,
-#      VISHNU_CRUSH_BIN, VISHNU_PORT_START, VISHNU_WEB_DIR
+#      VISHNU_CRUSH_BIN, VISHNU_PORT_START
 ```
 
 Browser opens `http://127.0.0.1:8080` → Add project (GitHub link —

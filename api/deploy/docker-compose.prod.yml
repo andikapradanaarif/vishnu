@@ -10,6 +10,11 @@ services:
     image: ghcr.io/andikapradanaarif/vishnu-web:${VISHNU_WEB_TAG:-latest}
     container_name: vishnu-web
     restart: unless-stopped
+    environment:
+      # Where nginx forwards /api + /p — the compose-network api here,
+      # or any reachable URL (e.g. https://api.example.com) when it
+      # lives on another host/domain.
+      VISHNU_API_UPSTREAM: ${VISHNU_API_UPSTREAM:-http://vishnu:8080}
     ports:
       - "127.0.0.1:${VISHNU_HOST_PORT:-8080}:80"
     healthcheck:
@@ -36,7 +41,18 @@ services:
       - "127.0.0.1:${VISHNU_API_PORT:-8081}:8080"
     volumes:
       - vishnu-data:/data
-      - ~/.ssh:/root/.ssh:ro
+      # Git credentials for clone/ls-remote — key material only (github
+      # host keys are baked into the image). `~` expands to the
+      # composing user's home, so under sudo or a different deploy
+      # user set VISHNU_SSH_DIR to the right account's .ssh.
+      - ${VISHNU_SSH_DIR:-~/.ssh}:/root/.ssh:ro
+      # Crush global config + data (model selection, provider creds
+      # incl. OAuth tokens) — the container's crush runs as root, so
+      # this mounts the composing user's dirs, not root's. Writable:
+      # OAuth refresh writes tokens back. Set VISHNU_CRUSH_*_DIR to the
+      # right account's paths under sudo / a different deploy user.
+      - ${VISHNU_CRUSH_CONFIG_DIR:-~/.config/crush}:/root/.config/crush
+      - ${VISHNU_CRUSH_DATA_DIR:-~/.local/share/crush}:/root/.local/share/crush
       # Link mode needs the host directory mounted at the same path:
       # - /srv/projects:/srv/projects
     healthcheck:

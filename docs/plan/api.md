@@ -1,4 +1,4 @@
-# api/ work plan — project registry + crush proxy + SPA host
+# api/ work plan — project registry + crush proxy
 
 Status: shipped — `api/cmd/server` registers the routes below, applies
 pending migrations on boot, and the end-to-end run described in
@@ -7,16 +7,18 @@ pending migrations on boot, and the end-to-end run described in
 ## Scope
 
 One Go module (`github.com/andikapradanaarif/vishnu`, module root at
-`api/`) that does three things:
+`api/`) that does two things:
 
-1. Serve the built `web/` SPA (embedded via `go:embed` for the single
-   binary prod path, `VISHNU_WEB_DIR` override for disk).
-2. Own a **project registry + process manager** — `/api/projects`
+1. Own a **project registry + process manager** — `/api/projects`
    CRUD, lazy-spawn/health-check one `crush server` per project
    (see `projects.md`).
-3. Reverse-proxy `/p/{pid}/v1/*` to that project's crush upstream,
+2. Reverse-proxy `/p/{pid}/v1/*` to that project's crush upstream,
    streaming responses — the SSE endpoint must flush per event.
    Path-prefixed per project because `EventSource` can't set headers.
+
+The api serves no SPA — the `web/` build ships in the separate
+`vishnu-web` nginx image (or vite dev server), which proxies `/api` +
+`/p` here.
 
 Brevo email service lives in `internal/service/email` (auth OTP
 later).
@@ -39,10 +41,7 @@ internal/service/process/              crush lazy-spawn/health-check per project
 internal/service/cloner/               git ls-remote eligibility + async clone
 internal/handler/proxy_handler.go      /p/{pid}/v1/* → project upstream (streaming)
 internal/handler/project_handler.go    /api/projects* CRUD + ensure-running/workspace
-internal/handler/web_handler.go        SPA static + index.html fallback
-internal/webui/webui.go                //go:embed all:dist
-internal/webui/dist/.gitkeep           placeholder so embed compiles pre-build
-Dockerfile                             bun → go → crush → alpine runtime
+Dockerfile                             go → crush → alpine runtime (api-only)
 entrypoint.sh                          `migrate` dispatch, else the server
 deploy/docker-compose.yml              postgres + vishnu services
 deploy/.env.example                    compose settings (copy to deploy/.env)
@@ -58,7 +57,6 @@ migrations, and the domain/repository/usecase conventions.
 | Env | Default | Purpose |
 | --- | --- | --- |
 | `VISHNU_LISTEN_ADDR` | `127.0.0.1:8080` | bind address (localhost default; LAN/Tailscale is deliberate opt-in) |
-| `VISHNU_WEB_DIR` | unset → embed | serve SPA from disk instead of embedded `dist` |
 | `DB_HOST` / `DB_PORT` / `DB_NAME` / `DB_USER` / `DB_PASS` | `127.0.0.1` / `5432` / `vishnu` / `vishnu` / — | Postgres (registry + auth tables) |
 | `VISHNU_DATA_DIR` | `~/.local/share/vishnu` | runtime data dir (default root for projects dir) |
 | `VISHNU_PROJECTS_DIR` | `$VISHNU_DATA_DIR/projects` | where GitHub clones land |
@@ -101,7 +99,6 @@ migrations, and the domain/repository/usecase conventions.
 | `POST /api/auth/logout`, `GET /api/auth/me` | AuthHandler | session-guarded |
 | `GET/POST/DELETE /api/projects*` | ProjectHandler | registry CRUD + ensure-running/workspace — session-guarded |
 | `ALL /p/:pid/v1/*` | ProxyHandler.Forward | strip prefix → per-project upstream, incl. SSE — session-guarded |
-| `ALL /*` (fallback) | WebHandler.Handle | file → bytes; miss → index.html — public (SPA renders login gate) |
 
 Auth middleware sits in front of `/api/*` (except `/api/auth/*`) and
 `/p/*`: validates the `vishnu_session` cookie against `auth_sessions`
@@ -145,44 +142,34 @@ Auth middleware sits in front of `/api/*` (except `/api/auth/*`) and
 - Workspace create takes `client_id` **in the JSON body**; other
   mutating endpoints take it as a `?client_id=` query param.
 
-## SPA serving
-
-`web_handler.go`: `fs.ReadFile(fsys, cleanPath)`; on miss →
-`index.html`; `Content-Type` via `mime.TypeByExtension`. `fsys` is
-`os.DirFS(VISHNU_WEB_DIR)` when set, else `webui.FS()`
-(`//go:embed all:dist` → `fs.Sub`). Warn at boot when the embed has no
-`index.html` (web not built yet).
-
 ## Build/run
 
 ```bash
-make dev      # VISHNU_WEB_DIR=../web/dist go run cmd/server/main.go
-make build    # bun build web → copy dist into webui → CGO_ENABLED=0 go build -o bin/vishnu-api
+make dev      # go run cmd/server/main.go
+make build    # CGO_ENABLED=0 go build -o bin/vishnu-api (api only)
 make test / lint / format / tidy
 ```
 
 ## Deployment — Debian server (docker)
 
 Production runs fully containerized: `api/deploy/docker-compose.yml`
-brings up `postgres` + `vishnu` (`restart: unless-stopped` — docker's
-restart policy replaces a systemd unit). `VISHNU_WEB_DIR` stays unset —
-embedded SPA is the prod path.
+brings up `postgres` + `web` (nginx SPA + proxy) + `vishnu`
+(`restart: unless-stopped` — docker's restart policy replaces a
+systemd unit). The api serves no SPA — the `vishnu-web` image owns it.
 
-**Image** (`api/Dockerfile`, build context = repo root — the SPA has
-to build inside the image):
+**Image** (`api/Dockerfile`, build context = repo root — api-only;
+`web/Dockerfile` builds the SPA into a separate nginx image):
 
-1. `oven/bun` stage — `bun install --frozen-lockfile` + `bun run build`
-   over shared-ui → contract → web → `web/dist`.
-2. `golang:1.26-alpine` stage — copy `api/`, copy `web/dist` into
-   `internal/webui/dist`, build `vishnu-api` + `migrate` in one RUN
-   (shared build cache, `-trimpath -ldflags="-s -w"`, `GOTOOLCHAIN=local`).
+1. `golang:1.26-alpine` stage — copy `api/`, build `vishnu-api` +
+   `migrate` in one RUN (shared build cache,
+   `-trimpath -ldflags="-s -w"`, `GOTOOLCHAIN=local`).
    Vendor `go.mod` deps later if build time becomes annoying (valo
    vendors; we don't yet).
-3. `golang:1.27-alpine` stage — `go install
+2. `golang:1.27-alpine` stage — `go install
    github.com/charmbracelet/crush@$CRUSH_VERSION` (build-arg, default
    `v0.98.1`). A newer toolchain than the api stage, because crush's own
    `go.mod` requires one.
-4. `alpine:3.22` runtime — `apk add ca-certificates curl git
+3. `alpine:3.22` runtime — `apk add ca-certificates curl git
    openssh-client tzdata` (cloner, healthcheck, TLS to Brevo), both
    binaries, the crush binary on `$PATH`, and `entrypoint.sh`
    (nexus-style: a `migrate` argv dispatches to `./migrate`, no
@@ -203,6 +190,13 @@ while the app used the file's.
 
 ```yaml
 services:
+  web:
+    build: { context: ../.., dockerfile: web/Dockerfile }
+    container_name: vishnu-web
+    restart: unless-stopped
+    ports: ["127.0.0.1:${VISHNU_HOST_PORT:-8080}:80"]  # browser entry — SPA + /api,/p proxy
+    healthcheck: wget -q -O /dev/null localhost/healthz
+    depends_on: { vishnu: { condition: service_healthy } }
   vishnu:
     build: { context: ../.., dockerfile: api/Dockerfile,
              args: { CRUSH_VERSION: v0.98.1 } }
@@ -210,7 +204,7 @@ services:
     restart: unless-stopped
     env_file: [.env]                   # deploy/.env — DB_*, BREVO_*, …
     environment: { DB_HOST: vishnu-db, DB_PORT: "5432" }
-    ports: ["127.0.0.1:${VISHNU_HOST_PORT:-8080}:8080"]  # loopback publish — tunnel/Tailscale in
+    ports: ["127.0.0.1:${VISHNU_API_PORT:-8081}:8080"]  # direct api access for debugging
     volumes:
       - vishnu-data:/data              # VISHNU_DATA_DIR=/data
       - ~/.ssh:/root/.ssh:ro           # server-side git auth for clones
@@ -233,8 +227,10 @@ logs` for the app's output).
 
 **Container-scoped caveats** — crush children run *inside* the vishnu
 container (same process tree): clones land in the `vishnu-data` volume;
-`git ls-remote`/clone use the mounted `~/.ssh` (or a `SSH_AUTH_SOCK`
-socket mount); **link-local-path mode requires the host dir
+`git ls-remote`/clone use the mounted `~/.ssh` **for the private key**
+(github.com's host keys are baked into the image at
+`/etc/ssh/ssh_known_hosts`, so host verification doesn't depend on the
+mount); **link-local-path mode requires the host dir
 bind-mounted at an identical in-container path** — the path is stored
 in the registry and handed to crush verbatim.
 
@@ -253,5 +249,5 @@ in the registry and handed to crush verbatim.
   carry file contents later).
 - **Verify**: `go build ./...`, `go vet ./...`, `gofmt -l` clean.
   Manual: `curl -N localhost:8080/p/{pid}/v1/workspaces/{id}/events?client_id=…`
-  shows events as they arrive; `curl localhost:8080/` returns the SPA;
-  `curl localhost:8080/api/projects` lists the registry.
+  shows events as they arrive; `curl localhost:8080/api/projects`
+  lists the registry; the SPA is served by the web front, not the api.

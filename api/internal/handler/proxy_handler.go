@@ -9,6 +9,8 @@ import (
 	"log/slog"
 	"net/http"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/gofiber/fiber/v3"
 
@@ -25,19 +27,25 @@ type UpstreamResolver interface {
 	Ensure(ctx context.Context, project domain.Project) (string, error)
 }
 
+type AgentEnsurer interface {
+	EnsureAgent(ctx context.Context, upstream, workspaceID string) error
+}
+
 // ProxyHandler forwards /p/{pid}/v1/* requests to that project's crush
 // server. Responses — including the SSE event stream — are streamed
 // through a bufio writer with a flush per read so events are delivered as
 // they arrive. The project is resolved per request from the registry, so
 // only the upstream lookup is dynamic; the streaming mechanics are not.
 type ProxyHandler struct {
-	projects ProjectLocator
-	proc     UpstreamResolver
-	client   *service.Proxy
+	projects  ProjectLocator
+	proc      UpstreamResolver
+	agents    AgentEnsurer
+	client    *service.Proxy
+	agentInit sync.Map
 }
 
-func NewProxyHandler(projects ProjectLocator, proc UpstreamResolver, client *service.Proxy) *ProxyHandler {
-	return &ProxyHandler{projects: projects, proc: proc, client: client}
+func NewProxyHandler(projects ProjectLocator, proc UpstreamResolver, agents AgentEnsurer, client *service.Proxy) *ProxyHandler {
+	return &ProxyHandler{projects: projects, proc: proc, agents: agents, client: client}
 }
 
 func (h *ProxyHandler) Forward(c fiber.Ctx) error {
@@ -74,6 +82,16 @@ func (h *ProxyHandler) Forward(c fiber.Ctx) error {
 	requestURI := strings.TrimPrefix(c.OriginalURL(), "/p/"+pid)
 	if !strings.HasPrefix(requestURI, "/") {
 		requestURI = "/" + requestURI
+	}
+
+	// Sessions-list is the SPA's "project opened" signal — lazily init
+	// the workspace's agent coordinator in the background so a crush
+	// that restarted (or predates select-time init) doesn't answer
+	// prompts with "agent coordinator not initialized".
+	if c.Method() == fiber.MethodGet {
+		if wid := sessionsListWorkspace(requestURI); wid != "" {
+			h.ensureAgent(upstream, pid, wid)
+		}
 	}
 
 	// The upstream request is cancelled when the stream writer exits —
@@ -139,6 +157,47 @@ func (h *ProxyHandler) Forward(c fiber.Ctx) error {
 			}
 		}
 	})
+}
+
+// agentInitRecheck bounds how often a sessions-list request re-checks a
+// workspace's agent — the SPA polls sessions, so a per-request ensure
+// would spam the upstream with GET /agent calls. A failed ensure drops
+// the marker so the next request retries instead of waiting the TTL.
+const agentInitRecheck = 30 * time.Second
+
+func (h *ProxyHandler) ensureAgent(upstream, pid, workspaceID string) {
+	key := pid + "/" + workspaceID
+	now := time.Now()
+	if last, loaded := h.agentInit.LoadOrStore(key, now); loaded {
+		lastAt, ok := last.(time.Time)
+		if ok && now.Sub(lastAt) < agentInitRecheck {
+			return
+		}
+		if !h.agentInit.CompareAndSwap(key, last, now) {
+			return
+		}
+	}
+	go func() {
+		if err := h.agents.EnsureAgent(context.Background(), upstream, workspaceID); err != nil {
+			slog.Warn("Agent init ensure failed", "project", pid, "workspace", workspaceID, "error", err)
+			h.agentInit.Delete(key)
+		}
+	}()
+}
+
+// sessionsListWorkspace extracts the workspace id from a
+// /v1/workspaces/{id}/sessions request path, "" otherwise.
+func sessionsListWorkspace(requestURI string) string {
+	const prefix, suffix = "/v1/workspaces/", "/sessions"
+	path, _, _ := strings.Cut(requestURI, "?")
+	if !strings.HasPrefix(path, prefix) || !strings.HasSuffix(path, suffix) {
+		return ""
+	}
+	id := strings.TrimSuffix(strings.TrimPrefix(path, prefix), suffix)
+	if id == "" || strings.Contains(id, "/") {
+		return ""
+	}
+	return id
 }
 
 func hopHeader(key string) bool {

@@ -10,21 +10,21 @@ Vishnu runs a single Go binary that owns a **project registry**
 reverse-proxies each project's `/v1` HTTP + SSE API — so an agent run
 continues server-side even after you close the tab.
 
-Built for deployment on a Debian server via Docker Compose (the image
-builds the SPA, api, and a `crush` binary together), reachable over SSH
-tunnel or Tailscale.
+Built for deployment on a Debian server via Docker Compose — a `web`
+image (nginx SPA + proxy) fronts the `vishnu-api` image (Go + a
+baked-in `crush` binary) — reachable over SSH tunnel or Tailscale.
 
 ## Architecture
 
 ```
-browser ──> vishnu api (Fiber v3, :8080)
-            ├─ /api/auth/*           email + OTP login → session cookie
-            ├─ /api/projects*        project registry (Postgres)
-            ├─ /p/{pid}/v1/*         proxy → that project's crush server
-            │    ├─ project A: crush server tcp://127.0.0.1:9201
-            │    ├─ project B: crush server tcp://127.0.0.1:9202
-            │    └─ …spawned lazily on select, restarted on demand
-            └─ /*                    embedded SPA
+browser ──> vishnu web (nginx :80)      SPA + /api,/p proxy
+            └─> vishnu api (Fiber v3, :8080)
+                ├─ /api/auth/*           email + OTP login → session cookie
+                ├─ /api/projects*        project registry (Postgres)
+                └─ /p/{pid}/v1/*         proxy → that project's crush server
+                     ├─ project A: crush server tcp://127.0.0.1:9201
+                     ├─ project B: crush server tcp://127.0.0.1:9202
+                     └─ …spawned lazily on select, restarted on demand
 ```
 
 Key decisions:
@@ -48,9 +48,12 @@ vishnu/
   api/          Go module — Fiber v3 + Postgres/GORM, nexus-style
                 clean architecture (domain → repository → usecase →
                 handler), embedded SQL migrations, process manager,
-                git cloner, Brevo email, streaming proxy, embedded SPA
+                git cloner, Brevo email, streaming proxy
   web/          Vite + React 19 + TS — feature modules under
-                src/features/<domain>/, TanStack Query, Tailwind v4
+                src/features/<domain>/, TanStack Query, Tailwind v4;
+                Dockerfile + nginx.conf.template → nginx image serving
+                the SPA and proxying /api + /p (VISHNU_API_UPSTREAM
+                picks the api — any host/domain)
   contract/     @vishnu/api-contract — crush /v1 wire types + typed
                 SDK clients (workspaces, sessions, agent, config,
                 permissions, questions, events)
@@ -73,7 +76,7 @@ vishnu/
 **Production — everything in Docker**:
 
 ```bash
-# Builds the SPA + api + crush into one image, runs postgres + vishnu
+# Builds the web (nginx SPA) + api (+crush) images, runs postgres + both
 docker compose -f api/deploy/docker-compose.yml up -d --build
 # → http://127.0.0.1:8080 (loopback — tunnel/Tailscale for remote)
 
@@ -88,10 +91,12 @@ docker compose -f api/deploy/docker-compose.yml run --rm vishnu migrate status
 bun install && bun run build   # shared-ui → contract → web
 cd api
 make db && make migrate        # postgres + schema
-make dev                       # http://127.0.0.1:8080 (VISHNU_WEB_DIR=../web/dist)
+make dev                       # api on http://127.0.0.1:8080
 ```
 
-`cd web && bun run dev` gives Vite HMR on :5173 during UI work.
+The api serves no SPA — `cd web && bun run dev` (Vite HMR on :5173,
+proxies `/api` + `/p` to :8080) or the docker stack is how you reach
+the UI.
 
 ## Adding a project
 
@@ -118,7 +123,6 @@ files on disk are never touched.
 | `VISHNU_PROJECTS_DIR` | `$VISHNU_DATA_DIR/projects` | where GitHub clones land |
 | `VISHNU_CRUSH_BIN` | `crush` | binary spawned for managed projects |
 | `VISHNU_PORT_START` | `9201` | first port probed upward for crush servers |
-| `VISHNU_WEB_DIR` | embed | serve SPA from disk (dev) |
 | `BREVO_API_KEY` / `BREVO_API_URL` / `BREVO_FROM_EMAIL` / `BREVO_FROM_NAME` | — / `https://api.brevo.com` / — / — | OTP email delivery |
 | `VISHNU_BOOTSTRAP_EMAIL` | unset | first `admin` user, upserted at boot |
 | `VISHNU_SESSION_TTL` | `720h` | auth session lifetime |

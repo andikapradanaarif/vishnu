@@ -1,7 +1,7 @@
-// Command server runs the vishnu web API: a Fiber app that serves the
-// embedded SPA, exposes the project registry, and reverse-proxies
-// /p/{pid}/v1/* (including the SSE event stream) to that project's
-// `crush server`.
+// Command server runs the vishnu web API: a Fiber app that exposes the
+// project registry and reverse-proxies /p/{pid}/v1/* (including the SSE
+// event stream) to that project's `crush server`. The SPA is served
+// separately — vite in dev, the vishnu-web nginx image in docker.
 package main
 
 import (
@@ -71,12 +71,7 @@ func main() {
 	projectHandler := handler.NewProjectHandler(projects)
 	authHandler := handler.NewAuthHandler(auth)
 	userHandler := handler.NewUserHandler(auth)
-	proxy := handler.NewProxyHandler(repositories.Project, manager, service.NewProxy())
-	web, err := handler.NewWebHandler(cfg.WebDir)
-	if err != nil {
-		slog.Error("Failed to init web handler", "error", err)
-		os.Exit(1)
-	}
+	proxy := handler.NewProxyHandler(repositories.Project, manager, crush, service.NewProxy())
 
 	app := fiber.New(fiber.Config{
 		// The agent accepts file contents in prompts; stay generous.
@@ -100,10 +95,6 @@ func main() {
 	// /p/{pid}/v1/workspaces/{id}/events. Auth is attached to the route
 	// itself so the middleware cannot leak onto unrelated /p… paths.
 	app.All("/p/:pid/v1/*", session, proxy.Forward)
-
-	// The SPA and its assets: public, because the shell renders the
-	// sign-in form and every API call behind it is authenticated.
-	app.Use("/", web.Handle)
 
 	slog.Info("Vishnu listening",
 		"addr", cfg.ListenAddr,

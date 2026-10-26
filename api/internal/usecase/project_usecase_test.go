@@ -153,16 +153,23 @@ func (f *fakeCloner) AllocDir(slug string) (string, error) {
 }
 
 type fakeWorkspaces struct {
-	id     string
-	err    error
-	calls  int
-	create bool
+	id         string
+	err        error
+	calls      int
+	create     bool
+	agentCalls int
+	agentErr   error
 }
 
 func (f *fakeWorkspaces) EnsureWorkspace(_ context.Context, _, _ string, create bool) (string, error) {
 	f.calls++
 	f.create = create
 	return f.id, f.err
+}
+
+func (f *fakeWorkspaces) EnsureAgent(_ context.Context, _, _ string) error {
+	f.agentCalls++
+	return f.agentErr
 }
 
 func newUsecase(repo *fakeRepo, proc *fakeProc, c *fakeCloner, ws *fakeWorkspaces) *ProjectUsecase {
@@ -459,6 +466,26 @@ func TestEnsureWorkspaceReturnsTheUpstreamWorkspace(t *testing.T) {
 	}
 	if workspace.WorkspaceID != "workspace-1" || workspace.Upstream != "http://127.0.0.1:9304" {
 		t.Fatalf("unexpected workspace: %+v", workspace)
+	}
+	if workspaces.agentCalls != 1 {
+		t.Fatalf("expected the agent coordinator to be ensured once, got %d", workspaces.agentCalls)
+	}
+}
+
+func TestEnsureWorkspacePropagatesAgentInitFailure(t *testing.T) {
+	repo := newFakeRepo()
+	proc := &fakeProc{upstream: "http://127.0.0.1:9304"}
+	agentErr := errors.New("agent coordinator not initialized")
+	workspaces := &fakeWorkspaces{id: "workspace-1", agentErr: agentErr}
+	usecase := newUsecase(repo, proc, &fakeCloner{}, workspaces)
+
+	linked, err := usecase.Create(context.Background(), dto.CreateProjectRequest{Path: t.TempDir()})
+	if err != nil {
+		t.Fatalf("create link: %v", err)
+	}
+
+	if _, err := usecase.EnsureWorkspace(context.Background(), linked.Project.ID); !errors.Is(err, agentErr) {
+		t.Fatalf("expected the agent init error, got %v", err)
 	}
 }
 

@@ -1,23 +1,8 @@
 # syntax=docker/dockerfile:1
 
-# Build context is the repository root: the SPA is built here so its output
-# can be embedded into the Go binary.
+# Build context is the repository root (for .dockerignore + api/ sources).
+# api-only image — the SPA ships in the separate vishnu-web nginx image.
 ARG CRUSH_VERSION=v0.98.1
-
-FROM oven/bun:1 AS web
-WORKDIR /src
-COPY package.json bun.lock ./
-COPY shared-ui/package.json shared-ui/
-COPY contract/package.json contract/
-COPY web/package.json web/
-# Only manifests are present here, so skip the workspaces' `prepare` hooks
-# (they shell out to scripts/ that arrives with the sources below); the
-# explicit `bun run build` builds every workspace in order.
-RUN bun install --frozen-lockfile --ignore-scripts
-COPY shared-ui/ shared-ui/
-COPY contract/ contract/
-COPY web/ web/
-RUN bun run build
 
 FROM golang:1.26-alpine AS api
 ENV GOTOOLCHAIN=local CGO_ENABLED=0
@@ -25,7 +10,6 @@ WORKDIR /src
 COPY api/go.mod api/go.sum ./
 RUN go mod download
 COPY api/ ./
-COPY --from=web /src/web/dist/ ./internal/webui/dist/
 RUN go build -trimpath -ldflags="-s -w" -o /out/vishnu-api ./cmd/server \
  && go build -trimpath -ldflags="-s -w" -o /out/migrate ./cmd/migrate
 
@@ -37,6 +21,17 @@ RUN go install github.com/charmbracelet/crush@${CRUSH_VERSION}
 
 FROM alpine:3.22
 RUN apk add --no-cache ca-certificates curl git openssh-client tzdata
+
+# The cloner only supports github.com — pin its published SSH host keys
+# (api.github.com/meta, fingerprints verified at authoring time) so
+# ls-remote/clone inside the container never depends on the mounted
+# ~/.ssh/known_hosts. The mount is still needed for the private key.
+RUN printf '%s\n' \
+	'github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl' \
+	'github.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEmKSENjQEezOmxkZMy7opKgwFB9nkt5YRrYMjNuG5N87uRgg6CLrbo5wAdT/y6v0mKV0U2w0WZ2YB/++Tpockg=' \
+	'github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk=' \
+	> /etc/ssh/ssh_known_hosts
+
 WORKDIR /app
 COPY --from=api /out/vishnu-api /out/migrate ./
 COPY --from=crush /go/bin/crush /usr/local/bin/crush
