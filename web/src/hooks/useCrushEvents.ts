@@ -45,7 +45,17 @@ export function useCrushEvents(workspaceId: string | undefined) {
 			} catch {
 				return;
 			}
-			dispatch(workspaceId, envelope, queryClient);
+			// Crush wraps every event's entity in a pubsub envelope:
+			// {"type":"message","payload":{"type":"created","payload":{…}}}.
+			// Unwrap it — the mock server sends the entity un-nested.
+			const inner = envelope.payload as { type?: unknown; payload?: unknown };
+			const wrapped =
+				inner !== null &&
+				typeof inner === "object" &&
+				(inner.type === "created" || inner.type === "updated" || inner.type === "deleted")
+					? inner.payload
+					: envelope.payload;
+			dispatch(workspaceId, envelope.type, wrapped, inner?.type, queryClient);
 		};
 
 		return () => {
@@ -55,22 +65,34 @@ export function useCrushEvents(workspaceId: string | undefined) {
 	}, [workspaceId, queryClient]);
 }
 
-function dispatch(workspaceId: string, evt: EventPayload, queryClient: QueryClient) {
-	switch (evt.type) {
+function dispatch(
+	workspaceId: string,
+	type: string,
+	payload: unknown,
+	innerType: unknown,
+	queryClient: QueryClient,
+) {
+	switch (type) {
 		case "message": {
-			const msg = evt.payload as Message;
+			const msg = payload as Message;
+			if (!msg?.session_id) break;
 			queryClient.setQueryData<Message[]>(
 				queryKeys.messages(workspaceId, msg.session_id),
-				(old) => mergeMessage(old ?? [], msg),
+				(old) =>
+					innerType === "deleted"
+						? (old ?? []).filter((m) => m.id !== msg.id)
+						: mergeMessage(old ?? [], msg),
 			);
-			pendingStore.setBusy(msg.session_id, true);
+			if (innerType !== "deleted") pendingStore.setBusy(msg.session_id, true);
 			break;
 		}
 		case "session": {
-			const s = evt.payload as Session;
+			const s = payload as Session;
+			if (!s?.id) break;
 			queryClient.setQueryData<Session[]>(queryKeys.sessions(workspaceId), (old) => {
 				const next = old ?? [];
 				const i = next.findIndex((x) => x.id === s.id);
+				if (innerType === "deleted") return i === -1 ? next : next.filter((x) => x.id !== s.id);
 				if (i === -1) return [...next, s];
 				const copy = [...next];
 				copy[i] = { ...copy[i], ...s };
@@ -79,7 +101,7 @@ function dispatch(workspaceId: string, evt: EventPayload, queryClient: QueryClie
 			break;
 		}
 		case "agent_event": {
-			const ev = evt.payload as AgentEvent;
+			const ev = payload as AgentEvent;
 			const sid = ev.session_id ?? ev.message?.session_id;
 			if (!sid) break;
 			if (ev.type === "error" || ev.done) pendingStore.setBusy(sid, false);
@@ -87,19 +109,19 @@ function dispatch(workspaceId: string, evt: EventPayload, queryClient: QueryClie
 			break;
 		}
 		case "permission_request":
-			pendingStore.addPermission(evt.payload as PermissionRequest);
+			pendingStore.addPermission(payload as PermissionRequest);
 			break;
 		case "permission_notification":
-			pendingStore.removePermission((evt.payload as PermissionNotification).tool_call_id);
+			pendingStore.removePermission((payload as PermissionNotification).tool_call_id);
 			break;
 		case "question_batch_request":
-			pendingStore.addQuestion(evt.payload as QuestionRequest);
+			pendingStore.addQuestion(payload as QuestionRequest);
 			break;
 		case "question_batch_notification":
-			pendingStore.removeQuestion((evt.payload as QuestionNotification).batch_id);
+			pendingStore.removeQuestion((payload as QuestionNotification).batch_id);
 			break;
 		case "run_complete": {
-			const rc = evt.payload as RunComplete;
+			const rc = payload as RunComplete;
 			pendingStore.setBusy(rc.session_id, false);
 			queryClient.invalidateQueries({
 				queryKey: queryKeys.messages(workspaceId, rc.session_id),
