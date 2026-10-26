@@ -1,11 +1,20 @@
 # nginx front for the vishnu SPA. Serves the static build and reverse-proxies
-# the API and per-project crush traffic to the api container — the browser
-# only ever talks to this service.
+# the API and per-project crush traffic — the browser only ever talks to
+# this service, no matter where the api lives.
 #
-# `proxy_pass $api` goes through the Docker resolver (127.0.0.11) so the
-# upstream is re-resolved per request; a recreated api container with a new
-# IP does not leave nginx proxying to a stale address.
-resolver 127.0.0.11 valid=10s ipv6=off;
+# envsubst'd at container start (official nginx entrypoint, restricted to
+# VISHNU_* vars via NGINX_ENVSUBST_FILTER):
+#   VISHNU_API_UPSTREAM  where /api, /p, /healthz forward — a compose-
+#                        network name (http://vishnu:8080, default) or any
+#                        reachable URL when the api sits elsewhere /
+#                        another domain (https://api.example.com)
+#   VISHNU_DNS_RESOLVER  resolver for upstream names — 127.0.0.11 inside
+#                        docker networks; a public resolver otherwise
+#
+# `proxy_pass $api` goes through the resolver so the upstream is
+# re-resolved per request; a recreated api container with a new IP does
+# not leave nginx proxying to a stale address.
+resolver ${VISHNU_DNS_RESOLVER} valid=10s ipv6=off;
 
 server {
 	listen 80;
@@ -21,13 +30,13 @@ server {
 	# Container health / external probes — forwarded to the api so the check
 	# covers the whole path, not just nginx.
 	location = /healthz {
-		set $api http://vishnu:8080;
+		set $api ${VISHNU_API_UPSTREAM};
 		proxy_pass $api;
 	}
 
 	# Vishnu API (projects registry, auth, config).
 	location /api/ {
-		set $api http://vishnu:8080;
+		set $api ${VISHNU_API_UPSTREAM};
 		proxy_pass $api;
 		proxy_http_version 1.1;
 		proxy_set_header Host $host;
@@ -42,7 +51,7 @@ server {
 	# or events arrive in chunks; the read timeout must outlive an idle
 	# stream.
 	location /p/ {
-		set $api http://vishnu:8080;
+		set $api ${VISHNU_API_UPSTREAM};
 		proxy_pass $api;
 		proxy_http_version 1.1;
 		proxy_set_header Host $host;

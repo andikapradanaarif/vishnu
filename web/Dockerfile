@@ -20,7 +20,14 @@ RUN bun run build
 
 FROM nginx:alpine
 COPY --from=build /src/web/dist /usr/share/nginx/html
-COPY web/nginx.conf /etc/nginx/conf.d/default.conf
+# The stock entrypoint envsubsts /etc/nginx/templates/*.template into
+# /etc/nginx/conf.d at start; the filter keeps nginx's own $vars literal.
+# VISHNU_API_UPSTREAM points at the api — a compose-network name here, or
+# any reachable URL when it lives on another host/domain.
+ENV VISHNU_API_UPSTREAM=http://vishnu:8080 \
+	VISHNU_DNS_RESOLVER=127.0.0.11 \
+	NGINX_ENVSUBST_FILTER=VISHNU
+COPY web/nginx.conf.template /etc/nginx/templates/default.conf.template
 EXPOSE 80
 HEALTHCHECK --interval=10s --timeout=3s --start-period=10s --retries=3 \
   CMD wget -q -O /dev/null http://127.0.0.1/healthz || exit 1
