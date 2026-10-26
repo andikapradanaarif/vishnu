@@ -33,6 +33,7 @@ export const queryKeys = {
 	providers: (wid: string) => ["providers", wid] as const,
 	config: (wid: string) => ["config", wid] as const,
 	permissionsSkip: (wid: string) => ["permissions-skip", wid] as const,
+	needsInit: (wid: string) => ["needs-init", wid] as const,
 };
 
 // ---------- Vishnu control plane ----------
@@ -170,6 +171,14 @@ export function usePermissionsSkip(wid: string | undefined) {
 	});
 }
 
+export function useNeedsInit(wid: string | undefined) {
+	return useQuery({
+		queryKey: queryKeys.needsInit(wid ?? ""),
+		queryFn: () => workspacesClient.needsInit(wid!),
+		enabled: !!wid,
+	});
+}
+
 // ---------- Mutations ----------
 
 export function useCreateSession(wid: string | undefined) {
@@ -257,6 +266,57 @@ export function useSetModel(wid: string | undefined) {
 			qc.invalidateQueries({ queryKey: queryKeys.agent(wid!) });
 			qc.invalidateQueries({ queryKey: queryKeys.config(wid!) });
 		},
+	});
+}
+
+/**
+ * `/init` — fetch the project's init prompt, dispatch it as a normal
+ * agent run, then mark the workspace initialized. Needs a session id to
+ * run under, so the caller passes the current session.
+ */
+export function useInitProject(wid: string | undefined) {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationKey: ["project", "init"],
+		mutationFn: async (sid: string) => {
+			const { prompt } = await workspacesClient.initPrompt(wid!);
+			await agentClient.sendPrompt(wid!, {
+				session_id: sid,
+				prompt,
+				run_id: crypto.randomUUID(),
+			});
+			await workspacesClient.markInitialized(wid!);
+			return sid;
+		},
+		onSuccess: (sid) => {
+			pendingStore.setBusy(sid, true);
+			qc.invalidateQueries({ queryKey: queryKeys.needsInit(wid!) });
+		},
+	});
+}
+
+/** `/summarize` — compact the current session. */
+export function useSummarize(wid: string | undefined) {
+	return useMutation({
+		mutationKey: ["agent", "summarize"],
+		mutationFn: (sid: string) => agentClient.summarize(wid!, sid),
+	});
+}
+
+/** `/shell <cmd>` — run a shell command in the workspace. */
+export function useRunShell(wid: string | undefined) {
+	return useMutation({
+		mutationKey: ["agent", "shell"],
+		mutationFn: ({ sid, command }: { sid: string; command: string }) =>
+			agentClient.runShell(wid!, sid, command),
+	});
+}
+
+/** `/clear` — drop queued prompts for the session. */
+export function useClearPrompts(wid: string | undefined) {
+	return useMutation({
+		mutationKey: ["agent", "clear-prompts"],
+		mutationFn: (sid: string) => agentClient.clearPrompts(wid!, sid),
 	});
 }
 
