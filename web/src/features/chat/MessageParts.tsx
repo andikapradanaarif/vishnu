@@ -54,7 +54,7 @@ export function MessagePart({ part, role }: { part: ContentPart; role: Message["
 					{plan && <div className="mt-1"><TodoList todos={plan} /></div>}
 					{!plan && call.input && (
 						<details className="mt-1">
-							<summary className="cursor-pointer font-display text-xs text-ghost select-none">
+							<summary className="cursor-pointer font-display text-sm text-ghost select-none">
 								input
 							</summary>
 							<pre className="mt-1 overflow-x-auto font-mono text-[13px] text-on-surface-muted">
