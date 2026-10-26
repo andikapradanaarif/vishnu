@@ -34,8 +34,10 @@ type AgentEnsurer interface {
 // ProxyHandler forwards /p/{pid}/v1/* requests to that project's crush
 // server. Responses — including the SSE event stream — are streamed
 // through a bufio writer with a flush per read so events are delivered as
-// they arrive. The project is resolved per request from the registry, so
-// only the upstream lookup is dynamic; the streaming mechanics are not.
+// they arrive; SSE responses additionally get keepalive comments injected
+// during idle gaps so intermediate proxies don't cut the stream. The
+// project is resolved per request from the registry, so only the upstream
+// lookup is dynamic; the streaming mechanics are not.
 type ProxyHandler struct {
 	projects  ProjectLocator
 	proc      UpstreamResolver
@@ -133,14 +135,43 @@ func (h *ProxyHandler) Forward(c fiber.Ctx) error {
 	}
 	c.Set("X-Accel-Buffering", "no")
 
+	isSSE := strings.HasPrefix(resp.Header.Get("Content-Type"), "text/event-stream")
+
 	return c.SendStreamWriter(func(w *bufio.Writer) {
 		defer func() {
 			_ = resp.Body.Close()
 			cancel()
 		}()
+		if !isSSE {
+			streamCopy(w, resp.Body, nil)
+			return
+		}
+		// Crush emits no keepalives — between events the stream is fully
+		// silent and every proxy in the chain with a read timeout will
+		// cut it. SSE comment lines are ignored by EventSource but reset
+		// those idle timers, so the connection survives any hop.
+		streamCopy(w, resp.Body, func() bool {
+			if _, err := w.WriteString(": vishnu-keepalive\n\n"); err != nil {
+				return false
+			}
+			return w.Flush() == nil
+		})
+	})
+}
+
+// sseKeepaliveInterval must stay comfortably under the shortest
+// read-timeout commonly found in front of the stream (nginx and most
+// reverse proxies default to 60s).
+const sseKeepaliveInterval = 15 * time.Second
+
+// streamCopy forwards resp.Body to w with a flush per chunk. When
+// onIdle is set (SSE streams), it fires after every keepalive interval
+// without upstream data; returning false from it ends the copy.
+func streamCopy(w *bufio.Writer, body io.Reader, onIdle func() bool) {
+	if onIdle == nil {
 		buf := make([]byte, 32*1024)
 		for {
-			n, readErr := resp.Body.Read(buf)
+			n, readErr := body.Read(buf)
 			if n > 0 {
 				if _, writeErr := w.Write(buf[:n]); writeErr != nil {
 					return
@@ -156,7 +187,56 @@ func (h *ProxyHandler) Forward(c fiber.Ctx) error {
 				return
 			}
 		}
-	})
+	}
+
+	// The read goroutine copies each chunk into its own buffer before
+	// handing it over, so it can keep reading while w.Write drains.
+	type readResult struct {
+		data []byte
+		err  error
+	}
+	results := make(chan readResult, 1)
+	go func() {
+		buf := make([]byte, 32*1024)
+		for {
+			n, err := body.Read(buf)
+			var data []byte
+			if n > 0 {
+				data = make([]byte, n)
+				copy(data, buf[:n])
+			}
+			results <- readResult{data: data, err: err}
+			if err != nil {
+				return
+			}
+		}
+	}()
+
+	ticker := time.NewTicker(sseKeepaliveInterval)
+	defer ticker.Stop()
+	for {
+		select {
+		case r := <-results:
+			if len(r.data) > 0 {
+				if _, writeErr := w.Write(r.data); writeErr != nil {
+					return
+				}
+				if flushErr := w.Flush(); flushErr != nil {
+					return
+				}
+			}
+			if r.err != nil {
+				if r.err != io.EOF {
+					slog.Debug("Upstream stream ended", "error", r.err)
+				}
+				return
+			}
+		case <-ticker.C:
+			if !onIdle() {
+				return
+			}
+		}
+	}
 }
 
 // agentInitRecheck bounds how often a sessions-list request re-checks a
