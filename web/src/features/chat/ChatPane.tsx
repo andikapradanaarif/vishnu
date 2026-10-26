@@ -20,15 +20,40 @@ export function ChatPane({ wid, sid }: ChatPaneProps) {
 	const { busy, permissions, questions } = usePendingState();
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const pinned = useRef(true);
+	const hadMessages = useRef(false);
 
 	const sessionPermissions = permissions.filter((p) => p.session_id === sid);
 	const sessionQuestions = questions.filter((q) => q.session_id === sid);
 
-	// Keep the transcript pinned to the bottom while streaming or when a
-	// prompt arrives, unless the user has scrolled up.
+	// Opening a session lands on the latest message — the scroll must
+	// re-run a frame later because web fonts and images settle layout
+	// after first paint and would leave the view mid-transcript.
 	useEffect(() => {
-		if (pinned.current && scrollRef.current) {
-			scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+		pinned.current = true;
+		hadMessages.current = false;
+		const el = scrollRef.current;
+		if (!el) return;
+		el.scrollTop = el.scrollHeight;
+		const raf = requestAnimationFrame(() => {
+			el.scrollTop = el.scrollHeight;
+		});
+		return () => cancelAnimationFrame(raf);
+	}, [sid]);
+
+	// Keep the transcript pinned to the bottom while streaming or when a
+	// prompt arrives, unless the user has scrolled up. When the first
+	// content lands after a load, scroll once more a frame later for the
+	// same late-layout reason as the session-open effect.
+	useEffect(() => {
+		const el = scrollRef.current;
+		const firstContent = !hadMessages.current && (messages?.length ?? 0) > 0;
+		hadMessages.current = (messages?.length ?? 0) > 0;
+		if (!el || !pinned.current) return;
+		el.scrollTop = el.scrollHeight;
+		if (firstContent) {
+			requestAnimationFrame(() => {
+				el.scrollTop = el.scrollHeight;
+			});
 		}
 	}, [messages, sessionPermissions.length, sessionQuestions.length]);
 
