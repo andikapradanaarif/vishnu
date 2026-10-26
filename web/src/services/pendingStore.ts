@@ -58,6 +58,29 @@ export const pendingStore = {
 	setBusy(sessionId: string, busy: boolean) {
 		set({ busy: { ...state.busy, [sessionId]: busy } });
 	},
+	/**
+	 * Fold the server's `is_busy` values into the optimistic map and
+	 * drop flags for sessions that no longer exist — this is what lets
+	 * a run_complete missed while the stream was disconnected (tab
+	 * suspended, reconnect, proxy timeout) un-stick the spinner.
+	 */
+	reconcileBusy(truth: Record<string, boolean>) {
+		const busy = { ...state.busy };
+		let changed = false;
+		for (const [sid, v] of Object.entries(truth)) {
+			if (busy[sid] !== v) {
+				busy[sid] = v;
+				changed = true;
+			}
+		}
+		for (const sid of Object.keys(busy)) {
+			if (!(sid in truth) && busy[sid]) {
+				delete busy[sid];
+				changed = true;
+			}
+		}
+		if (changed) set({ busy });
+	},
 	setConn(conn: ConnState) {
 		set({ conn });
 	},

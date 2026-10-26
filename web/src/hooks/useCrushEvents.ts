@@ -13,7 +13,7 @@ import type {
 	RunComplete,
 	Session,
 } from "@vishnu/api-contract";
-import { queryKeys } from "@/hooks/queries";
+import { queryKeys, useSessions } from "@/hooks/queries";
 
 /**
  * Attaches the workspace SSE stream and fans events out to the query
@@ -21,6 +21,19 @@ import { queryKeys } from "@/hooks/queries";
  */
 export function useCrushEvents(workspaceId: string | undefined) {
 	const queryClient = useQueryClient();
+	const sessions = useSessions(workspaceId);
+
+	// The busy map is optimistic: if the stream drops mid-run (proxy
+	// timeout, tab suspend) run_complete is never seen and the flag
+	// sticks. Sessions carry crush's computed is_busy, so every list
+	// refresh — initial load, reconnect catch-up, session events —
+	// resets the map to server truth.
+	useEffect(() => {
+		if (!sessions.data) return;
+		pendingStore.reconcileBusy(
+			Object.fromEntries(sessions.data.map((s) => [s.id, s.is_busy])),
+		);
+	}, [sessions.data]);
 
 	useEffect(() => {
 		if (!workspaceId) return;
