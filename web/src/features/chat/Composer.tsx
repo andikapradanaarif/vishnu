@@ -210,7 +210,7 @@ export function Composer({ wid, sid, busy }: ComposerProps) {
 										: "text-on-surface-muted"
 								}`}
 							>
-								<span className="shrink-0 font-display text-sm text-primary-300">
+								<span className="shrink-0 font-display text-sm text-primary-400">
 									/{cmd.name}
 									{cmd.hint && <span className="text-ghost"> {cmd.hint}</span>}
 								</span>
