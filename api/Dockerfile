@@ -2,7 +2,9 @@
 
 # Build context is the repository root (for .dockerignore + api/ sources).
 # api-only image — the SPA ships in the separate vishnu-web nginx image.
-ARG CRUSH_VERSION=v0.98.1
+# Pinned fork commit + its `git describe` version — bump both together.
+ARG CRUSH_REF=55cade493eed76429179567b1d45881f8f59b9db
+ARG CRUSH_VERSION=v0.98.3-fork-4-g55cade493
 
 FROM golang:1.26-alpine AS api
 ENV GOTOOLCHAIN=local CGO_ENABLED=0
@@ -14,10 +16,23 @@ RUN go build -trimpath -ldflags="-s -w" -o /out/vishnu-api ./cmd/server \
  && go build -trimpath -ldflags="-s -w" -o /out/migrate ./cmd/migrate
 
 # crush's own go.mod requires a newer toolchain than the api module.
+# Build the fork — upstream rejects the crushrc's fork-only option keys
+# and exits. `go install` can't reach it (the fork keeps module
+# github.com/charmbracelet/crush), so fetch the pinned SHA and build.
 FROM golang:1.27-alpine AS crush
+ARG CRUSH_REF
 ARG CRUSH_VERSION
-ENV GOTOOLCHAIN=local CGO_ENABLED=0
-RUN go install github.com/charmbracelet/crush@${CRUSH_VERSION}
+ENV GOTOOLCHAIN=local CGO_ENABLED=0 GOEXPERIMENT=greenteagc
+RUN apk add --no-cache git
+RUN git init /src \
+ && cd /src \
+ && git remote add origin https://github.com/andikapradanaarif/crush \
+ && git fetch --depth 1 origin "$CRUSH_REF" \
+ && git checkout -q FETCH_HEAD \
+ && go build -buildvcs=false -trimpath -ldflags="-s -w \
+    -X github.com/charmbracelet/crush/internal/version.Version=${CRUSH_VERSION} \
+    -X github.com/charmbracelet/crush/internal/version.Commit=${CRUSH_REF}" \
+    -o /crush .
 
 FROM alpine:3.22
 RUN apk add --no-cache ca-certificates curl git openssh-client tzdata
@@ -34,7 +49,7 @@ RUN printf '%s\n' \
 
 WORKDIR /app
 COPY --from=api /out/vishnu-api /out/migrate ./
-COPY --from=crush /go/bin/crush /usr/local/bin/crush
+COPY --from=crush /crush /usr/local/bin/crush
 COPY api/entrypoint.sh ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
 
