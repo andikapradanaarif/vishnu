@@ -30,7 +30,7 @@ export function TodoList({ todos, stale }: TodoListProps) {
 			{todos.map((t, i) => (
 				<li key={i} className={`flex items-start gap-2 text-xs ${itemClass(t.status, stale)}`}>
 					<Icon icon={icon(t.status)} width={14} className="mt-0.5 shrink-0" />
-					<span className="min-w-0">
+					<span className="min-w-0 break-words">
 						{t.status === "in_progress" && t.active_form ? t.active_form : t.content}
 						{stale && t.status === "in_progress" && (
 							<span className="ml-1.5 text-ghost">(run ended)</span>

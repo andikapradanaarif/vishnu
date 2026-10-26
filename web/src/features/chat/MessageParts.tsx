@@ -23,7 +23,7 @@ export function MessagePart({ part, role }: { part: ContentPart; role: Message["
 			return role === "assistant" ? (
 				<Markdown>{text}</Markdown>
 			) : (
-				<p className="text-sm whitespace-pre-wrap text-on-surface">{text}</p>
+				<p className="text-sm whitespace-pre-wrap break-words text-on-surface">{text}</p>
 			);
 		}
 		case "reasoning": {
@@ -34,7 +34,7 @@ export function MessagePart({ part, role }: { part: ContentPart; role: Message["
 					<summary className="cursor-pointer font-display text-sm tracking-[0.15em] text-primary-400/80 select-none">
 						THINKING
 					</summary>
-					<p className="mt-2 font-mono whitespace-pre-wrap">{thinking}</p>
+					<p className="mt-2 font-mono whitespace-pre-wrap break-all">{thinking}</p>
 				</details>
 			);
 		}
@@ -57,7 +57,7 @@ export function MessagePart({ part, role }: { part: ContentPart; role: Message["
 							<summary className="cursor-pointer font-display text-sm text-ghost select-none">
 								input
 							</summary>
-							<pre className="mt-1 overflow-x-auto font-mono text-[13px] text-on-surface-muted">
+							<pre className="mt-1 overflow-x-auto font-mono text-[13px] whitespace-pre-wrap break-all text-on-surface-muted">
 								{clamp(prettyJson(call.input), 4000)}
 							</pre>
 						</details>
@@ -79,7 +79,7 @@ export function MessagePart({ part, role }: { part: ContentPart; role: Message["
 					<summary className="cursor-pointer font-display text-sm text-on-surface-muted select-none">
 						{res.name || "tool"} result{res.is_error ? " · error" : ""}
 					</summary>
-					<pre className="mt-1 max-h-64 overflow-auto font-mono text-[13px] whitespace-pre-wrap text-on-surface-muted">
+					<pre className="mt-1 max-h-64 overflow-auto font-mono text-[13px] whitespace-pre-wrap break-all text-on-surface-muted">
 						{clamp(res.content, 6000)}
 					</pre>
 				</details>
@@ -89,9 +89,9 @@ export function MessagePart({ part, role }: { part: ContentPart; role: Message["
 			const sh = part.data as { command: string; output: string };
 			return (
 				<div className="border border-border bg-surface-alt px-3 py-2 font-mono text-[13px]">
-					<div className="text-success-400">$ {sh.command}</div>
+					<div className="text-success-400 break-all">$ {sh.command}</div>
 					{sh.output && (
-						<pre className="mt-1 overflow-x-auto whitespace-pre-wrap text-on-surface-muted">
+						<pre className="mt-1 overflow-x-auto whitespace-pre-wrap break-all text-on-surface-muted">
 							{clamp(sh.output, 4000)}
 						</pre>
 					)}
