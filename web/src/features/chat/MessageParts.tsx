@@ -57,7 +57,7 @@ export function MessagePart({ part, role }: { part: ContentPart; role: Message["
 							<summary className="cursor-pointer font-display text-xs text-ghost select-none">
 								input
 							</summary>
-							<pre className="mt-1 overflow-x-auto font-mono text-[11px] text-on-surface-muted">
+							<pre className="mt-1 overflow-x-auto font-mono text-xs text-on-surface-muted">
 								{clamp(prettyJson(call.input), 4000)}
 							</pre>
 						</details>
@@ -79,7 +79,7 @@ export function MessagePart({ part, role }: { part: ContentPart; role: Message["
 					<summary className="cursor-pointer font-display text-xs text-on-surface-muted select-none">
 						{res.name || "tool"} result{res.is_error ? " · error" : ""}
 					</summary>
-					<pre className="mt-1 max-h-64 overflow-auto font-mono text-[11px] whitespace-pre-wrap text-on-surface-muted">
+					<pre className="mt-1 max-h-64 overflow-auto font-mono text-xs whitespace-pre-wrap text-on-surface-muted">
 						{clamp(res.content, 6000)}
 					</pre>
 				</details>

@@ -50,7 +50,7 @@ export function PermissionCard({ wid, request }: PermissionCardProps) {
 						<p className="mt-1 font-mono text-[11px] break-all text-ghost">{request.path}</p>
 					)}
 					{paramsText && (
-						<pre className="mt-2 max-h-32 overflow-auto border border-border bg-surface-alt p-2 font-mono text-[11px] whitespace-pre-wrap text-on-surface-muted">
+						<pre className="mt-2 max-h-32 overflow-auto border border-border bg-surface-alt p-2 font-mono text-xs whitespace-pre-wrap text-on-surface-muted">
 							{clamp(paramsText, 1200)}
 						</pre>
 					)}
