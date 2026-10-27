@@ -12,7 +12,7 @@ the API actually shipped — treat it as the contract's reference
 implementation. When doc and code disagree, the shipped code wins —
 the API is live.
 
-## Conventions (nexus-contract style — non-negotiable)
+## Conventions (non-negotiable)
 
 - Package `@vishnu/api-contract`, root `contract/`, TS strict.
 - One directory per domain: `src/<domain>/{index.ts,sdk.ts}` —

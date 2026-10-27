@@ -1,11 +1,11 @@
-# shared-ts Agent Rules
+# shared-ui Agent Rules
 
-These rules apply to files under `shared-ts/`.
+These rules apply to files under `shared-ui/`.
 
 ## Package Identity
 
-- **Package name**: `@nexus/ui-component`
-- **Repository folder**: `shared-ts`
+- **Package name**: `@vishnu/ui-component`
+- **Repository folder**: `shared-ui`
 
 ## Canonical Public API Sources
 
@@ -16,19 +16,19 @@ These rules apply to files under `shared-ts/`.
 
 The following entrypoints are supported for consumers:
 
-1. `@nexus/ui-component` — main barrel (all exports)
-2. `@nexus/ui-component/styles.css` — global stylesheet
-3. Per-component subpaths (e.g. `@nexus/ui-component/button`, `@nexus/ui-component/accordion`) — declared in `package.json#exports` and `scripts/build.sh`/`scripts/dev.sh`
+1. `@vishnu/ui-component` — main barrel (all exports)
+2. `@vishnu/ui-component/styles.css` — global stylesheet
+3. Per-component subpaths (e.g. `@vishnu/ui-component/button`, `@vishnu/ui-component/accordion`) — declared in `package.json#exports` and `scripts/build.sh`/`scripts/dev.sh`
 
 ## Import Policy
 
-- Use `@nexus/ui-component` for all JS/TS symbols.
-- Use `@nexus/ui-component/styles.css` for styles.
+- Use `@vishnu/ui-component` for all JS/TS symbols.
+- Use `@vishnu/ui-component/styles.css` for styles.
 - Do not document or suggest undeclared subpath imports unless `package.json#exports` is intentionally updated.
 
 ## Common Commands
 
-All commands run from the `shared-ts/` directory:
+All commands run from the `shared-ui/` directory:
 
 - `bun run build` — clean `dist/`, bundle with Bun, generate `.d.ts` via `tsc`.
 - `bun run dev` — watch mode (rebuild on change).
@@ -47,7 +47,7 @@ All commands run from the `shared-ts/` directory:
 ## Repository Layout
 
 ```
-shared-ts/
+shared-ui/
 ├── index.ts              # Public barrel — THE source of truth for exports
 ├── styles.css            # Global styles (shipped as styles.css entrypoint)
 ├── package.json          # Package config + exports map
@@ -107,11 +107,11 @@ Then run `bun run build` to verify.
 
 ## Preferred Skill
 
-- `shared-ts-sync-api` — wraps the full sync workflow (code changes → doc updates → build verification)
+- `shared-ui-sync-api` — wraps the full sync workflow (code changes → doc updates → build verification)
 
 ## General Rules
 
-- Keep changes localized to `shared-ts/`; do not touch `backend/` or `contract/`.
+- Keep changes localized to `shared-ui/`; do not touch `backend/` or `contract/`.
 - Run `bun run build` before committing.
 - Per-component subpath exports are declared in `package.json#exports` and wired in `scripts/build.sh` and `scripts/dev.sh`. Add new subpaths to all three files when adding a component.
 - The repository contains internal components/hooks/utils not exported from `index.ts` — their existence in source does not make them public API.

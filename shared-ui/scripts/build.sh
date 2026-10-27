@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Build script for shared-ts
+# Build script for shared-ui
 # This script bundles the library with Bun and generates TypeScript declarations
 
 set -e

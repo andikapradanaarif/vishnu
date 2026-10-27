@@ -18,7 +18,7 @@ const tailwindArgs = [process.execPath, "x", "@tailwindcss/cli", "-i", "playgrou
 // Initial build so the stylesheet exists before the first request.
 const initialCss = Bun.spawnSync(tailwindArgs, {stdio: ["ignore", "inherit", "inherit"]});
 if (initialCss.exitCode !== 0) {
-	console.error("Tailwind build failed — run `bun install` in shared-ts/ and retry.");
+	console.error("Tailwind build failed — run `bun install` in shared-ui/ and retry.");
 	process.exit(initialCss.exitCode);
 }
 

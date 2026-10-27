@@ -2,1165 +2,1165 @@
 	"schemaVersion": "1.0.0",
 	"generatedAt": "2026-10-17",
 	"package": {
-		"name": "@nexus/ui-component",
+		"name": "@vishnu/ui-component",
 		"version": "1.0.0"
 	},
 	"entrypoints": {
-		"module": "@nexus/ui-component",
-		"styles": "@nexus/ui-component/styles.css",
+		"module": "@vishnu/ui-component",
+		"styles": "@vishnu/ui-component/styles.css",
 		"subpaths": [
-			"@nexus/ui-component/accordion",
-			"@nexus/ui-component/actionBar",
-			"@nexus/ui-component/alert",
-			"@nexus/ui-component/breadcrumb",
-			"@nexus/ui-component/browserWarning",
-			"@nexus/ui-component/button",
-			"@nexus/ui-component/calendar",
-			"@nexus/ui-component/chip",
-			"@nexus/ui-component/clickOutside",
-			"@nexus/ui-component/dataList",
-			"@nexus/ui-component/dialog",
-			"@nexus/ui-component/drawer",
-			"@nexus/ui-component/emptyData",
-			"@nexus/ui-component/emptyState",
-			"@nexus/ui-component/form",
-			"@nexus/ui-component/hooks",
-			"@nexus/ui-component/input",
-			"@nexus/ui-component/loadingAnimation",
-			"@nexus/ui-component/menu",
-			"@nexus/ui-component/message",
-			"@nexus/ui-component/pagination",
-			"@nexus/ui-component/popover",
-			"@nexus/ui-component/progressBar",
-			"@nexus/ui-component/qrCode",
-			"@nexus/ui-component/rating",
-			"@nexus/ui-component/richTextEditor",
-			"@nexus/ui-component/slider",
-			"@nexus/ui-component/stepper",
-			"@nexus/ui-component/table",
-			"@nexus/ui-component/tabs",
-			"@nexus/ui-component/text",
-			"@nexus/ui-component/timePicker",
-			"@nexus/ui-component/tooltip",
-			"@nexus/ui-component/userImageIcon",
-			"@nexus/ui-component/utils",
-			"@nexus/ui-component/wrapper"
+			"@vishnu/ui-component/accordion",
+			"@vishnu/ui-component/actionBar",
+			"@vishnu/ui-component/alert",
+			"@vishnu/ui-component/breadcrumb",
+			"@vishnu/ui-component/browserWarning",
+			"@vishnu/ui-component/button",
+			"@vishnu/ui-component/calendar",
+			"@vishnu/ui-component/chip",
+			"@vishnu/ui-component/clickOutside",
+			"@vishnu/ui-component/dataList",
+			"@vishnu/ui-component/dialog",
+			"@vishnu/ui-component/drawer",
+			"@vishnu/ui-component/emptyData",
+			"@vishnu/ui-component/emptyState",
+			"@vishnu/ui-component/form",
+			"@vishnu/ui-component/hooks",
+			"@vishnu/ui-component/input",
+			"@vishnu/ui-component/loadingAnimation",
+			"@vishnu/ui-component/menu",
+			"@vishnu/ui-component/message",
+			"@vishnu/ui-component/pagination",
+			"@vishnu/ui-component/popover",
+			"@vishnu/ui-component/progressBar",
+			"@vishnu/ui-component/qrCode",
+			"@vishnu/ui-component/rating",
+			"@vishnu/ui-component/richTextEditor",
+			"@vishnu/ui-component/slider",
+			"@vishnu/ui-component/stepper",
+			"@vishnu/ui-component/table",
+			"@vishnu/ui-component/tabs",
+			"@vishnu/ui-component/text",
+			"@vishnu/ui-component/timePicker",
+			"@vishnu/ui-component/tooltip",
+			"@vishnu/ui-component/userImageIcon",
+			"@vishnu/ui-component/utils",
+			"@vishnu/ui-component/wrapper"
 		]
 	},
 	"exports": {
 		"componentsAndValues": [
 			{
 				"name": "ActionBar",
-				"import": "import {ActionBar} from \"@nexus/ui-component\"",
+				"import": "import {ActionBar} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/actionBar/ActionBar"
 			},
 			{
 				"name": "Breadcrumb",
-				"import": "import {Breadcrumb} from \"@nexus/ui-component\"",
+				"import": "import {Breadcrumb} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/breadcrumb/Breadcrumb"
 			},
 			{
 				"name": "Button",
-				"import": "import {Button} from \"@nexus/ui-component\"",
+				"import": "import {Button} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/button/Button"
 			},
 			{
 				"name": "ButtonGroup",
-				"import": "import {ButtonGroup} from \"@nexus/ui-component\"",
+				"import": "import {ButtonGroup} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/button/ButtonGroup"
 			},
 			{
 				"name": "BrowserNotSupportedDialog",
-				"import": "import {BrowserNotSupportedDialog} from \"@nexus/ui-component\"",
+				"import": "import {BrowserNotSupportedDialog} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/browserWarning/BrowserNotSupportedDialog"
 			},
 			{
 				"name": "Calendar",
-				"import": "import {Calendar} from \"@nexus/ui-component\"",
+				"import": "import {Calendar} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/calendar/Calendar"
 			},
 			{
 				"name": "Chip",
-				"import": "import {Chip} from \"@nexus/ui-component\"",
+				"import": "import {Chip} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/chip/Chip"
 			},
 			{
 				"name": "DataList",
-				"import": "import {DataList} from \"@nexus/ui-component\"",
+				"import": "import {DataList} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/dataList/DataList"
 			},
 			{
 				"name": "Dialog",
-				"import": "import {Dialog} from \"@nexus/ui-component\"",
+				"import": "import {Dialog} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/dialog/Dialog"
 			},
 			{
 				"name": "Drawer",
-				"import": "import {Drawer} from \"@nexus/ui-component\"",
+				"import": "import {Drawer} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/drawer/Drawer"
 			},
 			{
 				"name": "Input",
-				"import": "import {Input} from \"@nexus/ui-component\"",
+				"import": "import {Input} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/Input",
 				"sourceExport": "default"
 			},
 			{
 				"name": "PasswordInput",
-				"import": "import {PasswordInput} from \"@nexus/ui-component\"",
+				"import": "import {PasswordInput} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/PasswordInput",
 				"sourceExport": "default"
 			},
 			{
 				"name": "Message",
-				"import": "import {Message} from \"@nexus/ui-component\"",
+				"import": "import {Message} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/message/Message",
 				"sourceExport": "default"
 			},
 			{
 				"name": "Pagination",
-				"import": "import {Pagination} from \"@nexus/ui-component\"",
+				"import": "import {Pagination} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/pagination/Pagination"
 			},
 			{
 				"name": "Popover",
-				"import": "import {Popover} from \"@nexus/ui-component\"",
+				"import": "import {Popover} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/popover/Popover"
 			},
 			{
 				"name": "RichDescription",
-				"import": "import {RichDescription} from \"@nexus/ui-component\"",
+				"import": "import {RichDescription} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/richDescription/RichDescription"
 			},
 			{
 				"name": "Table",
-				"import": "import {Table} from \"@nexus/ui-component\"",
+				"import": "import {Table} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/table/Table"
 			},
 			{
 				"name": "Tooltip",
-				"import": "import {Tooltip} from \"@nexus/ui-component\"",
+				"import": "import {Tooltip} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/tooltip/Tooltip"
 			},
 			{
 				"name": "Select",
-				"import": "import {Select} from \"@nexus/ui-component\"",
+				"import": "import {Select} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/Select",
 				"sourceExport": "default"
 			},
 			{
 				"name": "TextAreaInput",
-				"import": "import {TextAreaInput} from \"@nexus/ui-component\"",
+				"import": "import {TextAreaInput} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/TextAreaInput",
 				"sourceExport": "default"
 			},
 			{
 				"name": "Tabs",
-				"import": "import {Tabs} from \"@nexus/ui-component\"",
+				"import": "import {Tabs} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/tabs/Tabs",
 				"sourceExport": "default"
 			},
 			{
 				"name": "Checkbox",
-				"import": "import {Checkbox} from \"@nexus/ui-component\"",
+				"import": "import {Checkbox} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/Checkbox"
 			},
 			{
 				"name": "Switch",
-				"import": "import {Switch} from \"@nexus/ui-component\"",
+				"import": "import {Switch} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/Switch"
 			},
 			{
 				"name": "Radio",
-				"import": "import {Radio} from \"@nexus/ui-component\"",
+				"import": "import {Radio} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/Radio"
 			},
 			{
 				"name": "DatePicker",
-				"import": "import {DatePicker} from \"@nexus/ui-component\"",
+				"import": "import {DatePicker} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/DatePicker"
 			},
 			{
 				"name": "DateRangePicker",
-				"import": "import {DateRangePicker} from \"@nexus/ui-component\"",
+				"import": "import {DateRangePicker} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/DateRangePicker"
 			},
 			{
 				"name": "MultipleSelect",
-				"import": "import {MultipleSelect} from \"@nexus/ui-component\"",
+				"import": "import {MultipleSelect} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/MultipleSelect",
 				"sourceExport": "default"
 			},
 			{
 				"name": "SearchInput",
-				"import": "import {SearchInput} from \"@nexus/ui-component\"",
+				"import": "import {SearchInput} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/SearchInput",
 				"sourceExport": "default"
 			},
 			{
 				"name": "SegmentedControl",
-				"import": "import {SegmentedControl} from \"@nexus/ui-component\"",
+				"import": "import {SegmentedControl} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/SegmentedControl"
 			},
 			{
 				"name": "LoadingAnimation",
-				"import": "import {LoadingAnimation} from \"@nexus/ui-component\"",
+				"import": "import {LoadingAnimation} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/loadingAnimation/LoadingDots"
 			},
 			{
 				"name": "LoadingSpinner",
-				"import": "import {LoadingSpinner} from \"@nexus/ui-component\"",
+				"import": "import {LoadingSpinner} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/loadingAnimation/LoadingSpinner",
 				"sourceExport": "default"
 			},
 			{
 				"name": "FormValidator",
-				"import": "import {FormValidator} from \"@nexus/ui-component\"",
+				"import": "import {FormValidator} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/form/FormValidator",
 				"sourceExport": "default"
 			},
 			{
 				"name": "PasswordFormValidator",
-				"import": "import {PasswordFormValidator} from \"@nexus/ui-component\"",
+				"import": "import {PasswordFormValidator} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/form/PasswordFormValidator",
 				"sourceExport": "default"
 			},
 			{
 				"name": "DateTimeValidator",
-				"import": "import {DateTimeValidator} from \"@nexus/ui-component\"",
+				"import": "import {DateTimeValidator} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/form/DateTimeValidator"
 			},
 			{
 				"name": "TimeTrackingValidator",
-				"import": "import {TimeTrackingValidator} from \"@nexus/ui-component\"",
+				"import": "import {TimeTrackingValidator} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/form/TimeTrackingValidator",
 				"sourceExport": "default"
 			},
 			{
 				"name": "Title",
-				"import": "import {Title} from \"@nexus/ui-component\"",
+				"import": "import {Title} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/text/Title",
 				"sourceExport": "default"
 			},
 			{
 				"name": "Subtitle",
-				"import": "import {Subtitle} from \"@nexus/ui-component\"",
+				"import": "import {Subtitle} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/text/Subtitle",
 				"sourceExport": "default"
 			},
 			{
 				"name": "Caption",
-				"import": "import {Caption} from \"@nexus/ui-component\"",
+				"import": "import {Caption} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/text/Caption",
 				"sourceExport": "default"
 			},
 			{
 				"name": "Paragraph",
-				"import": "import {Paragraph} from \"@nexus/ui-component\"",
+				"import": "import {Paragraph} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/text/Paragraph",
 				"sourceExport": "default"
 			},
 			{
 				"name": "Rating",
-				"import": "import {Rating} from \"@nexus/ui-component\"",
+				"import": "import {Rating} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/rating/Rating"
 			},
 			{
 				"name": "ProgressBar",
-				"import": "import {ProgressBar} from \"@nexus/ui-component\"",
+				"import": "import {ProgressBar} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/progressBar/ProgressBar"
 			},
 			{
 				"name": "CircularProgress",
-				"import": "import {CircularProgress} from \"@nexus/ui-component\"",
+				"import": "import {CircularProgress} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/progressBar/CircularProgress"
 			},
 			{
 				"name": "PageTitle",
-				"import": "import {PageTitle} from \"@nexus/ui-component\"",
+				"import": "import {PageTitle} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/text/PageTitle",
 				"sourceExport": "default"
 			},
 			{
 				"name": "Alert",
-				"import": "import {Alert} from \"@nexus/ui-component\"",
+				"import": "import {Alert} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/alert/Alert",
 				"sourceExport": "default"
 			},
 			{
 				"name": "AlertInline",
-				"import": "import {AlertInline} from \"@nexus/ui-component\"",
+				"import": "import {AlertInline} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/alert/AlertInline",
 				"sourceExport": "default"
 			},
 			{
 				"name": "AlertToast",
-				"import": "import {AlertToast} from \"@nexus/ui-component\"",
+				"import": "import {AlertToast} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/alert/AlertToast",
 				"sourceExport": "default"
 			},
 			{
 				"name": "ClickOutside",
-				"import": "import {ClickOutside} from \"@nexus/ui-component\"",
+				"import": "import {ClickOutside} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/clickOutside/ClickOutSide"
 			},
 			{
 				"name": "Skeleton",
-				"import": "import {Skeleton} from \"@nexus/ui-component\"",
+				"import": "import {Skeleton} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/loadingAnimation/Skeleton",
 				"sourceExport": "default"
 			},
 			{
 				"name": "MenuItem",
-				"import": "import {MenuItem} from \"@nexus/ui-component\"",
+				"import": "import {MenuItem} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/menu/MenuItem",
 				"sourceExport": "default"
 			},
 			{
 				"name": "MenuLink",
-				"import": "import {MenuLink} from \"@nexus/ui-component\"",
+				"import": "import {MenuLink} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/menu/MenuLink"
 			},
 			{
 				"name": "UserImageIcon",
-				"import": "import {UserImageIcon} from \"@nexus/ui-component\"",
+				"import": "import {UserImageIcon} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/userImageIcon/UserImageIcon",
 				"sourceExport": "default"
 			},
 			{
 				"name": "UserAvatarFallback",
-				"import": "import {UserAvatarFallback} from \"@nexus/ui-component\"",
+				"import": "import {UserAvatarFallback} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/userImageIcon/UserAvatarFallback"
 			},
 			{
 				"name": "ContentWrapper",
-				"import": "import {ContentWrapper} from \"@nexus/ui-component\"",
+				"import": "import {ContentWrapper} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/wrapper/ContentWrapper",
 				"sourceExport": "default"
 			},
 			{
 				"name": "PageWrapper",
-				"import": "import {PageWrapper} from \"@nexus/ui-component\"",
+				"import": "import {PageWrapper} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/wrapper/PageWrapper",
 				"sourceExport": "default"
 			},
 			{
 				"name": "FormList",
-				"import": "import {FormList} from \"@nexus/ui-component\"",
+				"import": "import {FormList} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/form/FormList"
 			},
 			{
 				"name": "TimePicker",
-				"import": "import {TimePicker} from \"@nexus/ui-component\"",
+				"import": "import {TimePicker} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/timePicker/TimePicker",
 				"sourceExport": "default"
 			},
 			{
 				"name": "delay",
-				"import": "import {delay} from \"@nexus/ui-component\"",
+				"import": "import {delay} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./utils/async"
 			},
 			{
 				"name": "getStringHash",
-				"import": "import {getStringHash} from \"@nexus/ui-component\"",
+				"import": "import {getStringHash} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./utils/string"
 			},
 			{
 				"name": "decodeHtml",
-				"import": "import {decodeHtml} from \"@nexus/ui-component\"",
+				"import": "import {decodeHtml} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./utils/string"
 			},
 			{
 				"name": "getFullName",
-				"import": "import {getFullName} from \"@nexus/ui-component\"",
+				"import": "import {getFullName} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./utils/string"
 			},
 			{
 				"name": "pasteFromClipboard",
-				"import": "import {pasteFromClipboard} from \"@nexus/ui-component\"",
+				"import": "import {pasteFromClipboard} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./utils/string"
 			},
 			{
 				"name": "getLocaledDateTimeString",
-				"import": "import {getLocaledDateTimeString} from \"@nexus/ui-component\"",
+				"import": "import {getLocaledDateTimeString} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./utils/time"
 			},
 			{
 				"name": "stringComparisonFn",
-				"import": "import {stringComparisonFn} from \"@nexus/ui-component\"",
+				"import": "import {stringComparisonFn} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./utils/sorting"
 			},
 			{
 				"name": "numberComparisonFn",
-				"import": "import {numberComparisonFn} from \"@nexus/ui-component\"",
+				"import": "import {numberComparisonFn} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./utils/sorting"
 			},
 			{
 				"name": "dateComparisonFn",
-				"import": "import {dateComparisonFn} from \"@nexus/ui-component\"",
+				"import": "import {dateComparisonFn} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./utils/sorting"
 			},
 			{
 				"name": "downloadUrlViaDOM",
-				"import": "import {downloadUrlViaDOM} from \"@nexus/ui-component\"",
+				"import": "import {downloadUrlViaDOM} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./utils/download"
 			},
 			{
 				"name": "dataSourceFormatter",
-				"import": "import {dataSourceFormatter} from \"@nexus/ui-component\"",
+				"import": "import {dataSourceFormatter} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./utils/table"
 			},
 			{
 				"name": "EMPTY_RICH_TEXT_VALUE",
-				"import": "import {EMPTY_RICH_TEXT_VALUE} from \"@nexus/ui-component\"",
+				"import": "import {EMPTY_RICH_TEXT_VALUE} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./utils/richText"
 			},
 			{
 				"name": "createEmptyRichTextValue",
-				"import": "import {createEmptyRichTextValue} from \"@nexus/ui-component\"",
+				"import": "import {createEmptyRichTextValue} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./utils/richText"
 			},
 			{
 				"name": "serializeRichText",
-				"import": "import {serializeRichText} from \"@nexus/ui-component\"",
+				"import": "import {serializeRichText} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./utils/richText"
 			},
 			{
 				"name": "deserializeRichText",
-				"import": "import {deserializeRichText} from \"@nexus/ui-component\"",
+				"import": "import {deserializeRichText} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./utils/richText"
 			},
 			{
 				"name": "isRichTextEmpty",
-				"import": "import {isRichTextEmpty} from \"@nexus/ui-component\"",
+				"import": "import {isRichTextEmpty} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./utils/richText"
 			},
 			{
 				"name": "serializeRichTextToHtml",
-				"import": "import {serializeRichTextToHtml} from \"@nexus/ui-component\"",
+				"import": "import {serializeRichTextToHtml} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./utils/richText"
 			},
 			{
 				"name": "useDebounce",
-				"import": "import {useDebounce} from \"@nexus/ui-component\"",
+				"import": "import {useDebounce} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./hooks/useDebounce"
 			},
 			{
 				"name": "useDebounceFunc",
-				"import": "import {useDebounceFunc} from \"@nexus/ui-component\"",
+				"import": "import {useDebounceFunc} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./hooks/useDebounce"
 			},
 			{
 				"name": "useTimer",
-				"import": "import {useTimer} from \"@nexus/ui-component\"",
+				"import": "import {useTimer} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./hooks/useTimer"
 			},
 			{
 				"name": "useBrowserSupport",
-				"import": "import {useBrowserSupport} from \"@nexus/ui-component\"",
+				"import": "import {useBrowserSupport} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./hooks/useBrowserSupport"
 			},
 			{
 				"name": "useRichTextField",
-				"import": "import {useRichTextField} from \"@nexus/ui-component\"",
+				"import": "import {useRichTextField} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./hooks/useRichTextField"
 			},
 			{
 				"name": "Accordion",
-				"import": "import {Accordion} from \"@nexus/ui-component\"",
+				"import": "import {Accordion} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/accordion/Accordion"
 			},
 			{
 				"name": "EmptyData",
-				"import": "import {EmptyData} from \"@nexus/ui-component\"",
+				"import": "import {EmptyData} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/emptyData/EmptyData"
 			},
 			{
 				"name": "QrCode",
-				"import": "import {QrCode} from \"@nexus/ui-component\"",
+				"import": "import {QrCode} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/qrCode/QrCode"
 			},
 			{
 				"name": "Stepper",
-				"import": "import {Stepper} from \"@nexus/ui-component\"",
+				"import": "import {Stepper} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/stepper/Stepper"
 			},
 			{
 				"name": "Slider",
-				"import": "import {Slider} from \"@nexus/ui-component\"",
+				"import": "import {Slider} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/slider/Slider"
 			},
 			{
 				"name": "RichTextEditor",
-				"import": "import {RichTextEditor} from \"@nexus/ui-component\"",
+				"import": "import {RichTextEditor} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/richTextEditor/RichTextEditor",
 				"sourceExport": "default"
 			},
 			{
 				"name": "filterTree",
-				"import": "import {filterTree} from \"@nexus/ui-component/utils\"",
+				"import": "import {filterTree} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/array"
 			},
 			{
 				"name": "flatten",
-				"import": "import {flatten} from \"@nexus/ui-component/utils\"",
+				"import": "import {flatten} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/array"
 			},
 			{
 				"name": "isSameTime",
-				"import": "import {isSameTime} from \"@nexus/ui-component/utils\"",
+				"import": "import {isSameTime} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "intlFormatDate",
-				"import": "import {intlFormatDate} from \"@nexus/ui-component/utils\"",
+				"import": "import {intlFormatDate} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "intlFormatDateWithTime",
-				"import": "import {intlFormatDateWithTime} from \"@nexus/ui-component/utils\"",
+				"import": "import {intlFormatDateWithTime} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "shortWeekNames",
-				"import": "import {shortWeekNames} from \"@nexus/ui-component/utils\"",
+				"import": "import {shortWeekNames} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "monthsNames",
-				"import": "import {monthsNames} from \"@nexus/ui-component/utils\"",
+				"import": "import {monthsNames} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "getYearsUntilNow",
-				"import": "import {getYearsUntilNow} from \"@nexus/ui-component/utils\"",
+				"import": "import {getYearsUntilNow} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "listYears",
-				"import": "import {listYears} from \"@nexus/ui-component/utils\"",
+				"import": "import {listYears} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "getStartOfDay",
-				"import": "import {getStartOfDay} from \"@nexus/ui-component/utils\"",
+				"import": "import {getStartOfDay} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "getEndOfDay",
-				"import": "import {getEndOfDay} from \"@nexus/ui-component/utils\"",
+				"import": "import {getEndOfDay} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "getStartOfMonth",
-				"import": "import {getStartOfMonth} from \"@nexus/ui-component/utils\"",
+				"import": "import {getStartOfMonth} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "getEndOfMonth",
-				"import": "import {getEndOfMonth} from \"@nexus/ui-component/utils\"",
+				"import": "import {getEndOfMonth} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "getStartOfWeek",
-				"import": "import {getStartOfWeek} from \"@nexus/ui-component/utils\"",
+				"import": "import {getStartOfWeek} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "getEndOfWeek",
-				"import": "import {getEndOfWeek} from \"@nexus/ui-component/utils\"",
+				"import": "import {getEndOfWeek} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "getStartOfYear",
-				"import": "import {getStartOfYear} from \"@nexus/ui-component/utils\"",
+				"import": "import {getStartOfYear} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "getEndOfYear",
-				"import": "import {getEndOfYear} from \"@nexus/ui-component/utils\"",
+				"import": "import {getEndOfYear} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "getDateBeforeMonths",
-				"import": "import {getDateBeforeMonths} from \"@nexus/ui-component/utils\"",
+				"import": "import {getDateBeforeMonths} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "addDays",
-				"import": "import {addDays} from \"@nexus/ui-component/utils\"",
+				"import": "import {addDays} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "subDays",
-				"import": "import {subDays} from \"@nexus/ui-component/utils\"",
+				"import": "import {subDays} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "addWeeks",
-				"import": "import {addWeeks} from \"@nexus/ui-component/utils\"",
+				"import": "import {addWeeks} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "addMonths",
-				"import": "import {addMonths} from \"@nexus/ui-component/utils\"",
+				"import": "import {addMonths} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "addYears",
-				"import": "import {addYears} from \"@nexus/ui-component/utils\"",
+				"import": "import {addYears} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "getFormattedTimeString",
-				"import": "import {getFormattedTimeString} from \"@nexus/ui-component/utils\"",
+				"import": "import {getFormattedTimeString} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "getFormattedDateString",
-				"import": "import {getFormattedDateString} from \"@nexus/ui-component/utils\"",
+				"import": "import {getFormattedDateString} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "getDurationBetweenDates",
-				"import": "import {getDurationBetweenDates} from \"@nexus/ui-component/utils\"",
+				"import": "import {getDurationBetweenDates} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "mergeDateAndTime",
-				"import": "import {mergeDateAndTime} from \"@nexus/ui-component/utils\"",
+				"import": "import {mergeDateAndTime} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "formatDateToLocalizedString",
-				"import": "import {formatDateToLocalizedString} from \"@nexus/ui-component/utils\"",
+				"import": "import {formatDateToLocalizedString} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "pad",
-				"import": "import {pad} from \"@nexus/ui-component/utils\"",
+				"import": "import {pad} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "formatDuration",
-				"import": "import {formatDuration} from \"@nexus/ui-component/utils\"",
+				"import": "import {formatDuration} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "getDayDescription",
-				"import": "import {getDayDescription} from \"@nexus/ui-component/utils\"",
+				"import": "import {getDayDescription} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "getDurationMs",
-				"import": "import {getDurationMs} from \"@nexus/ui-component/utils\"",
+				"import": "import {getDurationMs} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "formatTime",
-				"import": "import {formatTime} from \"@nexus/ui-component/utils\"",
+				"import": "import {formatTime} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "formatDate",
-				"import": "import {formatDate} from \"@nexus/ui-component/utils\"",
+				"import": "import {formatDate} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "formatMonthYear",
-				"import": "import {formatMonthYear} from \"@nexus/ui-component/utils\"",
+				"import": "import {formatMonthYear} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "formatYear",
-				"import": "import {formatYear} from \"@nexus/ui-component/utils\"",
+				"import": "import {formatYear} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "formatDateRange",
-				"import": "import {formatDateRange} from \"@nexus/ui-component/utils\"",
+				"import": "import {formatDateRange} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "roundUpToNearestByMinutes",
-				"import": "import {roundUpToNearestByMinutes} from \"@nexus/ui-component/utils\"",
+				"import": "import {roundUpToNearestByMinutes} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "roundToNearestByMinutes",
-				"import": "import {roundToNearestByMinutes} from \"@nexus/ui-component/utils\"",
+				"import": "import {roundToNearestByMinutes} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "addHours",
-				"import": "import {addHours} from \"@nexus/ui-component/utils\"",
+				"import": "import {addHours} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "formatRelativeDate",
-				"import": "import {formatRelativeDate} from \"@nexus/ui-component/utils\"",
+				"import": "import {formatRelativeDate} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/date"
 			},
 			{
 				"name": "validator",
-				"import": "import {validator} from \"@nexus/ui-component/utils\"",
+				"import": "import {validator} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/form"
 			},
 			{
 				"name": "passwordValidator",
-				"import": "import {passwordValidator} from \"@nexus/ui-component/utils\"",
+				"import": "import {passwordValidator} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/form"
 			},
 			{
 				"name": "startTimeValidator",
-				"import": "import {startTimeValidator} from \"@nexus/ui-component/utils\"",
+				"import": "import {startTimeValidator} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/form"
 			},
 			{
 				"name": "endTimeValidator",
-				"import": "import {endTimeValidator} from \"@nexus/ui-component/utils\"",
+				"import": "import {endTimeValidator} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/form"
 			},
 			{
 				"name": "createRipple",
-				"import": "import {createRipple} from \"@nexus/ui-component/utils\"",
+				"import": "import {createRipple} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/ripple"
 			},
 			{
 				"name": "getLanguage",
-				"import": "import {getLanguage} from \"@nexus/ui-component/utils\"",
+				"import": "import {getLanguage} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/storage"
 			},
 			{
 				"name": "setLanguage",
-				"import": "import {setLanguage} from \"@nexus/ui-component/utils\"",
+				"import": "import {setLanguage} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/storage"
 			},
 			{
 				"name": "translate",
-				"import": "import {translate} from \"@nexus/ui-component/utils\"",
+				"import": "import {translate} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/translation"
 			},
 			{
 				"name": "TranslationProvider",
-				"import": "import {TranslationProvider} from \"@nexus/ui-component/hooks\"",
+				"import": "import {TranslationProvider} from \"@vishnu/ui-component/hooks\"",
 				"sourceSpecifier": "./hooks/TranslationProvider"
 			},
 			{
 				"name": "DEFAULT_MIN_VERSIONS",
-				"import": "import {DEFAULT_MIN_VERSIONS} from \"@nexus/ui-component/hooks\"",
+				"import": "import {DEFAULT_MIN_VERSIONS} from \"@vishnu/ui-component/hooks\"",
 				"sourceSpecifier": "./hooks/useBrowserSupport"
 			},
 			{
 				"name": "detectBrowser",
-				"import": "import {detectBrowser} from \"@nexus/ui-component/hooks\"",
+				"import": "import {detectBrowser} from \"@vishnu/ui-component/hooks\"",
 				"sourceSpecifier": "./hooks/useBrowserSupport"
 			},
 			{
 				"name": "useIsSmallerThanTablet",
-				"import": "import {useIsSmallerThanTablet} from \"@nexus/ui-component/hooks\"",
+				"import": "import {useIsSmallerThanTablet} from \"@vishnu/ui-component/hooks\"",
 				"sourceSpecifier": "./hooks/useScreenSize"
 			},
 			{
 				"name": "useIsSmallPhone",
-				"import": "import {useIsSmallPhone} from \"@nexus/ui-component/hooks\"",
+				"import": "import {useIsSmallPhone} from \"@vishnu/ui-component/hooks\"",
 				"sourceSpecifier": "./hooks/useScreenSize"
 			},
 			{
 				"name": "useSlicedPages",
-				"import": "import {useSlicedPages} from \"@nexus/ui-component/hooks\"",
+				"import": "import {useSlicedPages} from \"@vishnu/ui-component/hooks\"",
 				"sourceSpecifier": "./hooks/useSlicedPages"
 			},
 			{
 				"name": "EmptyState",
-				"import": "import {EmptyState} from \"@nexus/ui-component\"",
+				"import": "import {EmptyState} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/emptyData/EmptyData"
 			}
 		],
 		"types": [
 			{
 				"name": "DataListDirection",
-				"import": "import type {DataListDirection} from \"@nexus/ui-component\"",
+				"import": "import type {DataListDirection} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/dataList/type"
 			},
 			{
 				"name": "DataListItemProps",
-				"import": "import type {DataListItemProps} from \"@nexus/ui-component\"",
+				"import": "import type {DataListItemProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/dataList/type"
 			},
 			{
 				"name": "DataListLabelProps",
-				"import": "import type {DataListLabelProps} from \"@nexus/ui-component\"",
+				"import": "import type {DataListLabelProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/dataList/type"
 			},
 			{
 				"name": "DateTimeRules",
-				"import": "import type {DateTimeRules} from \"@nexus/ui-component\"",
+				"import": "import type {DateTimeRules} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./types/form"
 			},
 			{
 				"name": "TimeTrackingRules",
-				"import": "import type {TimeTrackingRules} from \"@nexus/ui-component\"",
+				"import": "import type {TimeTrackingRules} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./types/form"
 			},
 			{
 				"name": "BrowserNotSupportedDialogProps",
-				"import": "import type {BrowserNotSupportedDialogProps} from \"@nexus/ui-component\"",
+				"import": "import type {BrowserNotSupportedDialogProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/browserWarning/type"
 			},
 			{
 				"name": "MenuLinkProps",
-				"import": "import type {MenuLinkProps} from \"@nexus/ui-component\"",
+				"import": "import type {MenuLinkProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/menu/MenuLink"
 			},
 			{
 				"name": "SelectOption",
-				"import": "import type {SelectOption} from \"@nexus/ui-component\"",
+				"import": "import type {SelectOption} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/types"
 			},
 			{
 				"name": "BreadcrumbItem",
-				"import": "import type {BreadcrumbItem} from \"@nexus/ui-component\"",
+				"import": "import type {BreadcrumbItem} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/breadcrumb/type"
 			},
 			{
 				"name": "BreadcrumbProps",
-				"import": "import type {BreadcrumbProps} from \"@nexus/ui-component\"",
+				"import": "import type {BreadcrumbProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/breadcrumb/type"
 			},
 			{
 				"name": "UserAvatarFallbackProps",
-				"import": "import type {UserAvatarFallbackProps} from \"@nexus/ui-component\"",
+				"import": "import type {UserAvatarFallbackProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/userImageIcon/UserAvatarFallback"
 			},
 			{
 				"name": "UserImageIconSize",
-				"import": "import type {UserImageIconSize} from \"@nexus/ui-component\"",
+				"import": "import type {UserImageIconSize} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/userImageIcon/UserAvatarFallback"
 			},
 			{
 				"name": "SelectProps",
-				"import": "import type {SelectProps} from \"@nexus/ui-component\"",
+				"import": "import type {SelectProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/types"
 			},
 			{
 				"name": "InputProps",
-				"import": "import type {InputProps} from \"@nexus/ui-component\"",
+				"import": "import type {InputProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/types"
 			},
 			{
 				"name": "TextAreaInputProps",
-				"import": "import type {TextAreaInputProps} from \"@nexus/ui-component\"",
+				"import": "import type {TextAreaInputProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/types"
 			},
 			{
 				"name": "RadioOption",
-				"import": "import type {RadioOption} from \"@nexus/ui-component\"",
+				"import": "import type {RadioOption} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/types"
 			},
 			{
 				"name": "RadioProps",
-				"import": "import type {RadioProps} from \"@nexus/ui-component\"",
+				"import": "import type {RadioProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/types"
 			},
 			{
 				"name": "SwitchProps",
-				"import": "import type {SwitchProps} from \"@nexus/ui-component\"",
+				"import": "import type {SwitchProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/types"
 			},
 			{
 				"name": "MultipleSelectProps",
-				"import": "import type {MultipleSelectProps} from \"@nexus/ui-component\"",
+				"import": "import type {MultipleSelectProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/types"
 			},
 			{
 				"name": "DatePickerProps",
-				"import": "import type {DatePickerProps} from \"@nexus/ui-component\"",
+				"import": "import type {DatePickerProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/types"
 			},
 			{
 				"name": "DateRangePickerProps",
-				"import": "import type {DateRangePickerProps} from \"@nexus/ui-component\"",
+				"import": "import type {DateRangePickerProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/types"
 			},
 			{
 				"name": "DateRangeType",
-				"import": "import type {DateRangeType} from \"@nexus/ui-component\"",
+				"import": "import type {DateRangeType} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/types"
 			},
 			{
 				"name": "SegmentedControlOption",
-				"import": "import type {SegmentedControlOption} from \"@nexus/ui-component\"",
+				"import": "import type {SegmentedControlOption} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/types"
 			},
 			{
 				"name": "SegmentedControlProps",
-				"import": "import type {SegmentedControlProps} from \"@nexus/ui-component\"",
+				"import": "import type {SegmentedControlProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/types"
 			},
 			{
 				"name": "SegmentedControlSize",
-				"import": "import type {SegmentedControlSize} from \"@nexus/ui-component\"",
+				"import": "import type {SegmentedControlSize} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/types"
 			},
 			{
 				"name": "Tab",
-				"import": "import type {Tab} from \"@nexus/ui-component\"",
+				"import": "import type {Tab} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/tabs/type"
 			},
 			{
 				"name": "TabsProps",
-				"import": "import type {TabsProps} from \"@nexus/ui-component\"",
+				"import": "import type {TabsProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/tabs/type"
 			},
 			{
 				"name": "ButtonVariant",
-				"import": "import type {ButtonVariant} from \"@nexus/ui-component\"",
+				"import": "import type {ButtonVariant} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/button/type"
 			},
 			{
 				"name": "ButtonColor",
-				"import": "import type {ButtonColor} from \"@nexus/ui-component\"",
+				"import": "import type {ButtonColor} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/button/type"
 			},
 			{
 				"name": "ButtonSize",
-				"import": "import type {ButtonSize} from \"@nexus/ui-component\"",
+				"import": "import type {ButtonSize} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/button/type"
 			},
 			{
 				"name": "ButtonProps",
-				"import": "import type {ButtonProps} from \"@nexus/ui-component\"",
+				"import": "import type {ButtonProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/button/type"
 			},
 			{
 				"name": "ButtonGroupProps",
-				"import": "import type {ButtonGroupProps} from \"@nexus/ui-component\"",
+				"import": "import type {ButtonGroupProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/button/type"
 			},
 			{
 				"name": "ChipProps",
-				"import": "import type {ChipProps} from \"@nexus/ui-component\"",
+				"import": "import type {ChipProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/chip/type"
 			},
 			{
 				"name": "ChipColorsType",
-				"import": "import type {ChipColorsType} from \"@nexus/ui-component\"",
+				"import": "import type {ChipColorsType} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/chip/type"
 			},
 			{
 				"name": "ChipSizeType",
-				"import": "import type {ChipSizeType} from \"@nexus/ui-component\"",
+				"import": "import type {ChipSizeType} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/chip/type"
 			},
 			{
 				"name": "ChipVariant",
-				"import": "import type {ChipVariant} from \"@nexus/ui-component\"",
+				"import": "import type {ChipVariant} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/chip/type"
 			},
 			{
 				"name": "RatingProps",
-				"import": "import type {RatingProps} from \"@nexus/ui-component\"",
+				"import": "import type {RatingProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/rating/type"
 			},
 			{
 				"name": "RatingSize",
-				"import": "import type {RatingSize} from \"@nexus/ui-component\"",
+				"import": "import type {RatingSize} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/rating/type"
 			},
 			{
 				"name": "RatingColor",
-				"import": "import type {RatingColor} from \"@nexus/ui-component\"",
+				"import": "import type {RatingColor} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/rating/type"
 			},
 			{
 				"name": "ProgressBarProps",
-				"import": "import type {ProgressBarProps} from \"@nexus/ui-component\"",
+				"import": "import type {ProgressBarProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/progressBar/type"
 			},
 			{
 				"name": "ProgressBarColor",
-				"import": "import type {ProgressBarColor} from \"@nexus/ui-component\"",
+				"import": "import type {ProgressBarColor} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/progressBar/type"
 			},
 			{
 				"name": "ProgressBarSize",
-				"import": "import type {ProgressBarSize} from \"@nexus/ui-component\"",
+				"import": "import type {ProgressBarSize} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/progressBar/type"
 			},
 			{
 				"name": "ProgressBarVariant",
-				"import": "import type {ProgressBarVariant} from \"@nexus/ui-component\"",
+				"import": "import type {ProgressBarVariant} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/progressBar/type"
 			},
 			{
 				"name": "CircularProgressProps",
-				"import": "import type {CircularProgressProps} from \"@nexus/ui-component\"",
+				"import": "import type {CircularProgressProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/progressBar/CircularProgressType"
 			},
 			{
 				"name": "CircularProgressColor",
-				"import": "import type {CircularProgressColor} from \"@nexus/ui-component\"",
+				"import": "import type {CircularProgressColor} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/progressBar/CircularProgressType"
 			},
 			{
 				"name": "CircularProgressVariant",
-				"import": "import type {CircularProgressVariant} from \"@nexus/ui-component\"",
+				"import": "import type {CircularProgressVariant} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/progressBar/CircularProgressType"
 			},
 			{
 				"name": "TimePickerProps",
-				"import": "import type {TimePickerProps} from \"@nexus/ui-component\"",
+				"import": "import type {TimePickerProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/input/types"
 			},
 			{
 				"name": "PageTitleProps",
-				"import": "import type {PageTitleProps} from \"@nexus/ui-component\"",
+				"import": "import type {PageTitleProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/text/type"
 			},
 			{
 				"name": "AlertOverlayPosition",
-				"import": "import type {AlertOverlayPosition} from \"@nexus/ui-component\"",
+				"import": "import type {AlertOverlayPosition} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/alert/type"
 			},
 			{
 				"name": "AlertSeverity",
-				"import": "import type {AlertSeverity} from \"@nexus/ui-component\"",
+				"import": "import type {AlertSeverity} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/alert/type"
 			},
 			{
 				"name": "AlertInput",
-				"import": "import type {AlertInput} from \"@nexus/ui-component\"",
+				"import": "import type {AlertInput} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/alert/type"
 			},
 			{
 				"name": "AlertItem",
-				"import": "import type {AlertItem} from \"@nexus/ui-component\"",
+				"import": "import type {AlertItem} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/alert/type"
 			},
 			{
 				"name": "BrowserName",
-				"import": "import type {BrowserName} from \"@nexus/ui-component\"",
+				"import": "import type {BrowserName} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./hooks/useBrowserSupport"
 			},
 			{
 				"name": "BrowserInfo",
-				"import": "import type {BrowserInfo} from \"@nexus/ui-component\"",
+				"import": "import type {BrowserInfo} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./hooks/useBrowserSupport"
 			},
 			{
 				"name": "MinBrowserVersions",
-				"import": "import type {MinBrowserVersions} from \"@nexus/ui-component\"",
+				"import": "import type {MinBrowserVersions} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./hooks/useBrowserSupport"
 			},
 			{
 				"name": "AccordionProps",
-				"import": "import type {AccordionProps} from \"@nexus/ui-component\"",
+				"import": "import type {AccordionProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/accordion/type"
 			},
 			{
 				"name": "EmptyDataProps",
-				"import": "import type {EmptyDataProps} from \"@nexus/ui-component\"",
+				"import": "import type {EmptyDataProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/emptyData/type"
 			},
 			{
 				"name": "QrCodeProps",
-				"import": "import type {QrCodeProps} from \"@nexus/ui-component\"",
+				"import": "import type {QrCodeProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/qrCode/type"
 			},
 			{
 				"name": "StepperProps",
-				"import": "import type {StepperProps} from \"@nexus/ui-component\"",
+				"import": "import type {StepperProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/stepper/type"
 			},
 			{
 				"name": "StepperStep",
-				"import": "import type {StepperStep} from \"@nexus/ui-component\"",
+				"import": "import type {StepperStep} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/stepper/type"
 			},
 			{
 				"name": "StepperOrientation",
-				"import": "import type {StepperOrientation} from \"@nexus/ui-component\"",
+				"import": "import type {StepperOrientation} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/stepper/type"
 			},
 			{
 				"name": "StepStatus",
-				"import": "import type {StepStatus} from \"@nexus/ui-component\"",
+				"import": "import type {StepStatus} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/stepper/type"
 			},
 			{
 				"name": "StepperSize",
-				"import": "import type {StepperSize} from \"@nexus/ui-component\"",
+				"import": "import type {StepperSize} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/stepper/type"
 			},
 			{
 				"name": "SliderProps",
-				"import": "import type {SliderProps} from \"@nexus/ui-component\"",
+				"import": "import type {SliderProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/slider/type"
 			},
 			{
 				"name": "SliderInputProps",
-				"import": "import type {SliderInputProps} from \"@nexus/ui-component\"",
+				"import": "import type {SliderInputProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/slider/type"
 			},
 			{
 				"name": "SliderMarkProps",
-				"import": "import type {SliderMarkProps} from \"@nexus/ui-component\"",
+				"import": "import type {SliderMarkProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/slider/type"
 			},
 			{
 				"name": "RichTextEditorProps",
-				"import": "import type {RichTextEditorProps} from \"@nexus/ui-component\"",
+				"import": "import type {RichTextEditorProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/richTextEditor/type"
 			},
 			{
 				"name": "RipplePointer",
-				"import": "import type {RipplePointer} from \"@nexus/ui-component/utils\"",
+				"import": "import type {RipplePointer} from \"@vishnu/ui-component/utils\"",
 				"sourceSpecifier": "./utils/ripple"
 			},
 			{
 				"name": "TranslationProviderProps",
-				"import": "import type {TranslationProviderProps} from \"@nexus/ui-component/hooks\"",
+				"import": "import type {TranslationProviderProps} from \"@vishnu/ui-component/hooks\"",
 				"sourceSpecifier": "./hooks/TranslationProvider"
 			},
 			{
 				"name": "TimerFormatter",
-				"import": "import type {TimerFormatter} from \"@nexus/ui-component\"",
+				"import": "import type {TimerFormatter} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./hooks/useTimer"
 			},
 			{
 				"name": "EmptyStateProps",
-				"import": "import type {EmptyStateProps} from \"@nexus/ui-component\"",
+				"import": "import type {EmptyStateProps} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./ui-component/emptyData/type"
 			},
 			{
 				"name": "FormRules",
-				"import": "import type {FormRules} from \"@nexus/ui-component\"",
+				"import": "import type {FormRules} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./types/form"
 			},
 			{
 				"name": "FormRulesOptions",
-				"import": "import type {FormRulesOptions} from \"@nexus/ui-component\"",
+				"import": "import type {FormRulesOptions} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./types/form"
 			},
 			{
 				"name": "PasswordRules",
-				"import": "import type {PasswordRules} from \"@nexus/ui-component\"",
+				"import": "import type {PasswordRules} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./types/form"
 			},
 			{
 				"name": "Language",
-				"import": "import type {Language} from \"@nexus/ui-component\"",
+				"import": "import type {Language} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./types/translations"
 			},
 			{
 				"name": "TranslationKey",
-				"import": "import type {TranslationKey} from \"@nexus/ui-component\"",
+				"import": "import type {TranslationKey} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./types/translations"
 			},
 			{
 				"name": "TranslationMap",
-				"import": "import type {TranslationMap} from \"@nexus/ui-component\"",
+				"import": "import type {TranslationMap} from \"@vishnu/ui-component\"",
 				"sourceSpecifier": "./types/translations"
 			}
 		]
@@ -1174,6 +1174,6 @@
 		"supportedImportsOnly": true,
 		"subpathExportsForTreeShaking": true,
 		"stylingRequirement": "Tailwind CSS v4.3.3+ is a required peer dependency. styles.css declares its --color-* tokens with the v4 @theme directive and has no v3 fallback.",
-		"rootSpecifierPolicy": "Import components and their prop types from @nexus/ui-component; utility helpers are exported from @nexus/ui-component/utils and the extended hook surface from @nexus/ui-component/hooks (the root barrel is a curated subset). Import @nexus/ui-component/styles.css for styles. Per-component subpaths (e.g. @nexus/ui-component/button) are supported for tree-shaking."
+		"rootSpecifierPolicy": "Import components and their prop types from @vishnu/ui-component; utility helpers are exported from @vishnu/ui-component/utils and the extended hook surface from @vishnu/ui-component/hooks (the root barrel is a curated subset). Import @vishnu/ui-component/styles.css for styles. Per-component subpaths (e.g. @vishnu/ui-component/button) are supported for tree-shaking."
 	}
 }

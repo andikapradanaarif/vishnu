@@ -23,7 +23,7 @@ The api serves no SPA — the `web/` build ships in the separate
 Brevo email service lives in `internal/service/email` (auth OTP
 later).
 
-## Layering (nexus-style clean architecture)
+## Layering (clean architecture)
 
 ```
 cmd/server/main.go                     wiring + lifecycle
@@ -163,7 +163,7 @@ systemd unit). The api serves no SPA — the `vishnu-web` image owns it.
 1. `golang:1.26-alpine` stage — copy `api/`, build `vishnu-api` +
    `migrate` in one RUN (shared build cache,
    `-trimpath -ldflags="-s -w"`, `GOTOOLCHAIN=local`).
-   Vendor `go.mod` deps later if build time becomes annoying (valo
+   Vendor `go.mod` deps later if build time becomes annoying (the reference backend
    vendors; we don't yet).
 2. `golang:1.27-alpine` stage — `go install
    github.com/charmbracelet/crush@$CRUSH_VERSION` (build-arg, default
@@ -172,7 +172,7 @@ systemd unit). The api serves no SPA — the `vishnu-web` image owns it.
 3. `alpine:3.22` runtime — `apk add ca-certificates curl git
    openssh-client tzdata` (cloner, healthcheck, TLS to Brevo), both
    binaries, the crush binary on `$PATH`, and `entrypoint.sh`
-   (nexus-style: a `migrate` argv dispatches to `./migrate`, no
+   (a `migrate` argv dispatches to `./migrate`, no
    arguments execs the server — which already auto-migrates on boot,
    anything else runs as given). `VISHNU_LISTEN_ADDR` becomes
    `0.0.0.0:8080` and `VISHNU_DATA_DIR` `/data` inside the image; the

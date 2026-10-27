@@ -1,6 +1,6 @@
 # Publishing
 
-This guide covers building, versioning, and publishing the @nexus/ui-component library.
+This guide covers building, versioning, and publishing the @vishnu/ui-component library.
 
 ## Table of Contents
 
@@ -116,7 +116,7 @@ Alternatively, manually update the version in `package.json`:
 
 ```json
 {
-	"name": "@nexus/ui-component",
+	"name": "@vishnu/ui-component",
 	"version": "1.0.1"
 }
 ```
@@ -162,7 +162,7 @@ Before publishing, ensure:
 
 3. Verify the package on npm:
    ```bash
-   npm view @nexus/ui-component
+   npm view @vishnu/ui-component
    ```
 
 ### Publishing with Access Levels
@@ -177,7 +177,7 @@ Use this for packages that should be publicly accessible.
 
 #### Scoped Public Package
 
-For scoped packages (e.g., `@nexus/ui-component`), you must specify public access:
+For scoped packages (e.g., `@vishnu/ui-component`), you must specify public access:
 
 ```bash
 npm publish --access public
@@ -216,7 +216,7 @@ npm publish --registry=https://npm.yourcompany.com
 Add the registry to your `.npmrc` file:
 
 ```ini
-@nexus:registry=https://npm.yourcompany.com
+@vishnu:registry=https://npm.yourcompany.com
 ```
 
 Then publish normally:
@@ -370,7 +370,7 @@ If your local version doesn't match the published version:
 
 ```bash
 # Check published version
-npm view @nexus/ui-component version
+npm view @vishnu/ui-component version
 
 # Update local version
 npm version patch
@@ -421,7 +421,7 @@ bun run build
 
 # Test locally
 npm pack
-bun add ./nexus-ui-component-1.0.0.tgz
+bun add ./vishnu-ui-component-1.0.0.tgz
 ```
 
 ### 2. Use Semantic Versioning
@@ -502,7 +502,7 @@ Key fields in `package.json` for publishing:
 
 ```json
 {
-	"name": "@nexus/ui-component",
+	"name": "@vishnu/ui-component",
 	"version": "1.0.0",
 	"description": "Shared UI component library",
 	"main": "dist/index.mjs",

@@ -19,16 +19,16 @@ model/agent/skip controls. It predates auth and multi-project. This
 task adds auth + project flows, rebinds every call through the new
 contract, and reskins everything.
 
-## Auth model (nexus-style — cookie sessions)
+## Auth model (cookie sessions)
 
-Vishnu signs in like nexus's backoffice, not valo's JWT-in-storage:
+Vishnu signs in like a backoffice cookie session, not JWT-in-storage:
 
 - The session token lives in an **HttpOnly cookie** (`vishnu_session`)
   — JS never sees or stores a token. No `localStorage`/`sessionStorage`
   auth state, no `Authorization` header plumbing.
 - `ApiClient` uses `credentials: "include"` (same-origin anyway, but
   declare it for dev proxy parity — check how the contract client
-  sets it and match nexus `contract/src/client.ts`).
+  sets it and match the reference repo's `contract/src/client.ts`).
 - Auth state = `useMe()` → `GET /api/auth/me` query. Signed-in user
   comes from the query cache; there is no auth context/store to
   duplicate.

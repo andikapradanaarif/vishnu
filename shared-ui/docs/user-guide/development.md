@@ -1,6 +1,6 @@
 # Development
 
-This guide covers development setup, adding new components, project structure, and contributing to the @nexus/ui-component library.
+This guide covers development setup, adding new components, project structure, and contributing to the @vishnu/ui-component library.
 
 ## Prerequisites
 
@@ -14,7 +14,7 @@ This guide covers development setup, adding new components, project structure, a
 
 ```bash
 git clone <repository-url>
-cd shared-ts
+cd shared-ui
 ```
 
 ### 2. Install Dependencies
@@ -43,7 +43,7 @@ This will start Bun in watch mode, automatically rebuilding when you make change
 ## Project Structure
 
 ```
-shared-ts/
+shared-ui/
 ├── ui-component/          # UI components
 │   ├── actionBar/        # Action bar component
 │   ├── alert/            # Alert/toast component
@@ -182,7 +182,7 @@ When you add or remove an export from `index.ts`, update the canonical API docs 
 3. `README.md` — update the "Public Exports" section
 4. `docs/user-guide/components.md` — add usage examples
 
-Alternatively, invoke the `shared-ts-sync-api` Devin skill which wraps this workflow.
+Alternatively, invoke the `shared-ui-sync-api` Devin skill which wraps this workflow.
 
 ## Component Best Practices
 
@@ -351,7 +351,7 @@ You should also manually test your components:
 
 1. Build the library: `bun run build`
 2. Create a test project or use an existing one
-3. Install the local version: `bun add ../shared-ts`
+3. Install the local version: `bun add ../shared-ui`
 4. Test your component in various scenarios
 
 ## Code Style

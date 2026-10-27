@@ -4,7 +4,7 @@ Status: shipped. `api/migration/` creates exactly this schema, and the
 project registry, the eligibility list, the one-time codes, and the
 sessions all live in it.
 
-Scope: Postgres + GORM + embedded SQL migrations, mirroring the nexus
+Scope: Postgres + GORM + embedded SQL migrations, mirroring the the reference repo
 `backend` layout (`domain → repository → usecase → handler`). Project
 behavior lives in `projects.md`; user/OTP flows land here when the auth
 milestone is planned in detail.
@@ -19,17 +19,17 @@ milestone is planned in detail.
 | Runner | `api/internal/migrator` — `EnsureTable` / `Up` / `Down` / `Status`, `migrations` tracking table, one transaction per migration |
 | CLI | `api/cmd/migrate` — `up` (default) / `down` / `status` |
 
-The nexus `migration/embed_check_test.go` parity test comes along: every
+The reference repo `migration/embed_check_test.go` parity test comes along: every
 name in `MigrationOrder` must have an embedded `.sql`, and vice versa.
 
 ## Config
 
 `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASS` — same env names as
-nexus, but plain values (nexus's base64 decoding is a deploy quirk vishnu
+the reference repo, but plain values (the reference repo's base64 decoding is a deploy quirk vishnu
 doesn't inherit). Defaults for dev: `127.0.0.1:5432`, db/user `vishnu`.
 `config.ConnectPostgres()` builds the DSN.
 
-## Layering (nexus clean architecture)
+## Layering (clean architecture)
 
 ```
 internal/domain/      entities + repository interfaces (Project, User…)
@@ -176,12 +176,12 @@ can't serve without it.
 
 - `migrator` — up/down/status on a throwaway DB (dockertest or compose
   service in CI)
-- `embed_check_test` — order↔files parity (port from nexus)
+- `embed_check_test` — order↔files parity (port from the reference repo)
 - `project_repository` — CRUD + unique-index dedupe + soft delete
 - `usecase` — clone/link/external create paths against a fake cloner
   and real DB
 
-## Deliberate deviations from nexus
+## Deliberate deviations from the reference layout
 
 - No i18n catalogs or sentinel-error registry — vishnu is
   single-locale; handlers return plain `{message, code}` JSON. Revisit

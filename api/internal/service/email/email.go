@@ -1,6 +1,5 @@
 // Package email provides transactional email delivery for vishnu
-// (auth OTP codes today; other notifications later). Mirrors the
-// valo-backend internal/service/email package conventions.
+// (auth OTP codes today; other notifications later).
 package email
 
 import "context"

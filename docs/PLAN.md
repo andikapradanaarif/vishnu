@@ -51,12 +51,13 @@ Key decisions:
 - **Auth before off-loopback** — email+OTP planned (Brevo); until then
   bind stays `127.0.0.1`.
 
-## Stack (valo/nexus style)
+## Stack (Go + React monorepo)
 
-Bun-workspaces monorepo in the style of valo (`api/` + `backoffice/`)
-and nexus (`backend/` + `backoffice/` + `contract/` + `shared-ts/`):
+Bun-workspaces monorepo in the style of earlier Go+React monorepos
+(`api/` + `backoffice/` and `backend/` + `backoffice/` + `contract/` +
+`shared-ui/`):
 
-- **`api/`** — Go + Fiber v3 + **Postgres/GORM**, nexus-style clean
+- **`api/`** — Go + Fiber v3 + **Postgres/GORM**, clean
   architecture (`cmd/` → `internal/{domain,repository,usecase,dto,
   handler,service}` + embedded SQL `migration/`). Registry, process
   manager, `/p/{pid}/v1/*` streaming proxy, Brevo email
@@ -66,7 +67,7 @@ and nexus (`backend/` + `backoffice/` + `contract/` + `shared-ts/`):
   primitives from `@vishnu/ui-component`.
 - **`contract/`** — `@vishnu/api-contract`: crush `/v1` wire types +
   per-domain SDK clients (hand-mirrored — crush has no OpenAPI spec).
-- **`shared-ui/`** — `@vishnu/ui-component`, vendored nexus `shared-ts`.
+- **`shared-ui/`** — `@vishnu/ui-component`, a vendored component library.
 
 Detailed plans: [`plan/api.md`](plan/api.md) (API),
 [`plan/web.md`](plan/web.md) (web frontend),
@@ -104,7 +105,7 @@ vishnu/
     Dockerfile              multi-stage: go → crush → alpine (api-only)
     deploy/docker-compose.yml           postgres + web + vishnu services
     entrypoint.sh  Makefile
-  shared-ui/              @vishnu/ui-component — vendored nexus shared-ts
+  shared-ui/              @vishnu/ui-component — vendored component lib
   contract/               @vishnu/api-contract — crush /v1 types + SDK
     src/types.ts          wire types · src/paths.ts route constants
     src/client.ts         ApiClient, ApiError, buildPath, withQuery

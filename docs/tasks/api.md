@@ -10,7 +10,7 @@ deployment), `plan/projects.md` (registry/lifecycle/clone flow),
 `plan/data.md` (schema/layering/migrations). When doc and code
 disagree, the doc wins — or flag it.
 
-## Conventions (nexus/valo style — non-negotiable)
+## Conventions (non-negotiable)
 
 - Module `github.com/andikapradanaarif/vishnu`, root `api/`,
   Fiber v3 (`c.Bind().Body(&req)`, `c.RequestCtx()` for ctx),
@@ -45,7 +45,7 @@ cd api && gofmt -l . && go vet ./... && go build ./... && go test ./...
   `postgres` (container `vishnu-db`), `POSTGRES_*` from `DB_*` envs
   (`vishnu`/`vishnu`/`vishnu`), port 5432, named volume, `pg_isready`
   healthcheck. The same file will carry the `vishnu` app service in
-  PR 7 — keep service names/network stable. (Copy nexus's shape.)
+  PR 7 — keep service names/network stable. (Copy the reference repo's shape.)
 - `internal/config/db.go`: `ConnectPostgres() (*gorm.DB, error)` —
   DSN from `DB_HOST/DB_PORT/DB_NAME/DB_USER/DB_PASS` (defaults
   `127.0.0.1:5432`, db `vishnu`, user `vishnu`; `DB_PASS` required in
@@ -57,15 +57,15 @@ cd api && gofmt -l . && go vet ./... && go build ./... && go test ./...
 - `migration/` package: `migrations_order.go` (`//go:embed *.sql`,
   `MigrationOrder []string`, `GetMigrationSQL`, `GetCreateMigrationsTableSQL`),
   `create_migrations_table.sql` (the tracking table itself, run first
-  outside the ordered list — copy nexus's semantics).
+  outside the ordered list — copy the reference repo's semantics).
 - `internal/migrator/migrator.go`: `Runner` — `EnsureTable`,
   `Up` (skip applied, per-migration tx, insert into `migrations`),
   `Down` (rollback latest via `<name>_down.sql`, `ErrNoDownMigration`),
-  `Status`. Port nexus `internal/migrator/migrator.go` nearly verbatim.
+  `Status`. Port the reference repo's `internal/migrator/migrator.go` nearly verbatim.
 - `migration/embed_check_test.go`: every `MigrationOrder` entry has a
   `.sql`; every embedded `<name>.sql` is in the order; downs exist.
 - `cmd/migrate/main.go`: `up` (default) / `down` / `status` —
-  port nexus `cmd/migrate`.
+  port the reference repo's `cmd/migrate`.
 - `Makefile`: `db` (`docker compose -f deploy/docker-compose.yml up -d
   postgres`), `migrate`, `migratedown`, `migratestatus`.
 - Acceptance: `make db && make migrate` applies `migrations` table +
@@ -226,7 +226,7 @@ cd api && gofmt -l . && go vet ./... && go build ./... && go test ./...
   4. `alpine` runtime — `apk add --no-cache git openssh-client curl`
      (git+ssh for the cloner, curl for healthcheck); copy both binaries
      + crush + `entrypoint.sh`; `HEALTHCHECK curl -f …/healthz`.
-- `api/entrypoint.sh` — nexus dispatch: `migrate` → `./migrate "$@"`,
+- `api/entrypoint.sh` — the reference repo dispatch: `migrate` → `./migrate "$@"`,
   default → `./vishnu-api` (server already migrates on boot; the
   binary is for `down`/`status` ops).
 - Root `.dockerignore`: `**/node_modules`, `**/dist`, `api/bin`,

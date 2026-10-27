@@ -1,6 +1,6 @@
 # Getting Started
 
-This guide will help you install, set up, and start using the @nexus/ui-component library in your project.
+This guide will help you install, set up, and start using the @vishnu/ui-component library in your project.
 
 ## Installation
 
@@ -9,7 +9,7 @@ This guide will help you install, set up, and start using the @nexus/ui-componen
 Install the library using Bun:
 
 ```bash
-bun add @nexus/ui-component
+bun add @vishnu/ui-component
 ```
 
 ### Install Peer Dependencies
@@ -34,8 +34,8 @@ CSS is processed, leaving `@theme` unregistered and the library unstyled:
 
 ```css
 @import "tailwindcss";
-@import "@nexus/ui-component/styles.css";
-@source "../node_modules/@nexus/ui-component";
+@import "@vishnu/ui-component/styles.css";
+@source "../node_modules/@vishnu/ui-component";
 ```
 
 `@source` makes Tailwind generate the classes the components emit; adjust
@@ -67,8 +67,8 @@ entry at the library's stylesheet and source it (see step 1):
 
 ```css
 @import "tailwindcss";
-@import "@nexus/ui-component/styles.css";
-@source "../node_modules/@nexus/ui-component";
+@import "@vishnu/ui-component/styles.css";
+@source "../node_modules/@vishnu/ui-component";
 ```
 
 No `tailwind.config.js` is needed — `@import` registers the `--color-*`
@@ -80,7 +80,7 @@ Here's a complete example of how to use the library in a React application:
 
 ```tsx
 // src/App.tsx
-import {Button, Input, Message} from "@nexus/ui-component";
+import {Button, Input, Message} from "@vishnu/ui-component";
 import {useState} from "react";
 
 function App() {
@@ -99,7 +99,7 @@ function App() {
 	return (
 		<div className="min-h-screen bg-gray-50 p-8">
 			<div className="max-w-md mx-auto">
-				<h1 className="text-2xl font-bold mb-6 text-gray-800">Welcome to @nexus/ui-component</h1>
+				<h1 className="text-2xl font-bold mb-6 text-gray-800">Welcome to @vishnu/ui-component</h1>
 
 				<div className="bg-white p-6 rounded-lg shadow-md">
 					<Input
@@ -181,37 +181,37 @@ root.render(
 For maximum tree-shaking, import from per-component subpaths instead of the root barrel. This ensures your bundler only includes the code for the components you actually use:
 
 ```tsx
-// Instead of: import {Button, Input} from "@nexus/ui-component";
-import {Button} from "@nexus/ui-component/button";
-import {Input, Select} from "@nexus/ui-component/input";
+// Instead of: import {Button, Input} from "@vishnu/ui-component";
+import {Button} from "@vishnu/ui-component/button";
+import {Input, Select} from "@vishnu/ui-component/input";
 ```
 
 Available subpath entry points:
 
 | Subpath                                | Exports                                                                                                           |
 | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `@nexus/ui-component/actionBar`        | `ActionBar`                                                                                                       |
-| `@nexus/ui-component/button`           | `Button`                                                                                                          |
-| `@nexus/ui-component/calendar`         | `Calendar`                                                                                                        |
-| `@nexus/ui-component/chip`             | `Chip`                                                                                                            |
-| `@nexus/ui-component/dataList`         | `DataList`, `DataListDirection`, `DataListItemProps`, `DataListLabelProps`                                                                                                        |
-| `@nexus/ui-component/dialog`           | `Dialog`                                                                                                          |
-| `@nexus/ui-component/drawer`           | `Drawer`                                                                                                          |
-| `@nexus/ui-component/emptyData`        | `EmptyData`, `EmptyDataProps`                                                                                     |
-| `@nexus/ui-component/emptyState`       | `EmptyData`, `EmptyState`, `EmptyDataProps`, `EmptyStateProps`                                    |
-| `@nexus/ui-component/input`            | `Input`, `Select`, `TextAreaInput`, `Checkbox`, `SelectOption`, `SelectProps`, `InputProps`, `TextAreaInputProps` |
-| `@nexus/ui-component/loadingAnimation` | `LoadingAnimation`                                                                                                |
-| `@nexus/ui-component/message`          | `Message`                                                                                                         |
-| `@nexus/ui-component/pagination`       | `Pagination`                                                                                                      |
-| `@nexus/ui-component/popover`          | `Popover`                                                                                                         |
-| `@nexus/ui-component/table`            | `Table`                                                                                                           |
-| `@nexus/ui-component/tabs`             | `Tabs`, `Tab`, `TabsProps`                                                                                        |
-| `@nexus/ui-component/text`             | `Title`, `Subtitle`, `Caption`, `Paragraph`                                                                       |
-| `@nexus/ui-component/tooltip`          | `Tooltip`                                                                                                         |
-| `@nexus/ui-component/hooks` | `TranslationProviderProps`, `TranslationProvider`, `BrowserName`, `BrowserInfo`, `MinBrowserVersions`, `DEFAULT_MIN_VERSIONS`, `detectBrowser`, `useBrowserSupport`, `useDebounce`, `useDebounceFunc`, `useRichTextField`, `useIsSmallerThanTablet`, `useIsSmallPhone`, `useSlicedPages`, `TimerFormatter`, `useTimer`, `Language`, `TranslationKey`, `TranslationMap` |
-| `@nexus/ui-component/utils` | `filterTree`, `flatten`, `delay`, `isSameTime`, `intlFormatDate`, `intlFormatDateWithTime`, `shortWeekNames`, `monthsNames`, `getYearsUntilNow`, `listYears`, `getStartOfDay`, `getEndOfDay`, `getStartOfMonth`, `getEndOfMonth`, `getStartOfWeek`, `getEndOfWeek`, `getStartOfYear`, `getEndOfYear`, `getDateBeforeMonths`, `addDays`, `subDays`, `addWeeks`, `addMonths`, `addYears`, `getFormattedTimeString`, `getFormattedDateString`, `getDurationBetweenDates`, `mergeDateAndTime`, `formatDateToLocalizedString`, `pad`, `formatDuration`, `getDayDescription`, `getDurationMs`, `formatTime`, `formatDate`, `formatMonthYear`, `formatYear`, `formatDateRange`, `roundUpToNearestByMinutes`, `roundToNearestByMinutes`, `addHours`, `formatRelativeDate`, `downloadUrlViaDOM`, `validator`, `passwordValidator`, `startTimeValidator`, `endTimeValidator`, `EMPTY_RICH_TEXT_VALUE`, `createEmptyRichTextValue`, `serializeRichText`, `deserializeRichText`, `isRichTextEmpty`, `serializeRichTextToHtml`, `RipplePointer`, `createRipple`, `stringComparisonFn`, `dateComparisonFn`, `numberComparisonFn`, `getLanguage`, `setLanguage`, `getStringHash`, `decodeHtml`, `getFullName`, `pasteFromClipboard`, `dataSourceFormatter`, `getLocaledDateTimeString`, `translate`, `FormRules`, `FormRulesOptions`, `PasswordRules`, `DateTimeRules`, `TimeTrackingRules`, `Language`, `TranslationKey`, `TranslationMap` |
+| `@vishnu/ui-component/actionBar`        | `ActionBar`                                                                                                       |
+| `@vishnu/ui-component/button`           | `Button`                                                                                                          |
+| `@vishnu/ui-component/calendar`         | `Calendar`                                                                                                        |
+| `@vishnu/ui-component/chip`             | `Chip`                                                                                                            |
+| `@vishnu/ui-component/dataList`         | `DataList`, `DataListDirection`, `DataListItemProps`, `DataListLabelProps`                                                                                                        |
+| `@vishnu/ui-component/dialog`           | `Dialog`                                                                                                          |
+| `@vishnu/ui-component/drawer`           | `Drawer`                                                                                                          |
+| `@vishnu/ui-component/emptyData`        | `EmptyData`, `EmptyDataProps`                                                                                     |
+| `@vishnu/ui-component/emptyState`       | `EmptyData`, `EmptyState`, `EmptyDataProps`, `EmptyStateProps`                                    |
+| `@vishnu/ui-component/input`            | `Input`, `Select`, `TextAreaInput`, `Checkbox`, `SelectOption`, `SelectProps`, `InputProps`, `TextAreaInputProps` |
+| `@vishnu/ui-component/loadingAnimation` | `LoadingAnimation`                                                                                                |
+| `@vishnu/ui-component/message`          | `Message`                                                                                                         |
+| `@vishnu/ui-component/pagination`       | `Pagination`                                                                                                      |
+| `@vishnu/ui-component/popover`          | `Popover`                                                                                                         |
+| `@vishnu/ui-component/table`            | `Table`                                                                                                           |
+| `@vishnu/ui-component/tabs`             | `Tabs`, `Tab`, `TabsProps`                                                                                        |
+| `@vishnu/ui-component/text`             | `Title`, `Subtitle`, `Caption`, `Paragraph`                                                                       |
+| `@vishnu/ui-component/tooltip`          | `Tooltip`                                                                                                         |
+| `@vishnu/ui-component/hooks` | `TranslationProviderProps`, `TranslationProvider`, `BrowserName`, `BrowserInfo`, `MinBrowserVersions`, `DEFAULT_MIN_VERSIONS`, `detectBrowser`, `useBrowserSupport`, `useDebounce`, `useDebounceFunc`, `useRichTextField`, `useIsSmallerThanTablet`, `useIsSmallPhone`, `useSlicedPages`, `TimerFormatter`, `useTimer`, `Language`, `TranslationKey`, `TranslationMap` |
+| `@vishnu/ui-component/utils` | `filterTree`, `flatten`, `delay`, `isSameTime`, `intlFormatDate`, `intlFormatDateWithTime`, `shortWeekNames`, `monthsNames`, `getYearsUntilNow`, `listYears`, `getStartOfDay`, `getEndOfDay`, `getStartOfMonth`, `getEndOfMonth`, `getStartOfWeek`, `getEndOfWeek`, `getStartOfYear`, `getEndOfYear`, `getDateBeforeMonths`, `addDays`, `subDays`, `addWeeks`, `addMonths`, `addYears`, `getFormattedTimeString`, `getFormattedDateString`, `getDurationBetweenDates`, `mergeDateAndTime`, `formatDateToLocalizedString`, `pad`, `formatDuration`, `getDayDescription`, `getDurationMs`, `formatTime`, `formatDate`, `formatMonthYear`, `formatYear`, `formatDateRange`, `roundUpToNearestByMinutes`, `roundToNearestByMinutes`, `addHours`, `formatRelativeDate`, `downloadUrlViaDOM`, `validator`, `passwordValidator`, `startTimeValidator`, `endTimeValidator`, `EMPTY_RICH_TEXT_VALUE`, `createEmptyRichTextValue`, `serializeRichText`, `deserializeRichText`, `isRichTextEmpty`, `serializeRichTextToHtml`, `RipplePointer`, `createRipple`, `stringComparisonFn`, `dateComparisonFn`, `numberComparisonFn`, `getLanguage`, `setLanguage`, `getStringHash`, `decodeHtml`, `getFullName`, `pasteFromClipboard`, `dataSourceFormatter`, `getLocaledDateTimeString`, `translate`, `FormRules`, `FormRulesOptions`, `PasswordRules`, `DateTimeRules`, `TimeTrackingRules`, `Language`, `TranslationKey`, `TranslationMap` |
 
-> The root barrel `@nexus/ui-component` remains the simplest way to import and is recommended for most use cases. Use subpath imports when bundle size is critical.
+> The root barrel `@vishnu/ui-component` remains the simplest way to import and is recommended for most use cases. Use subpath imports when bundle size is critical.
 
 ## Common Issues
 
@@ -219,7 +219,7 @@ Available subpath entry points:
 
 If styles are not applying, ensure:
 
-1. The stylesheet is loaded through your Tailwind-processed CSS entry (`@import "@nexus/ui-component/styles.css";` + `@source` — see step 1), not a JS import
+1. The stylesheet is loaded through your Tailwind-processed CSS entry (`@import "@vishnu/ui-component/styles.css";` + `@source` — see step 1), not a JS import
 2. Tailwind CSS is properly configured in your project
 3. Your bundler is processing CSS files
 
@@ -235,7 +235,7 @@ If you encounter TypeScript errors:
 
 If you get import errors:
 
-1. Verify the package is installed: `bun pm ls @nexus/ui-component`
+1. Verify the package is installed: `bun pm ls @vishnu/ui-component`
 2. Check your package.json for the correct version
 3. Clear node_modules and reinstall: `rm -rf node_modules && bun install`
 

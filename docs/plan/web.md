@@ -11,8 +11,8 @@ main plan.
 ## Layout & files
 
 ```
-shared-ui/                   @vishnu/ui-component — vendored copy of
-  ui-component/              nexus shared-ts (button, input/select,
+shared-ui/                   @vishnu/ui-component — vendored copy:
+  ui-component/              (button, input/select,
   hooks/ utils/ types/       drawer, dialog, popover, menu, tabs, chip,
   constants/ assets/         alert, emptyState, loadingAnimation, text,
   index.ts styles.css        tooltip, table, form, ... full set)
@@ -29,7 +29,7 @@ web/
                           oxlint/oxfmt
   vite.config.ts          plugins: react + tailwindcss; /api and /p →
                           http://127.0.0.1:8080 (dev proxy); alias @ → src
-  tsconfig{,.app,.node}.json   nexus-style strict (verbatimModuleSyntax,
+  tsconfig{,.app,.node}.json   strict (verbatimModuleSyntax,
                           erasableSyntaxOnly, noUncheckedSideEffectImports)
   index.html              viewport-fit=cover, dark
   src/
@@ -49,7 +49,7 @@ web/
                                useSessions/Messages/AgentInfo/Providers/
                                PermissionsSkip + mutations
     utils/errors.ts       ApiError → "[code] message" labels
-    features/             feature modules (valo backoffice convention)
+    features/             feature modules (backoffice convention)
       auth/LoginScreen.tsx     title screen: email → six-cell OTP
       projects/                ProjectPicker (menu + status + delete),
                                AddProjectDialog (GitHub | link | external),
@@ -222,7 +222,7 @@ clearly marked in the contract.
 (the vendored library ships its own variables/theme). App-level tokens
 override in `@theme`: dark palette, `h-dvh` root, `env(safe-area-*)`
 padding on composer, `.md` markdown element styles (code, pre, lists,
-tables), `.no-scrollbar` helper like nexus. Sidebar is a fixed column
+tables), `.no-scrollbar` helper like the reference backoffice. Sidebar is a fixed column
 ≥768px, shared `Drawer` slide-over under it.
 
 ## Build order

@@ -1,6 +1,6 @@
 # Components
 
-List of all publicly exported components in `@nexus/ui-component`.
+List of all publicly exported components in `@vishnu/ui-component`.
 
 Only components exported from `index.ts` are documented here. Internal source files that are not exported are not public API.
 
@@ -79,7 +79,7 @@ Only components exported from `index.ts` are documented here. Internal source fi
 ### Button
 
 ```tsx
-import {Button} from "@nexus/ui-component";
+import {Button} from "@vishnu/ui-component";
 
 <Button variant="filled" color="primary">Click Me</Button>
 <Button variant="outlined" color="danger">Danger</Button>
@@ -89,7 +89,7 @@ import {Button} from "@nexus/ui-component";
 ### ButtonGroup
 
 ```tsx
-import {ButtonGroup} from "@nexus/ui-component";
+import {ButtonGroup} from "@vishnu/ui-component";
 
 <ButtonGroup
 	items={[
@@ -103,7 +103,7 @@ import {ButtonGroup} from "@nexus/ui-component";
 ### Input
 
 ```tsx
-import {Input} from "@nexus/ui-component";
+import {Input} from "@vishnu/ui-component";
 
 <Input label="Email" type="email" placeholder="Enter your email" />
 <Input label="Password" type="password" error="Required" />
@@ -112,7 +112,7 @@ import {Input} from "@nexus/ui-component";
 ### PasswordInput
 
 ```tsx
-import {PasswordInput} from "@nexus/ui-component";
+import {PasswordInput} from "@vishnu/ui-component";
 
 <PasswordInput label="Password" name="password" value={pw} onChange={(e) => setPw(e.target.value)} />;
 ```
@@ -120,7 +120,7 @@ import {PasswordInput} from "@nexus/ui-component";
 ### Dialog
 
 ```tsx
-import {Dialog} from "@nexus/ui-component";
+import {Dialog} from "@vishnu/ui-component";
 
 <Dialog isOpen={isOpen} onClose={() => setIsOpen(false)} title="Confirm">
 	<p>Are you sure?</p>
@@ -130,7 +130,7 @@ import {Dialog} from "@nexus/ui-component";
 ### Table
 
 ```tsx
-import {Table} from "@nexus/ui-component";
+import {Table} from "@vishnu/ui-component";
 
 <Table
 	columns={[
@@ -144,7 +144,7 @@ import {Table} from "@nexus/ui-component";
 ### Pagination
 
 ```tsx
-import {Pagination} from "@nexus/ui-component";
+import {Pagination} from "@vishnu/ui-component";
 
 <Pagination currentPage={1} totalPages={10} onPageChange={setPage} />;
 ```
@@ -152,8 +152,8 @@ import {Pagination} from "@nexus/ui-component";
 ### Tabs
 
 ```tsx
-import {Tabs} from "@nexus/ui-component";
-import type {Tab} from "@nexus/ui-component";
+import {Tabs} from "@vishnu/ui-component";
+import type {Tab} from "@vishnu/ui-component";
 
 <Tabs
 	tabs={[
@@ -168,7 +168,7 @@ import type {Tab} from "@nexus/ui-component";
 ### Calendar
 
 ```tsx
-import {Calendar} from "@nexus/ui-component";
+import {Calendar} from "@vishnu/ui-component";
 
 <Calendar value={date} onChange={setDate} />;
 ```
@@ -176,7 +176,7 @@ import {Calendar} from "@nexus/ui-component";
 ### Chip
 
 ```tsx
-import {Chip} from "@nexus/ui-component";
+import {Chip} from "@vishnu/ui-component";
 
 <Chip>Tag</Chip>
 <Chip value="tag-1" color="blue" variant="solid" onRemove={(value) => console.log(value)}>Dismissible</Chip>
@@ -185,7 +185,7 @@ import {Chip} from "@nexus/ui-component";
 ### Drawer
 
 ```tsx
-import {Drawer} from "@nexus/ui-component";
+import {Drawer} from "@vishnu/ui-component";
 
 <Drawer isOpen={isOpen} onClose={() => setIsOpen(false)} position="right">
 	<nav>Content</nav>
@@ -195,7 +195,7 @@ import {Drawer} from "@nexus/ui-component";
 ### Popover
 
 ```tsx
-import {Popover} from "@nexus/ui-component";
+import {Popover} from "@vishnu/ui-component";
 
 <Popover content={<div>Content</div>} position="top">
 	<Button>Hover me</Button>
@@ -205,7 +205,7 @@ import {Popover} from "@nexus/ui-component";
 ### Tooltip
 
 ```tsx
-import {Tooltip} from "@nexus/ui-component";
+import {Tooltip} from "@vishnu/ui-component";
 
 <Tooltip content="Help text" position="top">
 	<Button>Hover me</Button>
@@ -215,8 +215,8 @@ import {Tooltip} from "@nexus/ui-component";
 ### Select
 
 ```tsx
-import {Select} from "@nexus/ui-component";
-import type {SelectOption} from "@nexus/ui-component";
+import {Select} from "@vishnu/ui-component";
+import type {SelectOption} from "@vishnu/ui-component";
 
 const options: SelectOption[] = [
 	{value: "1", label: "Option 1"},
@@ -229,7 +229,7 @@ const options: SelectOption[] = [
 ### Checkbox
 
 ```tsx
-import {Checkbox} from "@nexus/ui-component";
+import {Checkbox} from "@vishnu/ui-component";
 
 <Checkbox label="Accept terms" checked={isChecked} onChange={setIsChecked} />;
 ```
@@ -237,7 +237,7 @@ import {Checkbox} from "@nexus/ui-component";
 ### Switch
 
 ```tsx
-import {Switch} from "@nexus/ui-component";
+import {Switch} from "@vishnu/ui-component";
 
 <Switch name="notifications" checked={enabled} onChange={setEnabled} label="Enable notifications" />;
 ```
@@ -245,8 +245,8 @@ import {Switch} from "@nexus/ui-component";
 ### Radio
 
 ```tsx
-import {Radio} from "@nexus/ui-component";
-import type {RadioOption} from "@nexus/ui-component";
+import {Radio} from "@vishnu/ui-component";
+import type {RadioOption} from "@vishnu/ui-component";
 
 const options: RadioOption[] = [
 	{value: "small", label: "Small"},
@@ -260,7 +260,7 @@ const options: RadioOption[] = [
 ### TextAreaInput
 
 ```tsx
-import {TextAreaInput} from "@nexus/ui-component";
+import {TextAreaInput} from "@vishnu/ui-component";
 
 <TextAreaInput label="Description" placeholder="Enter description" />;
 ```
@@ -268,7 +268,7 @@ import {TextAreaInput} from "@nexus/ui-component";
 ### DatePicker
 
 ```tsx
-import {DatePicker} from "@nexus/ui-component";
+import {DatePicker} from "@vishnu/ui-component";
 
 <DatePicker name="birthday" value={date} onChange={setDate} language="en" />;
 ```
@@ -276,7 +276,7 @@ import {DatePicker} from "@nexus/ui-component";
 ### DateRangePicker
 
 ```tsx
-import {DateRangePicker} from "@nexus/ui-component";
+import {DateRangePicker} from "@vishnu/ui-component";
 
 <DateRangePicker
 	name="range"
@@ -293,8 +293,8 @@ import {DateRangePicker} from "@nexus/ui-component";
 ### MultipleSelect
 
 ```tsx
-import {MultipleSelect} from "@nexus/ui-component";
-import type {SelectOption} from "@nexus/ui-component";
+import {MultipleSelect} from "@vishnu/ui-component";
+import type {SelectOption} from "@vishnu/ui-component";
 
 const options: SelectOption[] = [
 	{value: "1", label: "Tag 1"},
@@ -307,7 +307,7 @@ const options: SelectOption[] = [
 ### SearchInput
 
 ```tsx
-import {SearchInput} from "@nexus/ui-component";
+import {SearchInput} from "@vishnu/ui-component";
 
 <SearchInput
 	placeholder="Search..."
@@ -320,7 +320,7 @@ import {SearchInput} from "@nexus/ui-component";
 ### SegmentedControl
 
 ```tsx
-import {SegmentedControl} from "@nexus/ui-component";
+import {SegmentedControl} from "@vishnu/ui-component";
 
 <SegmentedControl
 	name="view"
@@ -337,7 +337,7 @@ import {SegmentedControl} from "@nexus/ui-component";
 ### RichDescription
 
 ```tsx
-import {RichDescription} from "@nexus/ui-component";
+import {RichDescription} from "@vishnu/ui-component";
 
 <RichDescription text="<p>Hello <a href='example.com'>world</a></p>" />;
 ```
@@ -350,7 +350,7 @@ stripped while keeping its text content.
 ### Message
 
 ```tsx
-import {Message} from "@nexus/ui-component";
+import {Message} from "@vishnu/ui-component";
 
 <Message type="info">Information</Message>
 <Message type="success">Success</Message>
@@ -359,7 +359,7 @@ import {Message} from "@nexus/ui-component";
 ### LoadingAnimation
 
 ```tsx
-import {LoadingAnimation} from "@nexus/ui-component";
+import {LoadingAnimation} from "@vishnu/ui-component";
 
 <LoadingAnimation />
 <LoadingAnimation size="lg" />
@@ -368,7 +368,7 @@ import {LoadingAnimation} from "@nexus/ui-component";
 ### LoadingSpinner
 
 ```tsx
-import {LoadingSpinner} from "@nexus/ui-component";
+import {LoadingSpinner} from "@vishnu/ui-component";
 
 <LoadingSpinner size={24} />;
 ```
@@ -376,7 +376,7 @@ import {LoadingSpinner} from "@nexus/ui-component";
 ### Title, Subtitle, Caption, Paragraph
 
 ```tsx
-import {Title, Subtitle, Caption, Paragraph} from "@nexus/ui-component";
+import {Title, Subtitle, Caption, Paragraph} from "@vishnu/ui-component";
 
 <Title level={1}>Heading 1</Title>
 <Subtitle>Subtitle text</Subtitle>
@@ -387,7 +387,7 @@ import {Title, Subtitle, Caption, Paragraph} from "@nexus/ui-component";
 ### Rating
 
 ```tsx
-import {Rating} from "@nexus/ui-component";
+import {Rating} from "@vishnu/ui-component";
 import {useState} from "react";
 
 function App() {
@@ -402,7 +402,7 @@ function App() {
 ### ProgressBar
 
 ```tsx
-import {ProgressBar} from "@nexus/ui-component";
+import {ProgressBar} from "@vishnu/ui-component";
 
 // Determinate (e.g. upload progress)
 <ProgressBar value={65} showLabel color="primary" animated />
@@ -417,7 +417,7 @@ import {ProgressBar} from "@nexus/ui-component";
 ### CircularProgress
 
 ```tsx
-import {CircularProgress} from "@nexus/ui-component";
+import {CircularProgress} from "@vishnu/ui-component";
 
 // Determinate with center label
 <CircularProgress value={72} size={48} thickness={4} showLabel color="primary" />
@@ -430,55 +430,55 @@ import {CircularProgress} from "@nexus/ui-component";
 
 | Component             | Import                                                      | Usage                   |
 | --------------------- | ----------------------------------------------------------- | ----------------------- |
-| ActionBar             | `import {ActionBar} from "@nexus/ui-component"`             | Toolbar actions         |
-| Alert                 | `import {Alert} from "@nexus/ui-component"`                 | Alert notifications     |
-| AlertInline           | `import {AlertInline} from "@nexus/ui-component"`           | Inline alerts           |
-| AlertToast            | `import {AlertToast} from "@nexus/ui-component"`            | Toast alerts            |
-| Button                | `import {Button} from "@nexus/ui-component"`                | Buttons with variants   |
-| ButtonGroup           | `import {ButtonGroup} from "@nexus/ui-component"`           | Grouped buttons         |
-| Calendar              | `import {Calendar} from "@nexus/ui-component"`              | Calendar date picker    |
-| Caption               | `import {Caption} from "@nexus/ui-component"`               | Caption text            |
-| Checkbox              | `import {Checkbox} from "@nexus/ui-component"`              | Checkbox input          |
-| Chip                  | `import {Chip} from "@nexus/ui-component"`                  | Tags/labels             |
-| CircularProgress      | `import {CircularProgress} from "@nexus/ui-component"`      | Circular progress       |
-| ClickOutside          | `import {ClickOutside} from "@nexus/ui-component"`          | Click-outside detection |
-| ContentWrapper        | `import {ContentWrapper} from "@nexus/ui-component"`        | Content layout wrapper  |
-| DataList              | `import {DataList} from "@nexus/ui-component"`              | Data list display       |
-| DatePicker            | `import {DatePicker} from "@nexus/ui-component"`            | Date picker             |
-| DateRangePicker       | `import {DateRangePicker} from "@nexus/ui-component"`       | Date range picker       |
-| DateTimeValidator     | `import {DateTimeValidator} from "@nexus/ui-component"`     | Date/time validation    |
-| Dialog                | `import {Dialog} from "@nexus/ui-component"`                | Modal dialogs           |
-| Drawer                | `import {Drawer} from "@nexus/ui-component"`                | Side panels             |
-| FormList              | `import {FormList} from "@nexus/ui-component"`              | Form field grouping     |
-| FormValidator         | `import {FormValidator} from "@nexus/ui-component"`         | Form validation display |
-| Input                 | `import {Input} from "@nexus/ui-component"`                 | Form inputs             |
-| LoadingAnimation      | `import {LoadingAnimation} from "@nexus/ui-component"`      | Loading dots            |
-| LoadingSpinner        | `import {LoadingSpinner} from "@nexus/ui-component"`        | Loading spinner         |
-| MenuItem              | `import {MenuItem} from "@nexus/ui-component"`              | Menu items              |
-| Message               | `import {Message} from "@nexus/ui-component"`               | Message display         |
-| MultipleSelect        | `import {MultipleSelect} from "@nexus/ui-component"`        | Multi-value select      |
-| PageTitle             | `import {PageTitle} from "@nexus/ui-component"`             | Page-level title        |
-| PageWrapper           | `import {PageWrapper} from "@nexus/ui-component"`           | Page layout wrapper     |
-| Pagination            | `import {Pagination} from "@nexus/ui-component"`            | Pagination              |
-| Paragraph             | `import {Paragraph} from "@nexus/ui-component"`             | Body text               |
-| PasswordFormValidator | `import {PasswordFormValidator} from "@nexus/ui-component"` | Password validation     |
-| PasswordInput         | `import {PasswordInput} from "@nexus/ui-component"`         | Password input          |
-| Popover               | `import {Popover} from "@nexus/ui-component"`               | Popover positioning     |
-| ProgressBar           | `import {ProgressBar} from "@nexus/ui-component"`           | Linear progress bar     |
-| Radio                 | `import {Radio} from "@nexus/ui-component"`                 | Radio button group      |
-| Rating                | `import {Rating} from "@nexus/ui-component"`                | Star rating             |
-| RichDescription       | `import {RichDescription} from "@nexus/ui-component"`       | Rich text display       |
-| SearchInput           | `import {SearchInput} from "@nexus/ui-component"`           | Search input            |
-| Select                | `import {Select} from "@nexus/ui-component"`                | Dropdown select         |
-| SegmentedControl      | `import {SegmentedControl} from "@nexus/ui-component"`      | Segmented control       |
-| Skeleton              | `import {Skeleton} from "@nexus/ui-component"`              | Skeleton placeholder    |
-| Subtitle              | `import {Subtitle} from "@nexus/ui-component"`              | Subtitle text           |
-| Switch                | `import {Switch} from "@nexus/ui-component"`                | Toggle switch           |
-| Table                 | `import {Table} from "@nexus/ui-component"`                 | Data tables             |
-| Tabs                  | `import {Tabs} from "@nexus/ui-component"`                  | Tab navigation          |
-| TextAreaInput         | `import {TextAreaInput} from "@nexus/ui-component"`         | Text area input         |
-| TimePicker            | `import {TimePicker} from "@nexus/ui-component"`            | Time picker             |
-| TimeTrackingValidator | `import {TimeTrackingValidator} from "@nexus/ui-component"` | Time-tracking validation|
-| Title                 | `import {Title} from "@nexus/ui-component"`                 | Title/heading           |
-| Tooltip               | `import {Tooltip} from "@nexus/ui-component"`               | Tooltips                |
-| UserImageIcon         | `import {UserImageIcon} from "@nexus/ui-component"`         | User avatar icon        |
+| ActionBar             | `import {ActionBar} from "@vishnu/ui-component"`             | Toolbar actions         |
+| Alert                 | `import {Alert} from "@vishnu/ui-component"`                 | Alert notifications     |
+| AlertInline           | `import {AlertInline} from "@vishnu/ui-component"`           | Inline alerts           |
+| AlertToast            | `import {AlertToast} from "@vishnu/ui-component"`            | Toast alerts            |
+| Button                | `import {Button} from "@vishnu/ui-component"`                | Buttons with variants   |
+| ButtonGroup           | `import {ButtonGroup} from "@vishnu/ui-component"`           | Grouped buttons         |
+| Calendar              | `import {Calendar} from "@vishnu/ui-component"`              | Calendar date picker    |
+| Caption               | `import {Caption} from "@vishnu/ui-component"`               | Caption text            |
+| Checkbox              | `import {Checkbox} from "@vishnu/ui-component"`              | Checkbox input          |
+| Chip                  | `import {Chip} from "@vishnu/ui-component"`                  | Tags/labels             |
+| CircularProgress      | `import {CircularProgress} from "@vishnu/ui-component"`      | Circular progress       |
+| ClickOutside          | `import {ClickOutside} from "@vishnu/ui-component"`          | Click-outside detection |
+| ContentWrapper        | `import {ContentWrapper} from "@vishnu/ui-component"`        | Content layout wrapper  |
+| DataList              | `import {DataList} from "@vishnu/ui-component"`              | Data list display       |
+| DatePicker            | `import {DatePicker} from "@vishnu/ui-component"`            | Date picker             |
+| DateRangePicker       | `import {DateRangePicker} from "@vishnu/ui-component"`       | Date range picker       |
+| DateTimeValidator     | `import {DateTimeValidator} from "@vishnu/ui-component"`     | Date/time validation    |
+| Dialog                | `import {Dialog} from "@vishnu/ui-component"`                | Modal dialogs           |
+| Drawer                | `import {Drawer} from "@vishnu/ui-component"`                | Side panels             |
+| FormList              | `import {FormList} from "@vishnu/ui-component"`              | Form field grouping     |
+| FormValidator         | `import {FormValidator} from "@vishnu/ui-component"`         | Form validation display |
+| Input                 | `import {Input} from "@vishnu/ui-component"`                 | Form inputs             |
+| LoadingAnimation      | `import {LoadingAnimation} from "@vishnu/ui-component"`      | Loading dots            |
+| LoadingSpinner        | `import {LoadingSpinner} from "@vishnu/ui-component"`        | Loading spinner         |
+| MenuItem              | `import {MenuItem} from "@vishnu/ui-component"`              | Menu items              |
+| Message               | `import {Message} from "@vishnu/ui-component"`               | Message display         |
+| MultipleSelect        | `import {MultipleSelect} from "@vishnu/ui-component"`        | Multi-value select      |
+| PageTitle             | `import {PageTitle} from "@vishnu/ui-component"`             | Page-level title        |
+| PageWrapper           | `import {PageWrapper} from "@vishnu/ui-component"`           | Page layout wrapper     |
+| Pagination            | `import {Pagination} from "@vishnu/ui-component"`            | Pagination              |
+| Paragraph             | `import {Paragraph} from "@vishnu/ui-component"`             | Body text               |
+| PasswordFormValidator | `import {PasswordFormValidator} from "@vishnu/ui-component"` | Password validation     |
+| PasswordInput         | `import {PasswordInput} from "@vishnu/ui-component"`         | Password input          |
+| Popover               | `import {Popover} from "@vishnu/ui-component"`               | Popover positioning     |
+| ProgressBar           | `import {ProgressBar} from "@vishnu/ui-component"`           | Linear progress bar     |
+| Radio                 | `import {Radio} from "@vishnu/ui-component"`                 | Radio button group      |
+| Rating                | `import {Rating} from "@vishnu/ui-component"`                | Star rating             |
+| RichDescription       | `import {RichDescription} from "@vishnu/ui-component"`       | Rich text display       |
+| SearchInput           | `import {SearchInput} from "@vishnu/ui-component"`           | Search input            |
+| Select                | `import {Select} from "@vishnu/ui-component"`                | Dropdown select         |
+| SegmentedControl      | `import {SegmentedControl} from "@vishnu/ui-component"`      | Segmented control       |
+| Skeleton              | `import {Skeleton} from "@vishnu/ui-component"`              | Skeleton placeholder    |
+| Subtitle              | `import {Subtitle} from "@vishnu/ui-component"`              | Subtitle text           |
+| Switch                | `import {Switch} from "@vishnu/ui-component"`                | Toggle switch           |
+| Table                 | `import {Table} from "@vishnu/ui-component"`                 | Data tables             |
+| Tabs                  | `import {Tabs} from "@vishnu/ui-component"`                  | Tab navigation          |
+| TextAreaInput         | `import {TextAreaInput} from "@vishnu/ui-component"`         | Text area input         |
+| TimePicker            | `import {TimePicker} from "@vishnu/ui-component"`            | Time picker             |
+| TimeTrackingValidator | `import {TimeTrackingValidator} from "@vishnu/ui-component"` | Time-tracking validation|
+| Title                 | `import {Title} from "@vishnu/ui-component"`                 | Title/heading           |
+| Tooltip               | `import {Tooltip} from "@vishnu/ui-component"`               | Tooltips                |
+| UserImageIcon         | `import {UserImageIcon} from "@vishnu/ui-component"`         | User avatar icon        |

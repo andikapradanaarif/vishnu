@@ -1,6 +1,6 @@
 # Styling
 
-This guide covers styling, theming, and customization options for @nexus/ui-component.
+This guide covers styling, theming, and customization options for @vishnu/ui-component.
 
 ## Global Styles
 
@@ -36,8 +36,8 @@ gets generated:
 
 ```css
 @import "tailwindcss";
-@import "@nexus/ui-component/styles.css";
-@source "../node_modules/@nexus/ui-component";
+@import "@vishnu/ui-component/styles.css";
+@source "../node_modules/@vishnu/ui-component";
 ```
 
 - `@import` (not a bundler `import` in JS) is required so `styles.css`'s
@@ -129,8 +129,8 @@ Override tokens in your own CSS, after the library's `styles.css` is loaded:
 ```css
 /* src/styles/globals.css — the Tailwind-processed entry */
 @import "tailwindcss";
-@import "@nexus/ui-component/styles.css";
-@source "../node_modules/@nexus/ui-component";
+@import "@vishnu/ui-component/styles.css";
+@source "../node_modules/@vishnu/ui-component";
 
 @theme {
 	--color-primary-500: #8b5cf6;
@@ -271,7 +271,7 @@ The library includes built-in animations:
 ### Loading Animation
 
 ```tsx
-import {LoadingAnimation} from "@nexus/ui-component";
+import {LoadingAnimation} from "@vishnu/ui-component";
 
 <LoadingAnimation />;
 ```
@@ -399,7 +399,7 @@ Test your custom styles across different screen sizes:
 
 If styles are not applying:
 
-1. Ensure the global styles are loaded through your Tailwind-processed CSS entry (`@import "@nexus/ui-component/styles.css";` + `@source` — see Configuration)
+1. Ensure the global styles are loaded through your Tailwind-processed CSS entry (`@import "@vishnu/ui-component/styles.css";` + `@source` — see Configuration)
 2. Check that Tailwind CSS is properly configured
 3. Verify your bundler is processing CSS files
 4. Clear your cache and rebuild

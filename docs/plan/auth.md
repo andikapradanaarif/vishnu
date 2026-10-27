@@ -1,6 +1,6 @@
 # auth/ work plan — email OTP sign-in and an eligibility store
 
-Follows the valo implementation (`~/Documents/p/lmv/valo/valo-backend/api`)
+Follows the reference backend implementation (`<reference-backend>/api`)
 for the login flow, session mechanism, and provider integration. Where this
 plan diverges, the divergence is called out with the reason.
 
@@ -21,24 +21,24 @@ authorization for a shell, not for read-only data.
 
 - **`EventSource` cannot set request headers.** A bearer token in an
   `Authorization` header would authenticate REST and silently break
-  `GET /v1/workspaces/{id}/events`, the app's entire liveness model. Valo
+  `GET /v1/workspaces/{id}/events`, the app's entire liveness model. the reference backend
   solves this the same way: a JWT in an `HttpOnly` cookie (its handler
   sets the cookie *and* mirrors `Authorization: Bearer …` for API clients),
   with `GetMe` returning claims so the frontend never touches the raw JWT.
-- **Postgres rather than valo's Redis.** Valo keeps OTPs, attempt
+- **Postgres rather than the reference backend's Redis.** the reference backend keeps OTPs, attempt
   counters, Fibonacci rate-limit state, and the user's token set in Redis
   (`internal/repository/user_token_repository.go`). This deployment has
   Postgres and no Redis, so every one of those becomes a table with an
   explicit `expires_at`. The real cost is that Postgres has no key TTL:
   expired rows need a sweep (below), which Redis would have done for free.
-- **Email + OTP rather than phone + PIN.** Valo's `/login` is phone+PIN and
+- **Email + OTP rather than phone + PIN.** the reference backend's `/login` is phone+PIN and
   its OTP flows are registration and PIN reset. Here the OTP *is* the
   login, so `/auth/login` verifies the code and issues the session in one
   step, and there is no credential to reset.
 
 ## Data model (Postgres)
 
-Mirrors valo's `users` table (`api/migration/create_users_table.sql`) for
+Mirrors the reference backend's `users` table (`api/migration/create_users_table.sql`) for
 the user row, including its `set_updated_at` trigger pattern.
 
 ```sql
@@ -89,7 +89,7 @@ CREATE INDEX IF NOT EXISTS idx_auth_sessions_user ON auth_sessions (user_id);
 
 `auth_otp` is keyed on the email rather than `user_id` so a code can be
 issued before eligibility is resolved, and so an unknown address leaves no
-user-shaped trace. `code_hash` is a SHA-256 of the code (valo's `HashOTP`),
+user-shaped trace. `code_hash` is a SHA-256 of the code (the reference backend's `HashOTP`),
 compared in constant time — bcrypt is unnecessary for a 6-digit code that
 lives 5 minutes under a 3-attempt cap.
 
@@ -98,7 +98,7 @@ and the same for `auth_rate_limit`, run opportunistically on each OTP
 request (cheap with the primary key) and/or on a ticker. No cron, no
 extension.
 
-Migrations follow valo's convention: numbered `.sql` files under
+Migrations follow the reference backend's convention: numbered `.sql` files under
 `api/migration/` plus an applied-migrations table
 (`migration/create_migrations_table.sql`), run by a small runner — no new
 Go dependency.
@@ -121,9 +121,9 @@ browser                     api (vishnu)                       Brevo
   │◄────────────────────────────┤ 200 {user_id, email, name}
 ```
 
-### OTP mechanics (from valo)
+### OTP mechanics (from the reference backend)
 
-| Setting | Value | Valo source |
+| Setting | Value | Reference source |
 | --- | --- | --- |
 | Code | 6 digits, `crypto/rand` | `auth_usecase.go` |
 | Lifetime | 5 minutes | `otp_rate_limit.go` ("5-minute OTP window") |
@@ -133,7 +133,7 @@ browser                     api (vishnu)                       Brevo
 | On failure | `retry_after` (seconds) so the client can count down | `dto.OTPResponse` |
 | On send failure | rate-limit increment is rolled back via a request nonce | `RollbackFibRateLimit` |
 
-The atomicity valo gets from Redis pipelines needs a transaction here: the
+The atomicity the reference backend gets from Redis pipelines needs a transaction here: the
 rate-limit check-and-increment and the OTP upsert run in one
 `BEGIN … COMMIT`, with `SELECT … FOR UPDATE` on the `auth_rate_limit` row.
 
@@ -150,14 +150,14 @@ rate-limit check-and-increment and the OTP upsert run in one
 | `ALL /v1/*` | required | streaming proxy, behaviour unchanged once authorized |
 | `ALL /*` | required | SPA + assets; HTML navigations redirect to `/login?next=…` |
 
-Eligibility failures are deliberately explicit (`403 not_eligible`). Valo's
+Eligibility failures are deliberately explicit (`403 not_eligible`). the reference backend's
 `/register-otp` has the same shape, and this is an invite-only tool: a
 guessable-email probe that reveals "not on the list" is the better
 trade-off than silently emailing nobody.
 
 ## Session
 
-Valo's mechanism, unchanged:
+the reference backend's mechanism, unchanged:
 
 - **JWT HS256**, claims `UID`, `R` (roles), `EXP` as **Unix seconds**;
   `EXP` is required and validated explicitly rather than trusted to the
@@ -168,7 +168,7 @@ Valo's mechanism, unchanged:
   without `Secure`, because browsers drop such cookies.
 - **Logout** clears the cookie with `Value: ""` and a past `Expires`, and
   revokes the session row.
-- **Revocation** is the `auth_sessions` table (valo's Redis token set):
+- **Revocation** is the `auth_sessions` table (the reference backend's Redis token set):
   the middleware rejects a token whose row is missing or `revoked_at` is
   set, which is what makes "disable this user" and "log out everywhere"
   take effect immediately.
@@ -176,17 +176,17 @@ Valo's mechanism, unchanged:
 Trade-off to accept: `SameSite=Strict` means a deep link into the app from
 outside a browser session (an email client, a bookmark opened cold) lands
 on the login page before the cookie is sent. `COOKIE_SAME_SITE=Lax` is the
-override if that bites; the default stays `Strict` to match valo.
+override if that bites; the default stays `Strict` to match the reference backend.
 
 ## Middleware
 
-Order mirrors valo's route groups: **rate limiter → auth → handler**, with
+Order mirrors the reference backend's route groups: **rate limiter → auth → handler**, with
 the rate limiter emitting `429` and `Retry-After` before any auth work.
 
 - Reads the cookie, decodes the JWT, checks the session row, loads the
   user, requires `status = 'active'`.
 - Error codes pass through verbatim so callers can distinguish: 
-  `missing_token`, `invalid_token`, `expired_token` — valo's convention,
+  `missing_token`, `invalid_token`, `expired_token` — the reference backend's convention,
   documented per operation in its OpenAPI specs.
 - API clients (`Accept: application/json`, `/v1/*`, XHR, SSE) get `401`
   JSON; HTML navigations get `302 /login?next=…`.
@@ -199,7 +199,7 @@ the rate limiter emitting `429` and `Retry-After` before any auth work.
 
 ## Email (Brevo)
 
-Valo's sender is a small REST client (`internal/service/email/brevo.go`);
+the reference backend's sender is a small REST client (`internal/service/email/brevo.go`);
 the same shape here:
 
 - `POST {BREVO_API_URL}/v3/smtp/email` with header `api-key`, body
@@ -212,12 +212,12 @@ the same shape here:
 - Message body from an OTP template with an HTML rendering and a
   plain-text fallback, and i18n copy (`id` default, `en`), mirroring
   `GenerateOTPEmailContent(code, recipientName, lang, expirationMinutes)`.
-  Vishnu's template is its own (valo's carries Valopay branding and a
+  Vishnu's template is its own (the reference template carries product branding and a
   storage-bucket logo); copy only the structure, not the assets.
 
 Reuse the **`BREVO_*` variable names verbatim** so the credentials already
 in the environment work. App-specific settings keep the `VISHNU_` prefix
-instead of reusing valo's `JWT_SECRET` / `TOKEN_EXPIRATION_HOURS`, because
+instead of reusing the reference backend's `JWT_SECRET` / `TOKEN_EXPIRATION_HOURS`, because
 both projects run from the same shell and a shared secret would silently
 couple their token lifetimes.
 
@@ -243,7 +243,7 @@ on removal. A user holding a valid JWT is locked out on their next request.
 | Env | Default | Required | Purpose |
 | --- | --- | --- | --- |
 | `VISHNU_DATABASE_URL` | — | yes | Postgres DSN for the eligibility store and auth tables |
-| `VISHNU_JWT_SECRET` | — | yes | HS256 signing key, ≥32 bytes (valo's rule) |
+| `VISHNU_JWT_SECRET` | — | yes | HS256 signing key, ≥32 bytes (the reference backend's rule) |
 | `VISHNU_TOKEN_EXPIRATION_HOURS` | `168` | no | session lifetime |
 | `BREVO_API_KEY` | — | yes | Brevo transactional API key |
 | `BREVO_API_URL` | `https://api.brevo.com` | no | endpoint base |
@@ -252,7 +252,7 @@ on removal. A user holding a valid JWT is locked out on their next request.
 | `COOKIE_SAME_SITE` | `strict` | no | `strict` / `lax` / `none` |
 | `COOKIE_SECURE` | `true` | no | `false` only for local HTTP |
 
-Startup validation follows valo's config checks and fails closed with the
+Startup validation follows the reference backend's config checks and fails closed with the
 full list of problems at once: missing DSN, missing or <32-byte secret,
 unknown `SameSite`, `SameSite=None` without `Secure`, and any missing
 Brevo credential.
@@ -262,7 +262,7 @@ Brevo credential.
 ```
 api/internal/config/config.go              + the table above, validated at startup
 api/internal/auth/otp.go                   generate/hash/verify, TTL, attempt cap
-api/internal/auth/ratelimit.go             Fibonacci back-off (valo's math verbatim)
+api/internal/auth/ratelimit.go             Fibonacci back-off (the reference backend's math verbatim)
 api/internal/auth/jwt.go                   encode/decode, EXP validation, claim keys
 api/internal/auth/cookie.go                set/clear, SameSite/Secure normalization
 api/internal/auth/middleware.go            rate limit → auth → CSRF origin check
@@ -272,7 +272,7 @@ api/internal/repository/otp_repository.go       auth_otp + auth_rate_limit (tran
 api/internal/repository/session_repository.go   auth_sessions
 api/internal/service/email/brevo.go        Brevo REST client
 api/internal/service/email/otp_template.go OTP email, HTML + text, id/en
-api/migration/*.sql                        schema, valo naming convention
+api/migration/*.sql                        schema, the reference backend naming convention
 api/migration/runner.go                    sequential apply + migrations table
 api/cmd/users/main.go                      add / list / disable / enable / remove
 api/cmd/server/main.go                     wiring + startup validation
@@ -282,7 +282,7 @@ web/src/features/auth/LoginPage.tsx        email step → code step with retry_a
 web/src/features/topbar/TopBar.tsx         signed-in email + logout
 ```
 
-Layering stays nexus/valo style: `cmd` → `config` → `repository`/`service`
+Layering stays the same style: `cmd` → `config` → `repository`/`service`
 → `handler`, interfaces declared where they are consumed, concrete types
 unexported behind exported constructors.
 
@@ -311,7 +311,7 @@ First Go tests in the repo.
   window, nonce rollback.
 - `auth/jwt_test.go`: round-trip, tampered signature, missing `EXP`,
   expired `EXP`, secret rotation.
-- `repository/*_test.go` against a real Postgres (valo's `repositorytest`
+- `repository/*_test.go` against a real Postgres (the reference backend's `repositorytest`
   package is the pattern) — requires a test DSN; if that is unavailable,
   these run behind a build tag rather than being faked away.
 - `auth/middleware_test.go` + `handler_test.go` (fiber + `httptest`):
@@ -350,13 +350,13 @@ curl -ib c.txt localhost:8080/auth/me          # 200 with the user
 ## Open questions
 
 - [ ] OTP lifetime (5 min), attempt cap (3), and the Fibonacci ceiling —
-      keep valo's values as-is, or shorten for a localhost tool?
-- [ ] Email copy language: `id` default with `en` (valo's choice).
-- [ ] Error body shape for app-owned routes: valo's
+      keep the reference backend's values as-is, or shorten for a localhost tool?
+- [ ] Email copy language: `id` default with `en` (the reference backend's choice).
+- [ ] Error body shape for app-owned routes: the reference backend's
       `{code, message, retry_after, errors[]}` envelope, or crush's bare
       `{message}` for consistency with `/v1/*`?
 - [ ] Dev-mode auth: always run through `make dev`, or add an explicit
       `VISHNU_AUTH_DEV_BYPASS` for the Vite path?
-- [ ] `GET /auth/activity` (valo's login history) — in scope, or later?
+- [ ] `GET /auth/activity` (the reference backend's login history) — in scope, or later?
 - [ ] Is a Postgres test database available for repository tests, or do
       they run behind a build tag?

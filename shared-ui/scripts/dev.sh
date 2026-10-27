@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Dev script for shared-ts
+# Dev script for shared-ui
 # This script watches for changes and rebuilds with Bun
 
 set -e

@@ -1,4 +1,4 @@
-# @nexus/ui-component
+# @vishnu/ui-component
 
 Shared UI component library for Nexus frontend projects, built with React and TypeScript.
 
@@ -21,7 +21,7 @@ Use these as source of truth for public API usage:
 ## Installation
 
 ```bash
-bun add @nexus/ui-component
+bun add @vishnu/ui-component
 bun add react@^19.3.1 react-dom@^19.3.1 @tanstack/react-form@^1.33.5 tailwindcss@^4.3.3
 ```
 
@@ -32,50 +32,50 @@ warning and cannot load the stylesheet correctly.
 
 ## Supported Entry Points
 
-- `@nexus/ui-component` — root barrel (curated: components, their prop types, and common hooks; the full helper surface is in the `utils` and `hooks` subpaths)
-- `@nexus/ui-component/styles.css` — global stylesheet
+- `@vishnu/ui-component` — root barrel (curated: components, their prop types, and common hooks; the full helper surface is in the `utils` and `hooks` subpaths)
+- `@vishnu/ui-component/styles.css` — global stylesheet
 - Per-component subpaths (for tree-shaking):
-  - `@nexus/ui-component/accordion`
-  - `@nexus/ui-component/actionBar`
-  - `@nexus/ui-component/alert`
-  - `@nexus/ui-component/breadcrumb`
-  - `@nexus/ui-component/browserWarning`
-  - `@nexus/ui-component/button`
-  - `@nexus/ui-component/calendar`
-  - `@nexus/ui-component/chip`
-  - `@nexus/ui-component/clickOutside`
-  - `@nexus/ui-component/dataList`
-  - `@nexus/ui-component/dialog`
-  - `@nexus/ui-component/drawer`
-  - `@nexus/ui-component/emptyData`
-  - `@nexus/ui-component/emptyState`
-  - `@nexus/ui-component/form`
-  - `@nexus/ui-component/hooks`
-  - `@nexus/ui-component/input`
-  - `@nexus/ui-component/loadingAnimation`
-  - `@nexus/ui-component/menu`
-  - `@nexus/ui-component/message`
-  - `@nexus/ui-component/pagination`
-  - `@nexus/ui-component/popover`
-  - `@nexus/ui-component/progressBar`
-  - `@nexus/ui-component/qrCode`
-  - `@nexus/ui-component/rating`
-  - `@nexus/ui-component/richTextEditor`
-  - `@nexus/ui-component/slider`
-  - `@nexus/ui-component/stepper`
-  - `@nexus/ui-component/table`
-  - `@nexus/ui-component/tabs`
-  - `@nexus/ui-component/text`
-  - `@nexus/ui-component/timePicker`
-  - `@nexus/ui-component/tooltip`
-  - `@nexus/ui-component/userImageIcon`
-  - `@nexus/ui-component/utils`
-  - `@nexus/ui-component/wrapper`
+  - `@vishnu/ui-component/accordion`
+  - `@vishnu/ui-component/actionBar`
+  - `@vishnu/ui-component/alert`
+  - `@vishnu/ui-component/breadcrumb`
+  - `@vishnu/ui-component/browserWarning`
+  - `@vishnu/ui-component/button`
+  - `@vishnu/ui-component/calendar`
+  - `@vishnu/ui-component/chip`
+  - `@vishnu/ui-component/clickOutside`
+  - `@vishnu/ui-component/dataList`
+  - `@vishnu/ui-component/dialog`
+  - `@vishnu/ui-component/drawer`
+  - `@vishnu/ui-component/emptyData`
+  - `@vishnu/ui-component/emptyState`
+  - `@vishnu/ui-component/form`
+  - `@vishnu/ui-component/hooks`
+  - `@vishnu/ui-component/input`
+  - `@vishnu/ui-component/loadingAnimation`
+  - `@vishnu/ui-component/menu`
+  - `@vishnu/ui-component/message`
+  - `@vishnu/ui-component/pagination`
+  - `@vishnu/ui-component/popover`
+  - `@vishnu/ui-component/progressBar`
+  - `@vishnu/ui-component/qrCode`
+  - `@vishnu/ui-component/rating`
+  - `@vishnu/ui-component/richTextEditor`
+  - `@vishnu/ui-component/slider`
+  - `@vishnu/ui-component/stepper`
+  - `@vishnu/ui-component/table`
+  - `@vishnu/ui-component/tabs`
+  - `@vishnu/ui-component/text`
+  - `@vishnu/ui-component/timePicker`
+  - `@vishnu/ui-component/tooltip`
+  - `@vishnu/ui-component/userImageIcon`
+  - `@vishnu/ui-component/utils`
+  - `@vishnu/ui-component/wrapper`
 
 ## Quick Start
 
 ```tsx
-import {Button, Input} from "@nexus/ui-component";
+import {Button, Input} from "@vishnu/ui-component";
 
 function App() {
 	return (
@@ -95,8 +95,8 @@ import — so its `@theme` block registers the `--color-*` tokens:
 ```css
 /* e.g. src/index.css (Vite/CRA) or globals.css (Next.js) */
 @import "tailwindcss";
-@import "@nexus/ui-component/styles.css";
-@source "../node_modules/@nexus/ui-component";
+@import "@vishnu/ui-component/styles.css";
+@source "../node_modules/@vishnu/ui-component";
 ```
 
 `@source` makes Tailwind scan the package's emitted class strings; adjust
@@ -110,8 +110,8 @@ required.
 For maximum tree-shaking, import from per-component subpaths instead of the root barrel:
 
 ```tsx
-import {Button} from "@nexus/ui-component/button";
-import {Input, Select} from "@nexus/ui-component/input";
+import {Button} from "@vishnu/ui-component/button";
+import {Input, Select} from "@vishnu/ui-component/input";
 ```
 
 ## Theming (Color Tokens)
