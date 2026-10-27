@@ -1,6 +1,6 @@
 # Vishnu
 
-A web UI for driving [Crush](https://github.com/andikapradanaarif/crush)
+A web UI for driving [Crush fork by me](https://github.com/andikapradanaarif/crush)
 agent sessions across multiple projects — list, create, and delete
 sessions; chat with streaming responses; answer permission and question
 prompts; switch models and agents — from a browser, on any device.
