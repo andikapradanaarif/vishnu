@@ -28,6 +28,20 @@ for arg in "$@"; do
   esac
 done
 
+# Login first — fail fast on bad credentials instead of after the build.
+# GITHUB_PAT env var skips the interactive prompt (CI / re-runs).
+if [ -z "$GITHUB_PAT" ]; then
+  echo "Please enter your GitHub Personal Access Token (with 'write:packages' scope):"
+  read -rs GITHUB_PAT
+fi
+if [ -z "$GITHUB_PAT" ]; then
+  echo "❌ No token provided."; exit 1
+fi
+
+echo "Logging in to GitHub Container Registry..."
+echo "$GITHUB_PAT" | docker login ghcr.io -u "$GITHUB_USER" --password-stdin \
+  || { echo "❌ Login to GHCR failed — check the token has 'write:packages'."; exit 1; }
+
 echo "Building $IMAGE_NAME for $PLATFORM (context: $REPO_ROOT)..."
 docker build --platform "$PLATFORM" $BUILD_FLAGS \
   -f "$API_ROOT/Dockerfile" -t "$IMAGE_NAME" "$REPO_ROOT" \
@@ -35,13 +49,6 @@ docker build --platform "$PLATFORM" $BUILD_FLAGS \
 
 docker tag "$IMAGE_NAME:latest" "$GHCR_REPO:$TAG" \
   || { echo "❌ Tagging failed"; exit 1; }
-
-echo "Logging in to GitHub Container Registry..."
-echo "Please enter your GitHub Personal Access Token (with 'write:packages' scope):"
-read -s GITHUB_PAT
-
-echo "$GITHUB_PAT" | docker login ghcr.io -u "$GITHUB_USER" --password-stdin \
-  || { echo "❌ Login to GHCR failed."; docker rmi "$GHCR_REPO:$TAG" >/dev/null 2>&1; exit 1; }
 
 echo "Pushing image to GHCR..."
 docker push "$GHCR_REPO:$TAG" || { echo "❌ Push failed"; exit 1; }
