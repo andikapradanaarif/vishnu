@@ -288,6 +288,21 @@ export function useSetModel(wid: string | undefined) {
 }
 
 /**
+ * `POST .../sessions/{sid}/model` — pin this room's large model without
+ * touching the shared config. `null` clears the pin so the session
+ * follows the workspace default again. Applies to the next run.
+ */
+export function useSetSessionModel(wid: string | undefined, sid: string | undefined) {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationKey: ["sessions", "set-model"],
+		mutationFn: (model: SelectedModel | null) =>
+			sessionsClient.setModel(wid!, sid!, model),
+		onSettled: () => qc.invalidateQueries({ queryKey: queryKeys.sessions(wid!) }),
+	});
+}
+
+/**
  * `/init` — fetch the project's init prompt, dispatch it as a normal
  * agent run, then mark the workspace initialized. Needs a session id to
  * run under, so the caller passes the current session.
@@ -366,6 +381,24 @@ export function useReportCurrentSession(wid: string | undefined) {
 	return useMutation<void, Error, string>({
 		mutationKey: ["client", "current-session"],
 		mutationFn: (sid) => sessionsClient.setCurrent(wid!, sid),
+	});
+}
+
+/**
+ * `POST .../sessions/{sid}/permissions/skip` — arm or disarm this room's
+ * auto-approve override, persisted on the session row. `null` clears the
+ * override so the session inherits the workspace flag again.
+ */
+export function useSetSessionPermissionsSkip(
+	wid: string | undefined,
+	sid: string | undefined,
+) {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationKey: ["sessions", "permissions", "skip"],
+		mutationFn: (skip: boolean | null) =>
+			permissionsClient.setSessionSkip(wid!, sid!, skip),
+		onSettled: () => qc.invalidateQueries({ queryKey: queryKeys.sessions(wid!) }),
 	});
 }
 

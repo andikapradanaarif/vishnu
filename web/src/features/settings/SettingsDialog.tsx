@@ -27,7 +27,8 @@ export function SettingsDialog({ wid, isOpen, onClose }: SettingsDialogProps) {
 			<section>
 				<h3 className="font-display text-lg text-on-surface">Agent &amp; model</h3>
 				<p className="mt-1 text-xs text-on-surface-muted">
-					Which agent runs the session and which LLM drives it.
+					The defaults every session inherits — a room can pin its own
+					model from the top bar without changing these.
 				</p>
 				<div className="mt-3 flex flex-col gap-3">
 					<AgentModelControls
@@ -43,7 +44,8 @@ export function SettingsDialog({ wid, isOpen, onClose }: SettingsDialogProps) {
 				<h3 className="font-display text-lg text-on-surface">Permissions</h3>
 				<p className="mt-1 text-xs text-on-surface-muted">
 					When skip is on, crush auto-allows tool permission requests for this
-					workspace instead of showing a decision card.
+					workspace instead of showing a decision card. A session can set its
+					own override with /skip in the composer.
 				</p>
 				<div className="mt-3 flex items-center justify-between gap-3">
 					<label

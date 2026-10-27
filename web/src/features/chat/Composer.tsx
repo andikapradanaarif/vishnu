@@ -11,7 +11,8 @@ import {
 	usePermissionsSkip,
 	useRunShell,
 	useSendPrompt,
-	useSetPermissionsSkip,
+	useSessions,
+	useSetSessionPermissionsSkip,
 	useSummarize,
 } from "@/hooks/queries";
 import { errorLabel } from "@/utils/errors";
@@ -48,7 +49,13 @@ export function Composer({ wid, sid, busy }: ComposerProps) {
 	const runShell = useRunShell(wid);
 	const clearPrompts = useClearPrompts(wid);
 	const skip = usePermissionsSkip(wid);
-	const setSkip = useSetPermissionsSkip(wid);
+	const setSessionSkip = useSetSessionPermissionsSkip(wid, sid);
+	const { data: sessions } = useSessions(wid);
+	const session = sessions?.find((s) => s.id === sid);
+	// Tri-state: session.permission_skip wins over the workspace flag;
+	// absent means this room inherits the default.
+	const skipOverride = session?.permission_skip;
+	const skipEffective = skipOverride ?? skip.data?.skip ?? false;
 	const createSession = useCreateSession(wid);
 	const navigate = useNavigate();
 	const { projectId } = useParams({ strict: false }) as { projectId?: string };
@@ -139,12 +146,25 @@ export function Composer({ wid, sid, busy }: ComposerProps) {
 		},
 		{
 			name: "skip",
-			desc: `auto-approve permissions is ${skip.data?.skip ? "on" : "off"} — toggle`,
-			run: () =>
-				setSkip.mutate(!(skip.data?.skip ?? false), {
-					onSuccess: () => cmdNotice(true, `auto-approve ${!skip.data?.skip ? "on" : "off"}`),
+			hint: "[inherit]",
+			desc: `auto-approve ${skipEffective ? "on" : "off"} (${
+				skipOverride != null ? "this session" : "workspace default"
+			}) — toggle for this room`,
+			run: (arg) => {
+				if (arg === "inherit") {
+					setSessionSkip.mutate(null, {
+						onSuccess: () =>
+							cmdNotice(true, "auto-approve follows the workspace default"),
+						onError: (e) => cmdNotice(false, `reset failed: ${errorLabel(e)}`),
+					});
+					return;
+				}
+				setSessionSkip.mutate(!skipEffective, {
+					onSuccess: () =>
+						cmdNotice(true, `auto-approve ${!skipEffective ? "on" : "off"} for this session`),
 					onError: (e) => cmdNotice(false, `toggle failed: ${errorLabel(e)}`),
-				}),
+				});
+			},
 		},
 	];
 

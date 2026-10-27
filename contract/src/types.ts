@@ -67,6 +67,13 @@ export interface Session {
 	updated_at: number;
 	is_busy: boolean;
 	attached_clients: number;
+	/**
+	 * Session-scoped permission auto-approve tri-state: absent = inherit
+	 * the workspace flag, true = auto-approve, false = always prompt.
+	 */
+	permission_skip?: boolean;
+	/** Session-pinned large model; absent = follows the shared selection. */
+	model_override?: SelectedModel;
 }
 
 // ---------- Messages ----------
@@ -254,7 +261,13 @@ export interface PermissionNotification {
 }
 
 export interface PermissionSkipRequest {
-	skip: boolean;
+	/** Workspace scope rejects null; session scope sends null to inherit. */
+	skip: boolean | null;
+}
+
+/** Sets or clears a session's large-model override; null = inherit. */
+export interface SessionModelRequest {
+	model: SelectedModel | null;
 }
 
 export type QuestionType = "yes_no" | "single_choice" | "multi_choice" | "free_text";

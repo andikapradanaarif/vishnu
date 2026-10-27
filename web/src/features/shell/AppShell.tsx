@@ -138,6 +138,7 @@ export function AppShell({ project, wid }: AppShellProps) {
 				<TopBar
 					project={project}
 					workspaceId={wid}
+					sessionId={activeSessionId}
 					menuOpen={drawerOpen}
 					onMenu={() => setDrawerOpen((open) => !open)}
 					onSwitchProject={switchProject}

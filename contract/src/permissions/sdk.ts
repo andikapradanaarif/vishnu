@@ -3,6 +3,7 @@ import {
 	v1WorkspacePermissionsGrant,
 	v1WorkspacePermissionsSkip,
 	v1WorkspaceSessionPermissionsPending,
+	v1WorkspaceSessionPermissionsSkip,
 } from "../paths";
 import type {
 	PermissionAction,
@@ -60,6 +61,26 @@ export class PermissionsClient {
 	setSkip(workspaceId: string, skip: boolean): Promise<void> {
 		return this.api.post<void>(
 			buildPath(v1WorkspacePermissionsSkip, { id: workspaceId }),
+			{ skip } satisfies PermissionSkipRequest,
+		);
+	}
+
+	/**
+	 * POST `/workspaces/{id}/sessions/{sid}/permissions/skip` — set or
+	 * clear the session's auto-approve override. Persists on the session
+	 * row (survives child restarts); `null` clears the override so the
+	 * session inherits the workspace flag again.
+	 */
+	setSessionSkip(
+		workspaceId: string,
+		sessionId: string,
+		skip: boolean | null,
+	): Promise<void> {
+		return this.api.post<void>(
+			buildPath(v1WorkspaceSessionPermissionsSkip, {
+				id: workspaceId,
+				sid: sessionId,
+			}),
 			{ skip } satisfies PermissionSkipRequest,
 		);
 	}

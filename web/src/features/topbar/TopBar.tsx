@@ -6,6 +6,8 @@ import { AgentModelControls } from "./AgentModelControls";
 interface TopBarProps {
 	project: Project;
 	workspaceId: string;
+	/** Active room — scopes the model picker to the session override. */
+	sessionId?: string;
 	menuOpen?: boolean;
 	onMenu: () => void;
 	onSwitchProject: () => void;
@@ -16,6 +18,7 @@ interface TopBarProps {
 export function TopBar({
 	project,
 	workspaceId,
+	sessionId,
 	menuOpen = false,
 	onMenu,
 	onSwitchProject,
@@ -45,6 +48,7 @@ export function TopBar({
 
 			<AgentModelControls
 				wid={workspaceId}
+				sid={sessionId}
 				agentClassName="hidden w-28 shrink-0 font-display sm:block sm:w-36 md:ml-auto"
 				modelClassName="hidden !w-auto min-w-0 font-display lg:block"
 			/>

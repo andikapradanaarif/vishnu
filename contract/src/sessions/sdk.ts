@@ -3,9 +3,10 @@ import {
 	v1WorkspaceCurrentSession,
 	v1WorkspaceSessionById,
 	v1WorkspaceSessionMessages,
+	v1WorkspaceSessionModel,
 	v1WorkspaceSessions,
 } from "../paths";
-import type { Message, Session } from "../types";
+import type { Message, SelectedModel, Session, SessionModelRequest } from "../types";
 
 /**
  * SDK client for the `/workspaces/{id}/sessions` endpoints.
@@ -48,6 +49,23 @@ export class SessionsClient {
 	messages(workspaceId: string, sessionId: string): Promise<Message[]> {
 		return this.api.get<Message[]>(
 			buildPath(v1WorkspaceSessionMessages, { id: workspaceId, session_id: sessionId }),
+		);
+	}
+
+	/**
+	 * POST `/workspaces/{id}/sessions/{sid}/model` — set or clear the
+	 * session's large-model override. Applies to the next run in that
+	 * session and writes no global config; `null` clears the override so
+	 * the session follows the shared selection again.
+	 */
+	setModel(
+		workspaceId: string,
+		sessionId: string,
+		model: SelectedModel | null,
+	): Promise<void> {
+		return this.api.post<void>(
+			buildPath(v1WorkspaceSessionModel, { id: workspaceId, sid: sessionId }),
+			{ model } satisfies SessionModelRequest,
 		);
 	}
 

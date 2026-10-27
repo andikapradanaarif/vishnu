@@ -4,8 +4,10 @@ import {
 	useAgentInfo,
 	useConfig,
 	useProviders,
+	useSessions,
 	useSetMainAgent,
 	useSetModel,
+	useSetSessionModel,
 } from "@/hooks/queries";
 
 const AGENT_LABELS: Record<string, string> = {
@@ -14,8 +16,15 @@ const AGENT_LABELS: Record<string, string> = {
 	task: "Task",
 };
 
+/** Select value sent back to "follow the workspace default" — clears
+    the session's model_override. */
+const INHERIT_MODEL = "__inherit__";
+
 interface AgentModelControlsProps {
 	wid: string;
+	/** Active room — when set, the model picker writes the session's
+	    model override instead of the shared config. */
+	sid?: string;
 	agentClassName?: string;
 	modelClassName?: string;
 	/** Dialogs show field labels; the compact topbar uses placeholders. */
@@ -23,9 +32,12 @@ interface AgentModelControlsProps {
 }
 
 /** Agent + model selects — shared between the topbar and the settings
-    dialog so both stay in sync with the workspace config. */
+    dialog. With a `sid` the model picker is room-scoped (session
+    override, persisted server-side); without one it's the workspace
+    default every room inherits. */
 export function AgentModelControls({
 	wid,
+	sid,
 	agentClassName,
 	modelClassName,
 	showLabels,
@@ -33,13 +45,21 @@ export function AgentModelControls({
 	const { data: agentInfo } = useAgentInfo(wid);
 	const { data: config } = useConfig(wid);
 	const { data: providers } = useProviders(wid);
+	const { data: sessions } = useSessions(wid);
 	const setModel = useSetModel(wid);
+	const setSessionModel = useSetSessionModel(wid, sid);
 	const setMainAgent = useSetMainAgent(wid);
+
+	const session = useMemo(
+		() => (sid ? sessions?.find((s) => s.id === sid) : undefined),
+		[sessions, sid],
+	);
+	const override = session?.model_override;
 
 	// Model picker: group provider options → their models. The option
 	// value encodes "providerId/modelId" so onChange can split it back.
 	const modelOptions = useMemo<SelectOption<string>[]>(() => {
-		return (providers ?? [])
+		const groups: SelectOption<string>[] = (providers ?? [])
 			.filter((p) => p.id && p.models && p.models.length > 0 && !p.disable)
 			.map((p) => ({
 				value: p.id!,
@@ -49,10 +69,19 @@ export function AgentModelControls({
 					label: m.name || m.id,
 				})),
 			}));
-	}, [providers]);
+		// Room-scoped picker with an override gets a way back to inherit.
+		if (sid && override) {
+			return [
+				{ value: INHERIT_MODEL, label: "Default (workspace)" },
+				...groups,
+			];
+		}
+		return groups;
+	}, [providers, sid, override]);
 
-	const currentModelValue = agentInfo?.model_cfg
-		? `${agentInfo.model_cfg.provider}/${agentInfo.model_cfg.model}`
+	const effective = override ?? agentInfo?.model_cfg;
+	const currentModelValue = effective
+		? `${effective.provider}/${effective.model}`
 		: undefined;
 
 	const agentOptions = useMemo<SelectOption<string>[]>(() => {
@@ -61,7 +90,27 @@ export function AgentModelControls({
 		return list.map((id) => ({ value: id, label: AGENT_LABELS[id] ?? id }));
 	}, [config]);
 
+	const onModelChange = (v: string) => {
+		if (sid) {
+			// Room scope: writes the session's persisted override only.
+			if (v === INHERIT_MODEL) {
+				setSessionModel.mutate(null);
+				return;
+			}
+			const [provider, ...rest] = v.split("/");
+			const model = rest.join("/");
+			if (!provider || !model) return;
+			setSessionModel.mutate({ provider, model });
+			return;
+		}
+		const [provider, ...rest] = v.split("/");
+		const model = rest.join("/");
+		if (!provider || !model) return;
+		setModel.mutate({ modelType: "large", model: { provider, model } });
+	};
+
 	const namePrefix = showLabels ? "settings" : "topbar";
+	const modelPending = sid ? setSessionModel.isPending : setModel.isPending;
 
 	return (
 		<>
@@ -79,19 +128,14 @@ export function AgentModelControls({
 			<Select
 				name={`${namePrefix}-model`}
 				size="md"
-				label={showLabels ? "Model" : undefined}
+				label={showLabels ? (sid ? "Session model" : "Default model") : undefined}
 				placeholder="Model"
 				value={currentModelValue}
 				options={modelOptions}
 				isSearchable
-				onChange={(v) => {
-					const [provider, ...rest] = v.split("/");
-					const model = rest.join("/");
-					if (!provider || !model) return;
-					setModel.mutate({ modelType: "large", model: { provider, model } });
-				}}
+				onChange={onModelChange}
 				className={modelClassName}
-				isLoading={setModel.isPending}
+				isLoading={modelPending}
 			/>
 		</>
 	);

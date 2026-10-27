@@ -1,2 +1,2 @@
 export * from "./sdk";
-export type { Message, Session, Todo } from "../types";
+export type { Message, Session, SessionModelRequest, Todo } from "../types";
