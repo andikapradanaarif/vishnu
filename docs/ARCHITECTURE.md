@@ -254,8 +254,9 @@ server-mode features vishnu depends on:
 - fork-only `crushrc` option keys (memory/notebook/turn-context knobs —
   upstream fails hard on them)
 
-Dev can point `VISHNU_CRUSH_BIN` at a locally built fork binary;
-upstream works only if the mounted config avoids fork keys.
+**The fork is the supported engine** — `VISHNU_CRUSH_BIN` must point
+at a fork build; upstream is not a drop-in (missing endpoints, config
+hard-fail).
 
 ## Deployment
 

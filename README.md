@@ -46,14 +46,18 @@ Key decisions:
 
 ## The crush fork
 
-The api image builds `crush` from a pinned commit of
-[andikapradanaarif/crush](https://github.com/andikapradanaarif/crush),
-a fork of [charmbracelet/crush](https://github.com/charmbracelet/crush)
-carrying server-mode changes vishnu relies on — pending-prompt replay,
-per-session permission skip, a pending-permission list endpoint, and
-extra config options. For local dev either build the fork and set
-`VISHNU_CRUSH_BIN`, or run upstream `crush` (fork-only `crushrc` options
-will fail to load upstream).
+The agent engine is the fork
+[andikapradanaarif/crush](https://github.com/andikapradanaarif/crush) —
+upstream [charmbracelet/crush](https://github.com/charmbracelet/crush)
+is **not supported**. It lacks the server endpoints vishnu calls
+(pending-prompt replay, per-session permission skip, the
+pending-permission list) and hard-fails on the fork-only `crushrc`
+option keys.
+
+The api image builds the fork from a pinned commit
+(`CRUSH_REF`/`CRUSH_VERSION` args in `api/Dockerfile`). For local dev,
+build the fork and point `VISHNU_CRUSH_BIN` at it — an upstream binary
+is not a drop-in.
 
 ## Repository layout
 
