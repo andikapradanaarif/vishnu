@@ -1,5 +1,5 @@
-import {describe, it, expect} from "bun:test";
-import {clamp, snapValue} from "../Slider";
+import { describe, it, expect } from "bun:test";
+import { clamp, snapValue } from "../Slider";
 
 describe("Slider value normalization", () => {
 	it("snaps a value to the nearest step within bounds", () => {

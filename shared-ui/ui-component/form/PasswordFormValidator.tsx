@@ -1,10 +1,10 @@
-import type {PasswordRules} from "../../types/form";
-import {useMemo} from "react";
-import type {FieldApi} from "@tanstack/react-form";
+import type { PasswordRules } from "../../types/form";
+import { useMemo } from "react";
+import type { FieldApi } from "@tanstack/react-form";
 import PasswordInput from "../input/PasswordInput";
-import {PASSWORD_LEN_MIN} from "../../constants/user";
-import {translate} from "../../utils/translation";
-import type {Language} from "../../types/translations";
+import { PASSWORD_LEN_MIN } from "../../constants/user";
+import { translate } from "../../utils/translation";
+import type { Language } from "../../types/translations";
 
 interface PasswordFormValidatorProps {
 	validationKey: PasswordRules;
@@ -54,7 +54,11 @@ export default function PasswordFormValidator({
 				minLength: translate(language, "validation.password.minLength", "Minimum length is {min}", {
 					min: String(PASSWORD_LEN_MIN),
 				}),
-				containLetter: translate(language, "validation.password.containLetter", "Password must contain letters"),
+				containLetter: translate(
+					language,
+					"validation.password.containLetter",
+					"Password must contain letters",
+				),
 				containLowercase: translate(
 					language,
 					"validation.password.containLowercase",
@@ -65,7 +69,11 @@ export default function PasswordFormValidator({
 					"validation.password.containUppercase",
 					"Password must contain both uppercase and lowercase letters",
 				),
-				containNumber: translate(language, "validation.password.containNumber", "Password must contain numbers"),
+				containNumber: translate(
+					language,
+					"validation.password.containNumber",
+					"Password must contain numbers",
+				),
 				containSpecialCharacter: translate(
 					language,
 					"validation.password.containSpecialCharacter",

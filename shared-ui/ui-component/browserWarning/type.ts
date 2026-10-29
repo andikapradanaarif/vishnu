@@ -1,4 +1,4 @@
-import type {BrowserName} from "../../hooks/useBrowserSupport";
+import type { BrowserName } from "../../hooks/useBrowserSupport";
 
 export interface BrowserNotSupportedDialogProps {
 	/** Whether the dialog is visible. */

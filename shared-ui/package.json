@@ -204,6 +204,7 @@
 		"build": "./scripts/build.sh",
 		"dev": "./scripts/dev.sh",
 		"lint": "tsc --noEmit -p tsconfig.json && oxlint .",
+		"format": "bun fmt --use-tabs --print-width=100 .",
 		"check": "bun check",
 		"test": "bun test",
 		"test:watch": "bun test --watch",

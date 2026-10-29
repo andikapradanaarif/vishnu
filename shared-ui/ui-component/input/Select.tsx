@@ -1,13 +1,13 @@
 import classNames from "classnames";
-import {useState, useEffect, useRef, memo, useMemo} from "react";
+import { useState, useEffect, useRef, memo, useMemo } from "react";
 import LoadingSpinner from "../loadingAnimation/LoadingSpinner";
-import {Popover} from "../popover/Popover";
-import type {SelectOption, SelectProps} from "./types";
+import { Popover } from "../popover/Popover";
+import type { SelectOption, SelectProps } from "./types";
 import SearchInput from "./SearchInput";
-import {filterTree, flatten} from "../../utils/array";
+import { filterTree, flatten } from "../../utils/array";
 import Caption from "../text/Caption";
-import {translate} from "../../utils/translation";
-import type {Language} from "../../types/translations";
+import { translate } from "../../utils/translation";
+import type { Language } from "../../types/translations";
 
 interface SelectTriggerProps {
 	name: string;
@@ -73,7 +73,9 @@ const SelectTrigger = memo(function SelectTrigger({
 						}}
 						className={classNames(
 							"absolute left-3 inline-flex items-center text-neutral-500",
-							disabled || !onPrefixIconClick ? "cursor-not-allowed pointer-events-none text-neutral-400" : "cursor-pointer",
+							disabled || !onPrefixIconClick
+								? "cursor-not-allowed pointer-events-none text-neutral-400"
+								: "cursor-pointer",
 						)}
 					>
 						{prefixIcon}
@@ -81,7 +83,11 @@ const SelectTrigger = memo(function SelectTrigger({
 				)}
 
 				<span className="flex items-center gap-1.5 min-w-0 flex-1">
-					{selectedIcon && <span className="inline-flex items-center shrink-0 text-neutral-500">{selectedIcon}</span>}
+					{selectedIcon && (
+						<span className="inline-flex items-center shrink-0 text-neutral-500">
+							{selectedIcon}
+						</span>
+					)}
 
 					<span
 						className={classNames(
@@ -97,14 +103,23 @@ const SelectTrigger = memo(function SelectTrigger({
 				</span>
 
 				{!isLoading && (
-					<span className={classNames("absolute right-3 inline-flex items-center pointer-events-none text-neutral-500")}>
+					<span
+						className={classNames(
+							"absolute right-3 inline-flex items-center pointer-events-none text-neutral-500",
+						)}
+					>
 						<svg
 							className={classNames("w-4 h-4 transition-transform", isOpen && "rotate-180")}
 							fill="none"
 							stroke="currentColor"
 							viewBox="0 0 24 24"
 						>
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M19 9l-7 7-7-7"
+							/>
 						</svg>
 					</span>
 				)}
@@ -129,7 +144,12 @@ const SelectTrigger = memo(function SelectTrigger({
 					className="absolute right-8 top-1/2 -translate-y-1/2 inline-flex items-center text-neutral-400 cursor-pointer hover:text-neutral-600"
 				>
 					<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+						<path
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth={2}
+							d="M6 18L18 6M6 6l12 12"
+						/>
 					</svg>
 				</button>
 			)}
@@ -171,7 +191,8 @@ export default function Select<T = string>({
 	}, [options]);
 	const selectedOption = flattenOptions.find((opt) => Object.is(opt.value, value));
 	const isClearable = !!onClear;
-	const showClear = isClearable && !disabled && !isLoading && (selectedOption !== undefined || value != null);
+	const showClear =
+		isClearable && !disabled && !isLoading && (selectedOption !== undefined || value != null);
 
 	const filteredOptions = useMemo(() => {
 		if (!isSearchable) return options;
@@ -182,7 +203,7 @@ export default function Select<T = string>({
 		return filterTree(
 			options,
 			(item) => item.options,
-			(item, children) => ({...item, options: children}),
+			(item, children) => ({ ...item, options: children }),
 			(item) => item.label.toLowerCase().includes(q),
 		);
 	}, [options, isSearchable, searchQuery]);
@@ -224,16 +245,25 @@ export default function Select<T = string>({
 		hasScrolledToSelectedRef.current = true;
 
 		requestAnimationFrame(() => {
-			const selectedElement = listRef.current?.querySelector('[data-selected="true"]') as HTMLElement;
-			selectedElement?.scrollIntoView({block: "center"});
+			const selectedElement = listRef.current?.querySelector(
+				'[data-selected="true"]',
+			) as HTMLElement;
+			selectedElement?.scrollIntoView({ block: "center" });
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isOpen]);
 
-	const displayPlaceholder = placeholder || translate(language, "select.selectValue", "Select a value");
+	const displayPlaceholder =
+		placeholder || translate(language, "select.selectValue", "Select a value");
 
 	return (
-		<div className={classNames("flex w-full", direction === "row" ? "flex-row gap-4" : "flex-col", className)}>
+		<div
+			className={classNames(
+				"flex w-full",
+				direction === "row" ? "flex-row gap-4" : "flex-col",
+				className,
+			)}
+		>
 			{label && (
 				<label
 					className={classNames(
@@ -304,13 +334,22 @@ export default function Select<T = string>({
 							</div>
 						) : (
 							filteredOptions.map((option, index) => {
-								return <SelectItem key={index} handleSelect={handleSelect} option={option} value={value} />;
+								return (
+									<SelectItem
+										key={index}
+										handleSelect={handleSelect}
+										option={option}
+										value={value}
+									/>
+								);
 							})
 						)}
 					</div>
 				</Popover>
 				{message && <Caption className="text-neutral-600 mt-1">{message}</Caption>}
-				{error && typeof error === "string" && <Caption className="text-danger-500 mt-1">{error}</Caption>}
+				{error && typeof error === "string" && (
+					<Caption className="text-danger-500 mt-1">{error}</Caption>
+				)}
 				{success && <Caption className="text-success-700 mt-1">{success}</Caption>}
 			</div>
 		</div>
@@ -325,7 +364,7 @@ type SelectItemProps<T> = {
 };
 
 function SelectItem<T>(props: SelectItemProps<T>) {
-	const {handleSelect, option, size, value} = props;
+	const { handleSelect, option, size, value } = props;
 
 	const hasSubMenu = !!option?.options?.length;
 	const isSelected = Object.is(option.value, value);
@@ -366,7 +405,9 @@ function SelectItem<T>(props: SelectItemProps<T>) {
 					)}
 				>
 					{option.icon && (
-						<span className="inline-flex shrink-0 items-center mr-2 text-neutral-500">{option.icon}</span>
+						<span className="inline-flex shrink-0 items-center mr-2 text-neutral-500">
+							{option.icon}
+						</span>
 					)}
 					<span className="truncate">{option.label}</span>
 				</button>
@@ -379,7 +420,12 @@ function SelectItem<T>(props: SelectItemProps<T>) {
 							stroke="currentColor"
 							viewBox="0 0 24 24"
 						>
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M19 9l-7 7-7-7"
+							/>
 						</svg>
 					</div>
 				)}

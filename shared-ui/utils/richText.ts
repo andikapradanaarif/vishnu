@@ -1,7 +1,7 @@
-import type {Descendant} from "slate";
+import type { Descendant } from "slate";
 
 export const EMPTY_RICH_TEXT_VALUE: Descendant[] = [
-	{type: "paragraph", children: [{text: ""}]} as Descendant,
+	{ type: "paragraph", children: [{ text: "" }] } as Descendant,
 ];
 
 /**
@@ -12,14 +12,14 @@ export const EMPTY_RICH_TEXT_VALUE: Descendant[] = [
  * "Unable to find the path for Slate node" errors.
  */
 export function createEmptyRichTextValue(): Descendant[] {
-	return [{type: "paragraph", children: [{text: ""}]} as Descendant];
+	return [{ type: "paragraph", children: [{ text: "" }] } as Descendant];
 }
 
 export function serializeRichText(value: Descendant[]): string {
 	return value
 		.map((node) => {
 			if ("children" in node) {
-				const text = (node.children as {text: string}[]).map((c) => c.text).join("");
+				const text = (node.children as { text: string }[]).map((c) => c.text).join("");
 				return text;
 			}
 			return "";
@@ -32,7 +32,7 @@ export function deserializeRichText(text: string): Descendant[] {
 	if (!text) return EMPTY_RICH_TEXT_VALUE;
 	return text.split("\n").map((line) => ({
 		type: "paragraph",
-		children: [{text: line}],
+		children: [{ text: line }],
 	})) as Descendant[];
 }
 
@@ -73,7 +73,7 @@ function escapeHtml(text: string): string {
 export function serializeRichTextToHtml(value: Descendant[]): string {
 	const nodes = value as Array<{
 		type?: string;
-		children?: Array<Record<string, unknown> & {text: string}>;
+		children?: Array<Record<string, unknown> & { text: string }>;
 	}>;
 
 	let html = "";

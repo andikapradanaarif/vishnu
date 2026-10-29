@@ -1,18 +1,28 @@
 import classNames from "classnames";
-import {useCallback, useEffect, useId, useRef, useState, type KeyboardEvent, type PointerEvent} from "react";
+import {
+	useCallback,
+	useEffect,
+	useId,
+	useRef,
+	useState,
+	type KeyboardEvent,
+	type PointerEvent,
+} from "react";
 import Caption from "../text/Caption";
 import Input from "../input/Input";
-import type {SliderInputProps, SliderProps} from "./type";
+import type { SliderInputProps, SliderProps } from "./type";
 
 /**
  * Clamps a number between a min and max bound.
  */
-export const clamp = (value: number, min: number, max: number): number => Math.min(Math.max(value, min), max);
+export const clamp = (value: number, min: number, max: number): number =>
+	Math.min(Math.max(value, min), max);
 
 /**
  * Converts a value in [min, max] to a 0-100 percentage.
  */
-const valueToPercent = (value: number, min: number, max: number): number => (max === min ? 0 : ((value - min) / (max - min)) * 100);
+const valueToPercent = (value: number, min: number, max: number): number =>
+	max === min ? 0 : ((value - min) / (max - min)) * 100;
 
 /**
  * Returns the number of decimal places to use for a given step, handling
@@ -171,7 +181,9 @@ export const Slider = (props: SliderProps) => {
 					onClick={handleLabelClick}
 					className={classNames(
 						"block text-neutral-700",
-						direction === "row" ? "flex items-center flex-shrink-0 w-32 text-sm h-9.5" : "text-xs mb-1",
+						direction === "row"
+							? "flex items-center flex-shrink-0 w-32 text-sm h-9.5"
+							: "text-xs mb-1",
 					)}
 				>
 					{required && <span className="text-danger-500 mr-1">*</span>}
@@ -180,7 +192,12 @@ export const Slider = (props: SliderProps) => {
 			)}
 
 			<div className={direction === "row" ? "flex-1" : ""}>
-				<div className={classNames("flex flex-col sm:flex-row sm:items-center w-full", viewMode ? "gap-1" : "gap-6")}>
+				<div
+					className={classNames(
+						"flex flex-col sm:flex-row sm:items-center w-full",
+						viewMode ? "gap-1" : "gap-6",
+					)}
+				>
 					<div
 						ref={setTrackNode}
 						className={classNames(
@@ -199,7 +216,7 @@ export const Slider = (props: SliderProps) => {
 								"absolute top-0 h-1 rounded-full transition-[width] duration-150",
 								hasError ? "bg-danger-500" : success ? "bg-success-600" : "bg-primary-500",
 							)}
-							style={{width: `${percent}%`}}
+							style={{ width: `${percent}%` }}
 						/>
 
 						{marks.map((mark) => {
@@ -212,12 +229,12 @@ export const Slider = (props: SliderProps) => {
 											"absolute top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full transition-colors duration-150",
 											mark.value <= value ? "bg-primary-500" : "bg-neutral-400",
 										)}
-										style={{left: `${markPercent}%`}}
+										style={{ left: `${markPercent}%` }}
 									/>
 									{mark.label != null && (
 										<span
 											className="absolute top-4 -translate-x-1/2 whitespace-nowrap text-xs text-neutral-500"
-											style={{left: `${markPercent}%`}}
+											style={{ left: `${markPercent}%` }}
 										>
 											{mark.label}
 										</span>
@@ -242,9 +259,13 @@ export const Slider = (props: SliderProps) => {
 							className={classNames(
 								"absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 bg-white transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-primary-500/30",
 								!disabled && !viewMode && "cursor-pointer",
-								hasError ? "border-danger-500" : success ? "border-success-600" : "border-primary-500",
+								hasError
+									? "border-danger-500"
+									: success
+										? "border-success-600"
+										: "border-primary-500",
 							)}
-							style={{left: `${percent}%`}}
+							style={{ left: `${percent}%` }}
 							onKeyDown={handleKeyDown}
 						/>
 					</div>
@@ -268,9 +289,13 @@ export const Slider = (props: SliderProps) => {
 					/>
 				</div>
 
-				{sliderOnly && typeof error === "string" && error && <Caption className="text-danger-500 mt-1">{error}</Caption>}
+				{sliderOnly && typeof error === "string" && error && (
+					<Caption className="text-danger-500 mt-1">{error}</Caption>
+				)}
 				{!error && success && <Caption className="text-success-700 mt-1">{success}</Caption>}
-				{!error && !success && message && <Caption className="text-neutral-600 mt-1">{message}</Caption>}
+				{!error && !success && message && (
+					<Caption className="text-neutral-600 mt-1">{message}</Caption>
+				)}
 			</div>
 		</div>
 	);
@@ -325,7 +350,7 @@ const SliderInput = ({
 			name={name}
 			id={id}
 			ariaLabelledBy={labelId}
-			ariaLabel={labelId ? undefined : label ?? name}
+			ariaLabel={labelId ? undefined : (label ?? name)}
 			type="number"
 			value={inputValue}
 			step={step}

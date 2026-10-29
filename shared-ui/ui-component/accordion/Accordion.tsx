@@ -1,7 +1,7 @@
-import {Icon} from "@iconify/react";
+import { Icon } from "@iconify/react";
 import classNames from "classnames";
-import {useId, useState} from "react";
-import type {AccordionProps} from "./type";
+import { useId, useState } from "react";
+import type { AccordionProps } from "./type";
 
 /**
  * A collapsible section with a header and content body.
@@ -28,7 +28,9 @@ export function Accordion({
 				aria-expanded={isOpen}
 				aria-controls={panelId}
 			>
-				<span className={classNames("text-sm font-semibold text-neutral-700", labelClassName)}>{label}</span>
+				<span className={classNames("text-sm font-semibold text-neutral-700", labelClassName)}>
+					{label}
+				</span>
 				<Icon
 					icon="material-symbols:keyboard-arrow-down"
 					className={classNames(
@@ -37,7 +39,9 @@ export function Accordion({
 					)}
 				/>
 			</button>
-			<div id={panelId} className={classNames("space-y-4", bodyClassName)} hidden={!isOpen}>{children}</div>
+			<div id={panelId} className={classNames("space-y-4", bodyClassName)} hidden={!isOpen}>
+				{children}
+			</div>
 		</div>
 	);
 }

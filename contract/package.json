@@ -81,6 +81,7 @@
 	"scripts": {
 		"build": "./scripts/build.sh",
 		"lint": "tsc --noEmit -p tsconfig.json && oxlint .",
+		"format": "bun fmt --use-tabs --print-width=100 .",
 		"test": "bun test",
 		"typecheck": "tsc --noEmit -p tsconfig.json",
 		"prepare": "bun run build"

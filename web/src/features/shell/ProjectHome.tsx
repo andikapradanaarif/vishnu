@@ -56,10 +56,7 @@ export function ProjectHome({ projectId, wid }: ProjectHomeProps) {
 
 	return (
 		<div className="flex flex-1 items-center justify-center">
-			<EmptyState
-				text="Pick a session or start a new one"
-				className="py-16 font-display text-lg"
-			/>
+			<EmptyState text="Pick a session or start a new one" className="py-16 font-display text-lg" />
 		</div>
 	);
 }

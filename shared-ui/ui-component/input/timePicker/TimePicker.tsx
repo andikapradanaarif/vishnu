@@ -1,11 +1,11 @@
 import classNames from "classnames";
-import {useState, useCallback} from "react";
-import {Popover} from "../../popover/Popover";
+import { useState, useCallback } from "react";
+import { Popover } from "../../popover/Popover";
 import Caption from "../../text/Caption";
-import type {TimePickerProps} from "../types";
-import {buildHours, buildMinutes, parseTime} from "./timePicker.utility";
-import {TimeColumn} from "./TimeColumn";
-import {TimeTrigger} from "./TimeTrigger";
+import type { TimePickerProps } from "../types";
+import { buildHours, buildMinutes, parseTime } from "./timePicker.utility";
+import { TimeColumn } from "./TimeColumn";
+import { TimeTrigger } from "./TimeTrigger";
 
 const TimePicker = (props: TimePickerProps) => {
 	const {
@@ -57,7 +57,9 @@ const TimePicker = (props: TimePickerProps) => {
 	);
 
 	return (
-		<div className={classNames("flex", direction === "row" ? "flex-row gap-4" : "flex-col", className)}>
+		<div
+			className={classNames("flex", direction === "row" ? "flex-row gap-4" : "flex-col", className)}
+		>
 			{label && (
 				<span
 					className={classNames(
@@ -118,7 +120,9 @@ const TimePicker = (props: TimePickerProps) => {
 				</Popover>
 
 				{message && <Caption className="text-neutral-600 mt-1">{message}</Caption>}
-				{typeof error === "string" && error && <Caption className="text-danger-500 mt-1">{error}</Caption>}
+				{typeof error === "string" && error && (
+					<Caption className="text-danger-500 mt-1">{error}</Caption>
+				)}
 			</div>
 		</div>
 	);

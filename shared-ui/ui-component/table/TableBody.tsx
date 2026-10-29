@@ -1,10 +1,10 @@
 import classNames from "classnames";
-import {Fragment, useState} from "react";
-import type {InitRecordType, TableBodyProps, TableSizeType} from "./type";
+import { Fragment, useState } from "react";
+import type { InitRecordType, TableBodyProps, TableSizeType } from "./type";
 import Skeleton from "../loadingAnimation/Skeleton";
-import {EmptyData} from "../emptyData/EmptyData";
-import {Icon} from "@iconify/react";
-import {ExpandedRowContent} from "./ExpandedRowContent";
+import { EmptyData } from "../emptyData/EmptyData";
+import { Icon } from "@iconify/react";
+import { ExpandedRowContent } from "./ExpandedRowContent";
 
 const tableBodyMapSize: Record<TableSizeType, string> = {
 	middle: "py-4 px-4",
@@ -65,15 +65,20 @@ export const TableBody = <RecordType extends InitRecordType>(props: TableBodyPro
 			)}
 
 			{isLoading &&
-				Array.from({length: loadingRowCount}).map((_, rowIndex) => (
+				Array.from({ length: loadingRowCount }).map((_, rowIndex) => (
 					<tr key={`skeleton-${rowIndex}`} className="bg-white">
 						{hasExpandable && (
-							<td className={classNames("border-solid", tableBodyMapSize[size], "w-10 text-center")}>
+							<td
+								className={classNames("border-solid", tableBodyMapSize[size], "w-10 text-center")}
+							>
 								<Skeleton className="h-4 w-4 mx-auto" />
 							</td>
 						)}
 						{columns.map((column, colIndex) => (
-							<td key={colIndex} className={classNames("border-solid", tableBodyMapSize[size], column.className)}>
+							<td
+								key={colIndex}
+								className={classNames("border-solid", tableBodyMapSize[size], column.className)}
+							>
 								<Skeleton className="h-4 w-full" />
 							</td>
 						))}
@@ -82,7 +87,8 @@ export const TableBody = <RecordType extends InitRecordType>(props: TableBodyPro
 
 			{!isLoading &&
 				dataSource.map((record) => {
-					const isExpandable = hasExpandable && (expandable.rowExpandable ? expandable.rowExpandable(record) : true);
+					const isExpandable =
+						hasExpandable && (expandable.rowExpandable ? expandable.rowExpandable(record) : true);
 					const isExpanded = expandedKeys.has(record.key);
 
 					return (
@@ -90,9 +96,12 @@ export const TableBody = <RecordType extends InitRecordType>(props: TableBodyPro
 							{/* Main data row */}
 							<tr
 								data-row="main"
-								className={classNames("text-sm border-solid bg-white transition-all hover:bg-neutral-50", {
-									"cursor-pointer": !!onRowClick,
-								})}
+								className={classNames(
+									"text-sm border-solid bg-white transition-all hover:bg-neutral-50",
+									{
+										"cursor-pointer": !!onRowClick,
+									},
+								)}
 								onClick={(e) => {
 									e.stopPropagation();
 									if (onRowClick) {
@@ -103,17 +112,25 @@ export const TableBody = <RecordType extends InitRecordType>(props: TableBodyPro
 								{/* Expand toggle cell */}
 								{hasExpandable && (
 									<td
-										className={classNames("border-solid text-neutral-400", tableBodyMapSize[size], "w-10 text-center", {
-											"cursor-pointer": isExpandable,
-										})}
+										className={classNames(
+											"border-solid text-neutral-400",
+											tableBodyMapSize[size],
+											"w-10 text-center",
+											{
+												"cursor-pointer": isExpandable,
+											},
+										)}
 										onClick={isExpandable ? (e) => toggleExpand(record, e) : undefined}
 									>
 										{isExpandable && (
 											<Icon
 												icon="ri:arrow-right-s-line"
-												className={classNames("text-lg text-primary-500 transition-transform duration-300 ease-in-out", {
-													"rotate-90": isExpanded,
-												})}
+												className={classNames(
+													"text-lg text-primary-500 transition-transform duration-300 ease-in-out",
+													{
+														"rotate-90": isExpanded,
+													},
+												)}
 											/>
 										)}
 									</td>
@@ -124,7 +141,11 @@ export const TableBody = <RecordType extends InitRecordType>(props: TableBodyPro
 									return (
 										<td
 											key={index}
-											className={classNames("text-neutral-800 border-solid", tableBodyMapSize[size], column.className)}
+											className={classNames(
+												"text-neutral-800 border-solid",
+												tableBodyMapSize[size],
+												column.className,
+											)}
 										>
 											{column?.render ? column?.render(record) : column.fnDataIndex(record) || "-"}
 										</td>

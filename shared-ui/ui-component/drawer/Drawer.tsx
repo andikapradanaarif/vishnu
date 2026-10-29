@@ -1,6 +1,6 @@
-import {useCallback, useEffect, useState} from "react";
-import {createPortal} from "react-dom";
-import {useIsSmallerThanTablet} from "../../hooks/useScreenSize";
+import { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { useIsSmallerThanTablet } from "../../hooks/useScreenSize";
 
 interface DrawerProps {
 	isOpen: boolean;
@@ -73,7 +73,11 @@ export const Drawer = ({
 	return createPortal(
 		<div className="fixed inset-0 z-50" id={`${name}-drawer`}>
 			{/* Backdrop */}
-			<div className={`fixed inset-0 bg-neutral-700/40 ${backdropClass}`} onClick={handleClose} aria-hidden="true" />
+			<div
+				className={`fixed inset-0 bg-neutral-700/40 ${backdropClass}`}
+				onClick={handleClose}
+				aria-hidden="true"
+			/>
 
 			{/* Drawer */}
 			<div

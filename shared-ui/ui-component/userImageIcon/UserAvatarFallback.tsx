@@ -1,4 +1,4 @@
-import {Icon} from "@iconify/react";
+import { Icon } from "@iconify/react";
 import classNames from "classnames";
 
 export type UserImageIconSize = "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
@@ -34,12 +34,21 @@ export interface UserAvatarFallbackProps {
  * Fallback content for a user avatar when there is no image or the image fails
  * to load — either a user icon or the first letter of the name.
  */
-export function UserAvatarFallback({name, showUserIcon, size}: UserAvatarFallbackProps) {
+export function UserAvatarFallback({ name, showUserIcon, size }: UserAvatarFallbackProps) {
 	if (showUserIcon) {
-		return <Icon icon="ri-user-fill" className={classNames("text-neutral-500 shrink-0", iconSizeClass[size])} />;
+		return (
+			<Icon
+				icon="ri-user-fill"
+				className={classNames("text-neutral-500 shrink-0", iconSizeClass[size])}
+			/>
+		);
 	}
 
-	return <p className={classNames("capitalize text-primary-600", textSizeClass[size])}>{name?.[0] ?? "?"}</p>;
+	return (
+		<p className={classNames("capitalize text-primary-600", textSizeClass[size])}>
+			{name?.[0] ?? "?"}
+		</p>
+	);
 }
 
 export default UserAvatarFallback;

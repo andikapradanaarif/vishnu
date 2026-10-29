@@ -1,5 +1,5 @@
-import {describe, it, expect} from "bun:test";
-import {translate} from "../translation";
+import { describe, it, expect } from "bun:test";
+import { translate } from "../translation";
 
 describe("translate", () => {
 	it("returns translated value for known key", () => {
@@ -13,13 +13,13 @@ describe("translate", () => {
 	});
 
 	it("replaces placeholders with values", () => {
-		const result = translate("en", "validation.minLength", "fallback", {min: "3"});
+		const result = translate("en", "validation.minLength", "fallback", { min: "3" });
 		expect(result).toBe("Minimum length is 3");
 	});
 
 	it("replaces multiple placeholders", () => {
 		// Use a key with multiple placeholders by testing the replacement logic
-		const result = translate("en", "validation.maxLength", "fallback", {max: "100"});
+		const result = translate("en", "validation.maxLength", "fallback", { max: "100" });
 		expect(result).toBe("Maximum length is 100");
 	});
 

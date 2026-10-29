@@ -1,8 +1,5 @@
 import classNames from "classnames";
-import type {
-	CircularProgressColor,
-	CircularProgressProps,
-} from "./CircularProgressType";
+import type { CircularProgressColor, CircularProgressProps } from "./CircularProgressType";
 
 const colorMap: Record<CircularProgressColor, string> = {
 	primary: "text-primary-500",
@@ -50,14 +47,14 @@ export const CircularProgress = ({
 			aria-valuemin={0}
 			aria-valuemax={100}
 			aria-valuenow={isIndeterminate ? undefined : clamped}
-			style={{width: size, height: size}}
+			style={{ width: size, height: size }}
 		>
 			<svg
 				width={size}
 				height={size}
 				viewBox={`0 0 ${size} ${size}`}
 				className={isIndeterminate ? "animate-spin" : undefined}
-				style={isIndeterminate ? {animationDuration: "1.4s"} : undefined}
+				style={isIndeterminate ? { animationDuration: "1.4s" } : undefined}
 			>
 				{/* Track */}
 				<circle
@@ -97,7 +94,7 @@ export const CircularProgress = ({
 			{showLabel && !isIndeterminate && (
 				<span
 					className="absolute font-medium text-neutral-600 tabular-nums"
-					style={{fontSize: size * 0.22}}
+					style={{ fontSize: size * 0.22 }}
 				>
 					{label ?? `${Math.round(clamped)}%`}
 				</span>

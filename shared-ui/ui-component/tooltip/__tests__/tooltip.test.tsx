@@ -1,5 +1,5 @@
-import {afterEach, describe, expect, it} from "bun:test";
-import {cleanup, fireEvent, render} from "@testing-library/react";
+import { afterEach, describe, expect, it } from "bun:test";
+import { cleanup, fireEvent, render } from "@testing-library/react";
 
 import Tooltip from "../Tooltip";
 
@@ -17,7 +17,7 @@ describe("Tooltip", () => {
 	});
 
 	it("renders role=tooltip on hover and wires aria-describedby to its id", () => {
-		const {container} = render(
+		const { container } = render(
 			<Tooltip id="t1" content="Hint">
 				<span>trigger</span>
 			</Tooltip>,
@@ -35,7 +35,7 @@ describe("Tooltip", () => {
 	});
 
 	it("suppresses the tooltip when disabled", () => {
-		const {container} = render(
+		const { container } = render(
 			<Tooltip id="t1" content="Hint" disabled>
 				<span>trigger</span>
 			</Tooltip>,
@@ -47,7 +47,7 @@ describe("Tooltip", () => {
 	});
 
 	it("applies the corner animation class for corner positions", () => {
-		const {container} = render(
+		const { container } = render(
 			<Tooltip id="t1" content="Hint" position="top-left">
 				<span>trigger</span>
 			</Tooltip>,

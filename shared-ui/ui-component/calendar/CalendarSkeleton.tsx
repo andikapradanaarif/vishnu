@@ -1,6 +1,6 @@
-import type {CSSProperties} from "react";
-import {HOUR_HEIGHT} from "./type";
-import type {CalendarView} from "./type";
+import type { CSSProperties } from "react";
+import { HOUR_HEIGHT } from "./type";
+import type { CalendarView } from "./type";
 
 interface CalendarSkeletonProps {
 	view: CalendarView;
@@ -8,7 +8,7 @@ interface CalendarSkeletonProps {
 	loadingText?: string;
 }
 
-const Shimmer = ({className = "", style}: {className?: string; style?: CSSProperties}) => (
+const Shimmer = ({ className = "", style }: { className?: string; style?: CSSProperties }) => (
 	<div className={`animate-pulse bg-neutral-100 rounded ${className}`} style={style} />
 );
 
@@ -17,13 +17,24 @@ interface SpinnerProps {
 }
 
 const Spinner = (props: SpinnerProps) => {
-	const {text} = props;
+	const { text } = props;
 
 	return (
 		<div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10 gap-2">
-			<svg className="animate-spin text-neutral-300" width="24" height="24" viewBox="0 0 24 24" fill="none">
+			<svg
+				className="animate-spin text-neutral-300"
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+			>
 				<circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeOpacity="0.3" />
-				<path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+				<path
+					d="M12 2a10 10 0 0 1 10 10"
+					stroke="currentColor"
+					strokeWidth="3"
+					strokeLinecap="round"
+				/>
 			</svg>
 			{text && <p className="text-md text-neutral-400">{text}</p>}
 		</div>
@@ -35,7 +46,7 @@ interface DaySkeletonProps {
 }
 
 const DaySkeleton = (props: DaySkeletonProps) => {
-	const {loadingText} = props;
+	const { loadingText } = props;
 
 	return (
 		<div className="flex flex-col h-full relative">
@@ -47,9 +58,13 @@ const DaySkeleton = (props: DaySkeletonProps) => {
 
 			{/* Hour grid */}
 			<div className="flex-1 overflow-hidden relative">
-				<div className="relative" style={{height: HOUR_HEIGHT * 8}}>
-					{Array.from({length: 8}, (_, i) => (
-						<div key={i} className="absolute left-0 right-0 flex items-start" style={{top: i * HOUR_HEIGHT}}>
+				<div className="relative" style={{ height: HOUR_HEIGHT * 8 }}>
+					{Array.from({ length: 8 }, (_, i) => (
+						<div
+							key={i}
+							className="absolute left-0 right-0 flex items-start"
+							style={{ top: i * HOUR_HEIGHT }}
+						>
 							<Shimmer className="w-10 h-3 shrink-0 mx-2 mt-1" />
 							<div className="flex-1 border-t border-neutral-100" />
 						</div>
@@ -76,7 +91,7 @@ interface WeekSkeletonProps {
 }
 
 const WeekSkeleton = (props: WeekSkeletonProps) => {
-	const {showWeekend = true, loadingText} = props;
+	const { showWeekend = true, loadingText } = props;
 	const colCount = showWeekend ? 7 : 5;
 
 	return (
@@ -84,7 +99,7 @@ const WeekSkeleton = (props: WeekSkeletonProps) => {
 			{/* Header row */}
 			<div className="flex border-b border-neutral-200 shrink-0">
 				<div className="w-12 shrink-0" />
-				{Array.from({length: colCount}, (_, i) => (
+				{Array.from({ length: colCount }, (_, i) => (
 					<div
 						key={i}
 						className="flex-1 flex flex-col items-center gap-1 py-2 border-l border-neutral-200 first:border-l-0"
@@ -100,33 +115,33 @@ const WeekSkeleton = (props: WeekSkeletonProps) => {
 				<div className="w-12 shrink-0 px-1 py-2">
 					<Shimmer className="w-8 h-3 ml-auto" />
 				</div>
-				{Array.from({length: colCount}, (_, i) => (
+				{Array.from({ length: colCount }, (_, i) => (
 					<div key={i} className="flex-1 p-0.5 border-l border-neutral-200 first:border-l-0">
-						{i === 1 && <Shimmer className="h-4" style={{width: "250%"}} />}
+						{i === 1 && <Shimmer className="h-4" style={{ width: "250%" }} />}
 					</div>
 				))}
 			</div>
 
 			{/* Timed grid */}
 			<div className="flex-1 overflow-hidden relative">
-				<div className="relative flex" style={{height: HOUR_HEIGHT * 8}}>
+				<div className="relative flex" style={{ height: HOUR_HEIGHT * 8 }}>
 					{/* Time labels */}
 					<div className="w-12 shrink-0 relative">
-						{Array.from({length: 8}, (_, i) => (
-							<div key={i} className="absolute right-2" style={{top: i * HOUR_HEIGHT - 6}}>
+						{Array.from({ length: 8 }, (_, i) => (
+							<div key={i} className="absolute right-2" style={{ top: i * HOUR_HEIGHT - 6 }}>
 								{i > 0 && <Shimmer className="w-8 h-3" />}
 							</div>
 						))}
 					</div>
 
 					{/* Day columns */}
-					{Array.from({length: colCount}, (_, ci) => (
+					{Array.from({ length: colCount }, (_, ci) => (
 						<div key={ci} className="flex-1 relative border-l border-neutral-200 first:border-l-0">
-							{Array.from({length: 8}, (_, i) => (
+							{Array.from({ length: 8 }, (_, i) => (
 								<div
 									key={i}
 									className="absolute left-0 right-0 border-t border-neutral-200"
-									style={{top: i * HOUR_HEIGHT}}
+									style={{ top: i * HOUR_HEIGHT }}
 								/>
 							))}
 							{/* Fake events — scattered per column */}
@@ -149,7 +164,7 @@ interface MonthSkeletonProps {
 }
 
 const MonthSkeleton = (props: MonthSkeletonProps) => {
-	const {loadingText} = props;
+	const { loadingText } = props;
 	const weeks = 5;
 	const cols = 7;
 
@@ -157,7 +172,7 @@ const MonthSkeleton = (props: MonthSkeletonProps) => {
 		<div className="flex flex-col h-full relative">
 			{/* Day headers */}
 			<div className="grid grid-cols-7 border-b border-neutral-200 shrink-0">
-				{Array.from({length: cols}, (_, i) => (
+				{Array.from({ length: cols }, (_, i) => (
 					<div key={i} className="py-2 flex justify-center">
 						<Shimmer className="w-6 h-3" />
 					</div>
@@ -165,10 +180,10 @@ const MonthSkeleton = (props: MonthSkeletonProps) => {
 			</div>
 
 			{/* Grid */}
-			<div className="flex-1 grid relative" style={{gridTemplateRows: `repeat(${weeks}, 1fr)`}}>
-				{Array.from({length: weeks}, (_, wi) => (
+			<div className="flex-1 grid relative" style={{ gridTemplateRows: `repeat(${weeks}, 1fr)` }}>
+				{Array.from({ length: weeks }, (_, wi) => (
 					<div key={wi} className="grid grid-cols-7 border-b border-neutral-200 last:border-b-0">
-						{Array.from({length: cols}, (_, di) => {
+						{Array.from({ length: cols }, (_, di) => {
 							// Deterministic fake event placement
 							const hasEvent = (wi * 7 + di) % 3 === 0;
 							const hasMultiDay = wi === 1 && di === 2;
@@ -178,7 +193,9 @@ const MonthSkeleton = (props: MonthSkeletonProps) => {
 									<div className="flex justify-end mb-1">
 										<Shimmer className="w-6 h-6 rounded-full" />
 									</div>
-									{hasMultiDay && <Shimmer className="h-4 mb-0.5 rounded" style={{width: "280%"}} />}
+									{hasMultiDay && (
+										<Shimmer className="h-4 mb-0.5 rounded" style={{ width: "280%" }} />
+									)}
 									{hasEvent && !hasMultiDay && <Shimmer className="h-3.5 w-3/4 mb-0.5 rounded" />}
 									{(wi * 7 + di) % 5 === 0 && <Shimmer className="h-3.5 w-1/2 rounded" />}
 								</div>
@@ -198,29 +215,33 @@ interface YearSkeletonProps {
 }
 
 const YearSkeleton = (props: YearSkeletonProps) => {
-	const {loadingText} = props;
+	const { loadingText } = props;
 
 	return (
 		<div className="flex-1 overflow-hidden p-6 relative">
 			<div className="grid grid-cols-4 gap-8 max-md:grid-cols-2 max-sm:grid-cols-1">
-				{Array.from({length: 12}, (_, mi) => (
+				{Array.from({ length: 12 }, (_, mi) => (
 					<div key={mi} className="flex flex-col">
 						{/* Month name */}
 						<Shimmer className="w-16 h-4 mb-3" />
 
 						{/* Day header row */}
 						<div className="grid grid-cols-7 mb-1 gap-0.5">
-							{Array.from({length: 7}, (_, i) => (
+							{Array.from({ length: 7 }, (_, i) => (
 								<Shimmer key={i} className="h-3 mx-auto w-3" />
 							))}
 						</div>
 
 						{/* Week rows */}
-						{Array.from({length: 5}, (_, wi) => (
+						{Array.from({ length: 5 }, (_, wi) => (
 							<div key={wi} className="grid grid-cols-7 gap-0.5 mb-0.5">
-								{Array.from({length: 7}, (_, di) => {
+								{Array.from({ length: 7 }, (_, di) => {
 									const isEmpty = (mi + wi + di) % 7 === 0;
-									return isEmpty ? <div key={di} className="h-6" /> : <Shimmer key={di} className="h-6 rounded" />;
+									return isEmpty ? (
+										<div key={di} className="h-6" />
+									) : (
+										<Shimmer key={di} className="h-6 rounded" />
+									);
 								})}
 							</div>
 						))}
@@ -234,7 +255,7 @@ const YearSkeleton = (props: YearSkeletonProps) => {
 };
 
 export const CalendarSkeleton = (props: CalendarSkeletonProps) => {
-	const {view, showWeekend, loadingText} = props;
+	const { view, showWeekend, loadingText } = props;
 
 	switch (view) {
 		case "day":

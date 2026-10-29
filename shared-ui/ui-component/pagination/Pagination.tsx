@@ -1,9 +1,9 @@
 import classNames from "classnames";
-import {PageInformation} from "./PageInformation";
-import {PageSize} from "./PageSize";
-import {defaultPaginationOptions, type PaginationProps} from "./type";
-import {MainPagination} from "./MainPagination";
-import {useIsSmallPhone} from "../../hooks/useScreenSize";
+import { PageInformation } from "./PageInformation";
+import { PageSize } from "./PageSize";
+import { defaultPaginationOptions, type PaginationProps } from "./type";
+import { MainPagination } from "./MainPagination";
+import { useIsSmallPhone } from "../../hooks/useScreenSize";
 
 export const Pagination = (props: PaginationProps) => {
 	const {
@@ -29,7 +29,12 @@ export const Pagination = (props: PaginationProps) => {
 			aria-label="Pagination"
 		>
 			<div className="flex items-center gap-3">
-				<PageInformation total={total} pageSize={pageSize} currentPage={currentPage} language={language} />
+				<PageInformation
+					total={total}
+					pageSize={pageSize}
+					currentPage={currentPage}
+					language={language}
+				/>
 
 				<MainPagination
 					currentPage={currentPage}

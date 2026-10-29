@@ -1,12 +1,27 @@
 import classNames from "classnames";
-import {useEffect, useMemo, useRef} from "react";
-import DOMPurify, {type Config} from "dompurify";
+import { useEffect, useMemo, useRef } from "react";
+import DOMPurify, { type Config } from "dompurify";
 
 const HTML_TAG_REGEX = /<[a-z][\s\S]*>/i;
 
 // Explicit allowlist — tighter than DOMPurify's default surface.
 const SANITIZE_CONFIG: Config = {
-	ALLOWED_TAGS: ["p", "b", "strong", "i", "em", "u", "s", "code", "ul", "ol", "li", "blockquote", "br", "a"],
+	ALLOWED_TAGS: [
+		"p",
+		"b",
+		"strong",
+		"i",
+		"em",
+		"u",
+		"s",
+		"code",
+		"ul",
+		"ol",
+		"li",
+		"blockquote",
+		"br",
+		"a",
+	],
 	ALLOWED_ATTR: ["href", "target", "rel"],
 };
 
@@ -16,11 +31,14 @@ interface RichDescriptionProps {
 }
 
 export const RichDescription = (props: RichDescriptionProps) => {
-	const {text, className} = props;
+	const { text, className } = props;
 
 	const containerRef = useRef<HTMLDivElement>(null);
 	const isHtml = HTML_TAG_REGEX.test(text);
-	const sanitizedHtml = useMemo(() => (isHtml ? DOMPurify.sanitize(text, SANITIZE_CONFIG) : ""), [text, isHtml]);
+	const sanitizedHtml = useMemo(
+		() => (isHtml ? DOMPurify.sanitize(text, SANITIZE_CONFIG) : ""),
+		[text, isHtml],
+	);
 
 	useEffect(() => {
 		const container = containerRef.current;
@@ -47,7 +65,7 @@ export const RichDescription = (props: RichDescriptionProps) => {
 					"[&_p]:my-1 [&_p]:min-h-5",
 					className,
 				)}
-				dangerouslySetInnerHTML={{__html: sanitizedHtml}}
+				dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
 			/>
 		);
 	}
@@ -55,7 +73,12 @@ export const RichDescription = (props: RichDescriptionProps) => {
 	const paragraphs = text.split(/\n\n+/).filter((p) => p.trim().length > 0);
 
 	return (
-		<div className={classNames("flex flex-col gap-3 text-sm text-neutral-700 overflow-auto", className)}>
+		<div
+			className={classNames(
+				"flex flex-col gap-3 text-sm text-neutral-700 overflow-auto",
+				className,
+			)}
+		>
 			{paragraphs.map((paragraph, index) => (
 				<div key={index}>{paragraph.trim()}</div>
 			))}

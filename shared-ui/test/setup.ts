@@ -1,4 +1,4 @@
-import {Window} from "happy-dom";
+import { Window } from "happy-dom";
 
 const window = new Window();
 globalThis.document = window.document as any;
@@ -16,4 +16,3 @@ if (!globalThis.ResizeObserver) {
 		disconnect() {}
 	} as any;
 }
-

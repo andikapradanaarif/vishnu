@@ -1,16 +1,16 @@
 import classNames from "classnames";
-import {useState, useEffect, useRef, memo, useMemo} from "react";
+import { useState, useEffect, useRef, memo, useMemo } from "react";
 import LoadingSpinner from "../loadingAnimation/LoadingSpinner";
-import {Popover} from "../popover/Popover";
-import type {MultipleSelectProps, SelectOption} from "./types";
+import { Popover } from "../popover/Popover";
+import type { MultipleSelectProps, SelectOption } from "./types";
 import SearchInput from "./SearchInput";
-import {filterTree, flatten} from "../../utils/array";
+import { filterTree, flatten } from "../../utils/array";
 import Caption from "../text/Caption";
-import type {ReactNode} from "react";
-import {Chip} from "../chip/Chip";
-import {Checkbox} from "./Checkbox";
-import {translate} from "../../utils/translation";
-import type {Language} from "../../types/translations";
+import type { ReactNode } from "react";
+import { Chip } from "../chip/Chip";
+import { Checkbox } from "./Checkbox";
+import { translate } from "../../utils/translation";
+import type { Language } from "../../types/translations";
 
 interface MultipleSelectTriggerProps {
 	name: string;
@@ -51,7 +51,9 @@ const MultipleSelectTrigger = memo(function MultipleSelectTrigger({
 	onRemove,
 }: MultipleSelectTriggerProps) {
 	const hasSelected =
-		displayMode === "count" ? (selectedCount ?? selectedOptions.length) > 0 : selectedOptions.length > 0;
+		displayMode === "count"
+			? (selectedCount ?? selectedOptions.length) > 0
+			: selectedOptions.length > 0;
 
 	return (
 		// A div-based trigger: Popover's wrapper handles toggle clicks, and chips'
@@ -96,7 +98,9 @@ const MultipleSelectTrigger = memo(function MultipleSelectTrigger({
 					}}
 					className={classNames(
 						"absolute left-3 inline-flex items-center text-neutral-500",
-						disabled || !onPrefixIconClick ? "cursor-not-allowed pointer-events-none text-neutral-400" : "cursor-pointer",
+						disabled || !onPrefixIconClick
+							? "cursor-not-allowed pointer-events-none text-neutral-400"
+							: "cursor-pointer",
 					)}
 				>
 					{prefixIcon}
@@ -122,13 +126,17 @@ const MultipleSelectTrigger = memo(function MultipleSelectTrigger({
 								value={String(opt.value) || "-"}
 								onRemove={disabled ? undefined : () => onRemove(opt.value)}
 							>
-								{opt.icon && <span className="inline-flex items-center mr-2 text-neutral-500">{opt.icon}</span>}
+								{opt.icon && (
+									<span className="inline-flex items-center mr-2 text-neutral-500">{opt.icon}</span>
+								)}
 								{opt.label}
 							</Chip>
 						))
 					)
 				) : (
-					<span className={classNames("text-neutral-400", size === "sm" ? "text-xs" : "text-sm")}>{placeholder}</span>
+					<span className={classNames("text-neutral-400", size === "sm" ? "text-xs" : "text-sm")}>
+						{placeholder}
+					</span>
 				)}
 			</span>
 
@@ -168,7 +176,7 @@ interface SelectAllItemProps {
 	language: Language;
 }
 
-function SelectAllItem({state, onClick, size = "md", maxReached, language}: SelectAllItemProps) {
+function SelectAllItem({ state, onClick, size = "md", maxReached, language }: SelectAllItemProps) {
 	const isAll = state === "all";
 	const isSome = state === "some";
 
@@ -193,7 +201,12 @@ function SelectAllItem({state, onClick, size = "md", maxReached, language}: Sele
 				)}
 			>
 				{isAll && (
-					<svg className="w-2.5 h-2.5 text-on-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<svg
+						className="w-2.5 h-2.5 text-on-primary"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+					>
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
 					</svg>
 				)}
@@ -254,7 +267,7 @@ export default function MultipleSelect<T = string>({
 		return filterTree(
 			options,
 			(item) => item.options,
-			(item, children) => ({...item, options: children}),
+			(item, children) => ({ ...item, options: children }),
 			(item) => item.label.toLowerCase().includes(q),
 		);
 	}, [options, isSearchable, searchQuery]);
@@ -268,16 +281,23 @@ export default function MultipleSelect<T = string>({
 		return flat.filter((opt) => !opt.options?.length && !opt.disabled);
 	}, [filteredOptions]);
 
-	const selectedFilteredCount = filteredLeafNodes.filter((opt) => value.some((v) => Object.is(v, opt.value))).length;
+	const selectedFilteredCount = filteredLeafNodes.filter((opt) =>
+		value.some((v) => Object.is(v, opt.value)),
+	).length;
 
 	const selectAllState: SelectAllState =
-		selectedFilteredCount === 0 ? "none" : selectedFilteredCount === filteredLeafNodes.length ? "all" : "some";
+		selectedFilteredCount === 0
+			? "none"
+			: selectedFilteredCount === filteredLeafNodes.length
+				? "all"
+				: "some";
 
 	/**
 	 * maxReached: the limit is full AND none of the currently visible leaf
 	 * nodes are selected (so clicking Select All would genuinely do nothing).
 	 */
-	const maxReached = maxSelected !== undefined && value.length >= maxSelected && selectAllState === "none";
+	const maxReached =
+		maxSelected !== undefined && value.length >= maxSelected && selectAllState === "none";
 
 	const handleSelectAll = () => {
 		if (selectAllState === "all") {
@@ -287,7 +307,9 @@ export default function MultipleSelect<T = string>({
 		} else {
 			// Add unselected visible leaf nodes, capped by maxSelected
 			const alreadySelected = new Set(value);
-			const toAdd = filteredLeafNodes.filter((o) => !alreadySelected.has(o.value)).map((o) => o.value);
+			const toAdd = filteredLeafNodes
+				.filter((o) => !alreadySelected.has(o.value))
+				.map((o) => o.value);
 			const slots = maxSelected !== undefined ? maxSelected - value.length : Infinity;
 			onChange([...value, ...toAdd.slice(0, slots)]);
 		}
@@ -319,10 +341,13 @@ export default function MultipleSelect<T = string>({
 		}
 	}, [isOpen, isSearchable]);
 
-	const displayPlaceholder = placeholder || translate(language, "multipleSelect.selectValue", "Select a value");
+	const displayPlaceholder =
+		placeholder || translate(language, "multipleSelect.selectValue", "Select a value");
 
 	return (
-		<div className={classNames("flex", direction === "row" ? "flex-row gap-4" : "flex-col", className)}>
+		<div
+			className={classNames("flex", direction === "row" ? "flex-row gap-4" : "flex-col", className)}
+		>
 			{label && (
 				<label
 					className={classNames(
@@ -426,7 +451,9 @@ export default function MultipleSelect<T = string>({
 					</Caption>
 				)}
 				{message && <Caption className="text-neutral-600 mt-1">{message}</Caption>}
-				{typeof error === "string" && error && <Caption className="text-danger-500 mt-1">{error}</Caption>}
+				{typeof error === "string" && error && (
+					<Caption className="text-danger-500 mt-1">{error}</Caption>
+				)}
 				{success && <Caption className="text-success-700 mt-1">{success}</Caption>}
 			</div>
 		</div>
@@ -442,7 +469,7 @@ type MultipleSelectItemProps<T> = {
 	handleSelect: (value: T) => void;
 };
 
-function MultipleSelectItem<T>({handleSelect, option, size, value}: MultipleSelectItemProps<T>) {
+function MultipleSelectItem<T>({ handleSelect, option, size, value }: MultipleSelectItemProps<T>) {
 	const hasSubMenu = !!option?.options?.length;
 	const isSelected = value.some((v) => Object.is(v, option.value));
 	const [isOpen, setIsOpen] = useState(true);
@@ -458,7 +485,11 @@ function MultipleSelectItem<T>({handleSelect, option, size, value}: MultipleSele
 			<div
 				className={classNames(
 					"w-full px-3 py-2 text-left transition-colors rounded-md flex items-center justify-between gap-2",
-					option.disabled ? "cursor-disabled" : hasSubMenu ? "cursor-default" : "hover:bg-primary-50 cursor-pointer",
+					option.disabled
+						? "cursor-disabled"
+						: hasSubMenu
+							? "cursor-default"
+							: "hover:bg-primary-50 cursor-pointer",
 					isSelected && "bg-primary-500/15 text-primary-600",
 					!isSelected && !option.disabled && "text-neutral-800",
 					size === "sm" ? "text-xs" : "text-sm",
@@ -474,11 +505,23 @@ function MultipleSelectItem<T>({handleSelect, option, size, value}: MultipleSele
 			>
 				{/* Checkbox for leaf nodes only */}
 				{!hasSubMenu && (
-					<Checkbox disabled={option.disabled} checked={isSelected} id={option.label} onChecked={onChecked} />
+					<Checkbox
+						disabled={option.disabled}
+						checked={isSelected}
+						id={option.label}
+						onChecked={onChecked}
+					/>
 				)}
 
-				<span className={classNames("flex-1 inline-flex items-center gap-2", option.disabled && !hasSubMenu && "text-neutral-400")}>
-					{option.icon && <span className="inline-flex items-center text-neutral-500">{option.icon}</span>}
+				<span
+					className={classNames(
+						"flex-1 inline-flex items-center gap-2",
+						option.disabled && !hasSubMenu && "text-neutral-400",
+					)}
+				>
+					{option.icon && (
+						<span className="inline-flex items-center text-neutral-500">{option.icon}</span>
+					)}
 					{option.label}
 				</span>
 
@@ -490,7 +533,12 @@ function MultipleSelectItem<T>({handleSelect, option, size, value}: MultipleSele
 							stroke="currentColor"
 							viewBox="0 0 24 24"
 						>
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M19 9l-7 7-7-7"
+							/>
 						</svg>
 					</div>
 				)}
@@ -500,7 +548,12 @@ function MultipleSelectItem<T>({handleSelect, option, size, value}: MultipleSele
 				<div className={classNames("transition-all mt-1", isOpen ? "visible" : "hidden")}>
 					{option?.options?.map((item, index) => (
 						<div key={index} className="pl-2">
-							<MultipleSelectItem handleSelect={handleSelect} option={item} value={value} size={size} />
+							<MultipleSelectItem
+								handleSelect={handleSelect}
+								option={item}
+								value={value}
+								size={size}
+							/>
 						</div>
 					))}
 				</div>

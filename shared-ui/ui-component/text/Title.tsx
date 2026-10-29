@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import type {TextProps} from "./type";
+import type { TextProps } from "./type";
 
 const fontClassMap: Record<NonNullable<TextProps["font"]>, string> = {
 	normal: "font-normal",
@@ -15,9 +15,18 @@ const sizeClassMap: Record<NonNullable<TextProps["size"]>, string> = {
 	xl: "text-xl",
 };
 
-export default function Title({children, className, size = "xl", font = "semibold", ...props}: TextProps) {
+export default function Title({
+	children,
+	className,
+	size = "xl",
+	font = "semibold",
+	...props
+}: TextProps) {
 	return (
-		<h1 {...props} className={classNames("text-neutral-800", sizeClassMap[size], fontClassMap[font], className)}>
+		<h1
+			{...props}
+			className={classNames("text-neutral-800", sizeClassMap[size], fontClassMap[font], className)}
+		>
 			{children}
 		</h1>
 	);

@@ -1,5 +1,5 @@
-import {RefObject} from "react";
-import {GetPopoverPositionParams, GetPopoverPositionResult, PopoverPosition} from "./type";
+import { RefObject } from "react";
+import { GetPopoverPositionParams, GetPopoverPositionResult, PopoverPosition } from "./type";
 
 // Maps each position to its flipped counterpart on the primary axis
 const FLIP_MAP: Record<PopoverPosition, PopoverPosition> = {
@@ -61,9 +61,9 @@ export const getPopoverPosition = (
 	triggerRef: RefObject<HTMLDivElement | null>,
 	options: GetPopoverPositionParams,
 ): GetPopoverPositionResult => {
-	const {fullWidth, position, popoverRef} = options;
+	const { fullWidth, position, popoverRef } = options;
 
-	if (!triggerRef.current) return {top: 0, left: 0, resolvedPosition: position};
+	if (!triggerRef.current) return { top: 0, left: 0, resolvedPosition: position };
 
 	const triggerRect = triggerRef.current.getBoundingClientRect();
 
@@ -125,5 +125,5 @@ export const getPopoverPosition = (
 	const vw = window.innerWidth;
 	left = Math.min(Math.max(left, 8), Math.max(8, vw - popoverWidth - 8));
 
-	return {top, left, resolvedPosition};
+	return { top, left, resolvedPosition };
 };

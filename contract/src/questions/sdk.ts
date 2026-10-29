@@ -1,8 +1,5 @@
 import { buildPath, type ApiClient } from "../client";
-import {
-	v1WorkspaceQuestionsAnswer,
-	v1WorkspaceQuestionsCancel,
-} from "../paths";
+import { v1WorkspaceQuestionsAnswer, v1WorkspaceQuestionsCancel } from "../paths";
 import type { QuestionAnswer, ResolvedResponse } from "../types";
 
 /**

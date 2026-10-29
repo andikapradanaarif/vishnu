@@ -15,6 +15,6 @@ export const downloadUrlViaDOM = async (blobUrl: string | void | undefined, name
 		tag.click();
 		document.body.removeChild(tag);
 	} catch (error) {
-		throw new Error(`downloadUrlViaDOM failed: ${(error as Error).message}`, {cause: error});
+		throw new Error(`downloadUrlViaDOM failed: ${(error as Error).message}`, { cause: error });
 	}
 };

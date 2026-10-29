@@ -63,7 +63,6 @@ export function TopBar({
 			>
 				<Icon icon="ri:settings-3-line" width={20} />
 			</button>
-
 		</header>
 	);
 }

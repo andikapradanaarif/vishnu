@@ -1,9 +1,10 @@
-import {Time} from "../constants/time";
+import { Time } from "../constants/time";
 
 type Precision = "second" | "minute" | "hour" | "day";
 type DateInput = Date | string | number;
 
-const normalizeIsoTimestamp = (value: string): string => value.replace(/\.(\d{3})\d+([zZ]|[+-]\d{2}:?\d{2})$/, ".$1$2");
+const normalizeIsoTimestamp = (value: string): string =>
+	value.replace(/\.(\d{3})\d+([zZ]|[+-]\d{2}:?\d{2})$/, ".$1$2");
 
 const parseDateInput = (value: DateInput): Date => {
 	if (value instanceof Date) {
@@ -21,7 +22,8 @@ const factors = {
 	second: Time.MILLISECONDS_IN_SECOND,
 	minute: Time.MILLISECONDS_IN_SECOND * Time.SECONDS_IN_MINUTE,
 	hour: Time.MILLISECONDS_IN_SECOND * Time.SECONDS_IN_MINUTE * Time.MINUTES_IN_HOUR,
-	day: Time.MILLISECONDS_IN_SECOND * Time.SECONDS_IN_MINUTE * Time.MINUTES_IN_HOUR * Time.HOURS_IN_DAY,
+	day:
+		Time.MILLISECONDS_IN_SECOND * Time.SECONDS_IN_MINUTE * Time.MINUTES_IN_HOUR * Time.HOURS_IN_DAY,
 };
 
 /**
@@ -88,7 +90,7 @@ export const intlFormatDateWithTime = (date: Date | null, language: string) => {
 	const isSameYear = date.getFullYear() === now.getFullYear();
 
 	return new Intl.DateTimeFormat(language, {
-		...(isSameYear ? {} : {year: "numeric"}),
+		...(isSameYear ? {} : { year: "numeric" }),
 		weekday: "short",
 		month: "short",
 		day: "numeric",
@@ -102,14 +104,16 @@ export const intlFormatDateWithTime = (date: Date | null, language: string) => {
  */
 export const shortWeekNames = (language: string = "en") =>
 	[...Array(7).keys()].map((day) =>
-		new Intl.DateTimeFormat(language, {weekday: "short"}).format(new Date(2024, 0, day + 7)),
+		new Intl.DateTimeFormat(language, { weekday: "short" }).format(new Date(2024, 0, day + 7)),
 	);
 
 /**
  * Get month names
  */
 export const monthsNames = (language: string = "en") =>
-	Array.from({length: 12}, (_, i) => new Intl.DateTimeFormat(language, {month: "long"}).format(new Date(2024, i, 1)));
+	Array.from({ length: 12 }, (_, i) =>
+		new Intl.DateTimeFormat(language, { month: "long" }).format(new Date(2024, i, 1)),
+	);
 
 /**
  * Get list of years until now from the `startYear`
@@ -118,11 +122,11 @@ export const monthsNames = (language: string = "en") =>
  */
 export function getYearsUntilNow(startYear: number) {
 	const currentYear = new Date().getFullYear();
-	return Array.from({length: currentYear - startYear + 1}, (_, i) => startYear + i);
+	return Array.from({ length: currentYear - startYear + 1 }, (_, i) => startYear + i);
 }
 
 export function listYears(startYear: number, endYear: number) {
-	return Array.from({length: endYear - startYear + 1}, (_, i) => startYear + i);
+	return Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i);
 }
 
 /**
@@ -255,7 +259,8 @@ export function subDays(date: Date, days: number): Date {
  * @param weeks
  * @returns
  */
-export const addWeeks = (date: Date, weeks: number): Date => addDays(date, weeks * Time.DAYS_IN_WEEK);
+export const addWeeks = (date: Date, weeks: number): Date =>
+	addDays(date, weeks * Time.DAYS_IN_WEEK);
 
 /**
  * Add the selected date by months
@@ -287,7 +292,7 @@ export function getFormattedTimeString(date: Date, withSeconds = true): string {
 	const timeString = new Intl.DateTimeFormat("en-US", {
 		hour: "2-digit",
 		minute: "2-digit",
-		...(withSeconds ? {second: "2-digit"} : {}),
+		...(withSeconds ? { second: "2-digit" } : {}),
 		hour12: false,
 	}).format(date);
 	return timeString;
@@ -355,7 +360,6 @@ const TIME_FORMATS = {
 };
 
 export function mergeDateAndTime(date: Date, time: string): Date {
-
 	let hours: number;
 	let minutes = 0;
 	let seconds = 0;
@@ -390,7 +394,7 @@ export function formatDateToLocalizedString(
 ): string {
 	const parsedDate = parseDateInput(date);
 	const now = new Date();
-	const formatter = new Intl.RelativeTimeFormat(language, {numeric: "auto"});
+	const formatter = new Intl.RelativeTimeFormat(language, { numeric: "auto" });
 
 	if (Number.isNaN(parsedDate.getTime())) {
 		return "-";
@@ -398,14 +402,17 @@ export function formatDateToLocalizedString(
 
 	const dateStartOfDay = getStartOfDay(parsedDate).getTime();
 	const nowStartOfDay = getStartOfDay(now).getTime();
-	const calendarDiffDays = Math.round((dateStartOfDay - nowStartOfDay) / Time.MILLISECONDS_IN_24HOURS);
+	const calendarDiffDays = Math.round(
+		(dateStartOfDay - nowStartOfDay) / Time.MILLISECONDS_IN_24HOURS,
+	);
 
 	const yearDiff = parsedDate.getFullYear() - now.getFullYear();
 	if (yearDiff < 0) {
 		return formatter.format(yearDiff, "year");
 	}
 
-	const monthDiff = (parsedDate.getFullYear() - now.getFullYear()) * 12 + (parsedDate.getMonth() - now.getMonth());
+	const monthDiff =
+		(parsedDate.getFullYear() - now.getFullYear()) * 12 + (parsedDate.getMonth() - now.getMonth());
 	if (monthDiff < 0) {
 		return formatter.format(monthDiff, "month");
 	}
@@ -425,10 +432,15 @@ export function formatDateToLocalizedString(
 
 	const dateFormatter =
 		parsedDate.getFullYear() === now.getFullYear()
-			? new Intl.DateTimeFormat(language, {weekday: "short", day: "2-digit", month: "short"})
-			: new Intl.DateTimeFormat(language, {weekday: "short", day: "2-digit", month: "short", year: "numeric"});
+			? new Intl.DateTimeFormat(language, { weekday: "short", day: "2-digit", month: "short" })
+			: new Intl.DateTimeFormat(language, {
+					weekday: "short",
+					day: "2-digit",
+					month: "short",
+					year: "numeric",
+				});
 	if (withTime) {
-		return `${dateFormatter.format(parsedDate)} ${new Intl.DateTimeFormat(language, {hour: "2-digit", minute: "2-digit"}).format(parsedDate)}`;
+		return `${dateFormatter.format(parsedDate)} ${new Intl.DateTimeFormat(language, { hour: "2-digit", minute: "2-digit" }).format(parsedDate)}`;
 	}
 	return dateFormatter.format(parsedDate);
 }
@@ -476,13 +488,20 @@ export const formatDuration = (ms: number): string => {
  *
  * @returns A relative day description or a formatted date string.
  */
-export function getDayDescription(date: Date, now: Date = new Date(), translations?: Record<string, string>): string {
+export function getDayDescription(
+	date: Date,
+	now: Date = new Date(),
+	translations?: Record<string, string>,
+): string {
 	const target = getStartOfDay(date).getTime();
 	const today = getStartOfDay(now).getTime();
 
 	const diffInDays = Math.round(
 		(target - today) /
-			(Time.HOURS_IN_DAY * Time.MINUTES_IN_HOUR * Time.SECONDS_IN_MINUTE * Time.MILLISECONDS_IN_SECOND),
+			(Time.HOURS_IN_DAY *
+				Time.MINUTES_IN_HOUR *
+				Time.SECONDS_IN_MINUTE *
+				Time.MILLISECONDS_IN_SECOND),
 	);
 
 	switch (diffInDays) {
@@ -523,14 +542,14 @@ export const formatTime = (date: Date, locale: string = "en-GB"): string => {
  * Formats a date to a short readable string (e.g. `Mon, Jan 6`).
  */
 export const formatDate = (date: Date): string => {
-	return date.toLocaleDateString("en-US", {weekday: "short", month: "short", day: "numeric"});
+	return date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
 };
 
 /**
  * Formats a date to a month and year string (e.g. `January 2025`).
  */
 export const formatMonthYear = (date: Date): string => {
-	return date.toLocaleDateString("en-US", {month: "long", year: "numeric"});
+	return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 };
 
 /**
@@ -591,8 +610,12 @@ type FormatDateRangeOptions = {
 	translations?: Record<string, string>;
 };
 
-export function formatDateRange(start: Date, end?: Date, options: FormatDateRangeOptions = {}): string {
-	const {now = new Date(), locale = "en-GB", isAllDay = false, translations} = options;
+export function formatDateRange(
+	start: Date,
+	end?: Date,
+	options: FormatDateRangeOptions = {},
+): string {
+	const { now = new Date(), locale = "en-GB", isAllDay = false, translations } = options;
 
 	const isSameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
 
@@ -668,7 +691,10 @@ export const roundToNearestByMinutes = (date: Date = new Date(), minutes: number
  * // addHours(new Date('2024-01-01T10:00'), -3) → 07:00
  */
 export const addHours = (date: Date, hours: number): Date => {
-	return new Date(date.getTime() + hours * Time.MINUTES_IN_HOUR * Time.SECONDS_IN_MINUTE * Time.MILLISECONDS_IN_SECOND);
+	return new Date(
+		date.getTime() +
+			hours * Time.MINUTES_IN_HOUR * Time.SECONDS_IN_MINUTE * Time.MILLISECONDS_IN_SECOND,
+	);
 };
 
 /**
@@ -680,7 +706,11 @@ export const addHours = (date: Date, hours: number): Date => {
  * @param translations - Optional translation map for date strings
  * @returns A localized relative date label or formatted date string
  */
-export function formatRelativeDate(timestamp: number, language: string = "en", translations?: Record<string, string>): string {
+export function formatRelativeDate(
+	timestamp: number,
+	language: string = "en",
+	translations?: Record<string, string>,
+): string {
 	const messageDate = new Date(timestamp);
 	const now = new Date();
 

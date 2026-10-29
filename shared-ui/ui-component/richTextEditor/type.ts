@@ -1,4 +1,4 @@
-import type {Descendant} from "slate";
+import type { Descendant } from "slate";
 
 export interface RichTextEditorProps {
 	label?: string;

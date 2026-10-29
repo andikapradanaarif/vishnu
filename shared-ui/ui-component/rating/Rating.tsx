@@ -1,12 +1,12 @@
-import {useState, useCallback, type KeyboardEvent} from "react";
+import { useState, useCallback, type KeyboardEvent } from "react";
 import classNames from "classnames";
-import {Icon} from "@iconify/react";
-import type {RatingColor, RatingProps, RatingSize} from "./type";
+import { Icon } from "@iconify/react";
+import type { RatingColor, RatingProps, RatingSize } from "./type";
 
-const sizeMap: Record<RatingSize, {star: string; text: string}> = {
-	sm: {star: "w-4 h-4", text: "text-xs"},
-	md: {star: "w-6 h-6", text: "text-sm"},
-	lg: {star: "w-8 h-8", text: "text-base"},
+const sizeMap: Record<RatingSize, { star: string; text: string }> = {
+	sm: { star: "w-4 h-4", text: "text-xs" },
+	md: { star: "w-6 h-6", text: "text-sm" },
+	lg: { star: "w-8 h-8", text: "text-base" },
 };
 
 const colorMap: Record<RatingColor, string> = {
@@ -20,8 +20,7 @@ const colorMap: Record<RatingColor, string> = {
 const clamp = (value: number, min: number, max: number): number =>
 	Math.min(Math.max(value, min), max);
 
-const roundToStep = (value: number, step: number): number =>
-	Math.round(value / step) * step;
+const roundToStep = (value: number, step: number): number => Math.round(value / step) * step;
 
 export const Rating = ({
 	value,
@@ -77,7 +76,7 @@ export const Rating = ({
 		[isInteractive, onChange, value, hoverValue, step, max],
 	);
 
-	const stars = Array.from({length: max}, (_, i) => i);
+	const stars = Array.from({ length: max }, (_, i) => i);
 	const supportsHalf = step === 0.5;
 
 	return (
@@ -126,8 +125,12 @@ export const Rating = ({
 							{/* Filled overlay */}
 							{(isFull || isHalf || isPartial) && (
 								<span
-									className={classNames("absolute inset-0 overflow-hidden", activeColor, colorClassName)}
-									style={isFull ? undefined : {width: `${fillRatio * 100}%`}}
+									className={classNames(
+										"absolute inset-0 overflow-hidden",
+										activeColor,
+										colorClassName,
+									)}
+									style={isFull ? undefined : { width: `${fillRatio * 100}%` }}
 								>
 									<Icon
 										icon={isHalf ? "ri:star-half-fill" : "ri:star-fill"}

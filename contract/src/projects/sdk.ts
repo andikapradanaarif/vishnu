@@ -37,10 +37,7 @@ export class ProjectsClient {
 
 	/** POST `/projects` — 201, or 202 for clone mode (same body shape). */
 	async create(req: CreateProjectRequest): Promise<Project> {
-		const { project } = await this.api.post<ProjectEnvelope>(
-			vishnuProjects,
-			req,
-		);
+		const { project } = await this.api.post<ProjectEnvelope>(vishnuProjects, req);
 		return project;
 	}
 
@@ -51,9 +48,7 @@ export class ProjectsClient {
 
 	/** GET `/projects/{id}/workspace` — ensure and return the workspace. */
 	workspace(id: string): Promise<WorkspaceResponse> {
-		return this.api.get<WorkspaceResponse>(
-			buildPath(vishnuProjectWorkspace, { id }),
-		);
+		return this.api.get<WorkspaceResponse>(buildPath(vishnuProjectWorkspace, { id }));
 	}
 
 	/**
@@ -63,10 +58,9 @@ export class ProjectsClient {
 	 * setting outlives the child that serves it.
 	 */
 	setPermissionSkip(id: string, skip: boolean): Promise<Project> {
-		return this.api.put<Project>(
-			buildPath(vishnuProjectPermissionsSkip, { id }),
-			{ skip } satisfies SetPermissionSkipRequest,
-		);
+		return this.api.put<Project>(buildPath(vishnuProjectPermissionsSkip, { id }), {
+			skip,
+		} satisfies SetPermissionSkipRequest);
 	}
 
 	/**
@@ -75,9 +69,8 @@ export class ProjectsClient {
 	 * keeps the choice and replays it when it ensures the workspace.
 	 */
 	setAgent(id: string, agent: string): Promise<Project> {
-		return this.api.put<Project>(
-			buildPath(vishnuProjectAgent, { id }),
-			{ agent } satisfies SetAgentRequest,
-		);
+		return this.api.put<Project>(buildPath(vishnuProjectAgent, { id }), {
+			agent,
+		} satisfies SetAgentRequest);
 	}
 }

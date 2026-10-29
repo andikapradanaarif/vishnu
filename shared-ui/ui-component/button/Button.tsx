@@ -1,8 +1,8 @@
 import classNames from "classnames";
-import {useRef, type MouseEventHandler, type PointerEventHandler} from "react";
+import { useRef, type MouseEventHandler, type PointerEventHandler } from "react";
 import LoadingSpinner from "../loadingAnimation/LoadingSpinner";
-import type {ButtonColor, ButtonProps, ButtonSize, ButtonVariant} from "./type";
-import {createRipple, type RipplePointer} from "../../utils/ripple";
+import type { ButtonColor, ButtonProps, ButtonSize, ButtonVariant } from "./type";
+import { createRipple, type RipplePointer } from "../../utils/ripple";
 
 export const Button = (props: ButtonProps) => {
 	const {
@@ -35,7 +35,7 @@ export const Button = (props: ButtonProps) => {
 
 		const button = buttonRef.current;
 		if (button) {
-			const pointer: RipplePointer = {clientX: event.clientX, clientY: event.clientY};
+			const pointer: RipplePointer = { clientX: event.clientX, clientY: event.clientY };
 			createRipple(button, pointer);
 		}
 	};
@@ -44,7 +44,7 @@ export const Button = (props: ButtonProps) => {
 		if (disabled || isLoading) return;
 
 		if (event.detail === 0 && buttonRef.current) {
-			const pointer: RipplePointer = {clientX: event.clientX, clientY: event.clientY};
+			const pointer: RipplePointer = { clientX: event.clientX, clientY: event.clientY };
 			createRipple(buttonRef.current, pointer);
 		}
 
@@ -80,13 +80,17 @@ export const Button = (props: ButtonProps) => {
 			form={form}
 		>
 			{/* left icon */}
-			{icon && iconPosition === "left" && <span className="mr-1.5 inline-flex items-center">{icon}</span>}
+			{icon && iconPosition === "left" && (
+				<span className="mr-1.5 inline-flex items-center">{icon}</span>
+			)}
 
 			{/* label/content */}
 			{children}
 
 			{/* right icon (e.g. chevron) */}
-			{icon && iconPosition === "right" && <span className="ml-1.5 inline-flex items-center">{icon}</span>}
+			{icon && iconPosition === "right" && (
+				<span className="ml-1.5 inline-flex items-center">{icon}</span>
+			)}
 
 			{/* loading */}
 			{isLoading && (

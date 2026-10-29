@@ -1,4 +1,4 @@
-import {storageKeys, type StorageKeys} from "../constants/storageKeys";
+import { storageKeys, type StorageKeys } from "../constants/storageKeys";
 
 const storage = {
 	getItem(key: StorageKeys) {
@@ -13,4 +13,5 @@ const storage = {
 };
 
 export const getLanguage = (): string | null => storage.getItem(storageKeys.LANGUAGE);
-export const setLanguage = (language: string): void => storage.setItem(storageKeys.LANGUAGE, language);
+export const setLanguage = (language: string): void =>
+	storage.setItem(storageKeys.LANGUAGE, language);

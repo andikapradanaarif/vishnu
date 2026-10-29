@@ -54,9 +54,7 @@ export function ProjectPicker({ onSelect, onLogout }: ProjectPickerProps) {
 	return (
 		<div className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col gap-4 px-4 py-10">
 			<div className="flex items-center justify-between">
-				<h1 className="glow font-logo text-xs tracking-[0.2em] text-primary-400">
-					SELECT PROJECT
-				</h1>
+				<h1 className="glow font-logo text-xs tracking-[0.2em] text-primary-400">SELECT PROJECT</h1>
 				<Button variant="text" size="sm" className="font-display" onClick={onLogout}>
 					LOG OUT
 				</Button>
@@ -81,9 +79,7 @@ export function ProjectPicker({ onSelect, onLogout }: ProjectPickerProps) {
 					</Button>
 				</div>
 			)}
-			{actionError && (
-				<p className="font-display text-sm text-danger-400">{actionError}</p>
-			)}
+			{actionError && <p className="font-display text-sm text-danger-400">{actionError}</p>}
 
 			{!isLoading && !error && (projects ?? []).length === 0 && (
 				<div className="flex flex-col items-center gap-5 py-16">
@@ -125,11 +121,7 @@ export function ProjectPicker({ onSelect, onLogout }: ProjectPickerProps) {
 									<span className="truncate font-display text-xl text-on-surface">
 										{project.name}
 									</span>
-									<Chip
-										size="sm"
-										color="custom"
-										colorClassName={MODE_META[project.mode].className}
-									>
+									<Chip size="sm" color="custom" colorClassName={MODE_META[project.mode].className}>
 										{MODE_META[project.mode].label}
 									</Chip>
 								</div>
@@ -184,7 +176,11 @@ export function ProjectPicker({ onSelect, onLogout }: ProjectPickerProps) {
 					Crush is stopped for managed projects. Files on disk are not touched.
 				</p>
 				<div className="mt-4 flex justify-end gap-2">
-					<Button variant="text" className="font-display" onClick={() => setPendingDelete(undefined)}>
+					<Button
+						variant="text"
+						className="font-display"
+						onClick={() => setPendingDelete(undefined)}
+					>
 						CANCEL
 					</Button>
 					<Button
@@ -198,9 +194,7 @@ export function ProjectPicker({ onSelect, onLogout }: ProjectPickerProps) {
 				</div>
 			</Dialog>
 
-			{addOpen && (
-				<AddProjectDialog isOpen onClose={() => setAddOpen(false)} />
-			)}
+			{addOpen && <AddProjectDialog isOpen onClose={() => setAddOpen(false)} />}
 		</div>
 	);
 }

@@ -53,10 +53,9 @@ export class AgentClient {
 
 	/** POST `/workspaces/{id}/agent/main` — switch the main agent (coder/plan/task). */
 	setMain(workspaceId: string, agentId: string): Promise<void> {
-		return this.api.post<void>(
-			buildPath(v1WorkspaceAgentMain, { id: workspaceId }),
-			{ agent_id: agentId },
-		);
+		return this.api.post<void>(buildPath(v1WorkspaceAgentMain, { id: workspaceId }), {
+			agent_id: agentId,
+		});
 	}
 
 	/** POST `/workspaces/{id}/agent/sessions/{session_id}/summarize` — compact the session. */

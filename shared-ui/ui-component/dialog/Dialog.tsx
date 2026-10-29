@@ -1,8 +1,8 @@
-import {useCallback, useEffect, useRef, useState, type ReactNode} from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import classNames from "classnames";
-import {Icon} from "@iconify/react";
+import { Icon } from "@iconify/react";
 import Subtitle from "../text/Subtitle";
-import {createPortal} from "react-dom";
+import { createPortal } from "react-dom";
 
 type DialogProps = {
 	isOpen: boolean;

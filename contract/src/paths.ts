@@ -23,8 +23,7 @@ export const v1WorkspaceAgentUpdate = "/workspaces/{id}/agent/update";
 export const v1WorkspaceAgentSessionCancel = "/workspaces/{id}/agent/sessions/{session_id}/cancel";
 export const v1WorkspaceAgentSessionSummarize =
 	"/workspaces/{id}/agent/sessions/{session_id}/summarize";
-export const v1WorkspaceAgentSessionShell =
-	"/workspaces/{id}/agent/sessions/{session_id}/shell";
+export const v1WorkspaceAgentSessionShell = "/workspaces/{id}/agent/sessions/{session_id}/shell";
 export const v1WorkspaceAgentSessionPromptsClear =
 	"/workspaces/{id}/agent/sessions/{session_id}/prompts/clear";
 export const v1WorkspaceProjectNeedsInit = "/workspaces/{id}/project/needs-init";
@@ -35,8 +34,7 @@ export const v1WorkspaceConfigModel = "/workspaces/{id}/config/model";
 export const v1WorkspaceProviders = "/workspaces/{id}/providers";
 export const v1WorkspaceSessionPermissionsPending =
 	"/workspaces/{id}/sessions/{sid}/permissions/pending";
-export const v1WorkspaceSessionPermissionsSkip =
-	"/workspaces/{id}/sessions/{sid}/permissions/skip";
+export const v1WorkspaceSessionPermissionsSkip = "/workspaces/{id}/sessions/{sid}/permissions/skip";
 export const v1WorkspaceSessionModel = "/workspaces/{id}/sessions/{sid}/model";
 export const v1WorkspacePermissionsGrant = "/workspaces/{id}/permissions/grant";
 export const v1WorkspacePermissionsSkip = "/workspaces/{id}/permissions/skip";

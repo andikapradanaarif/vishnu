@@ -33,12 +33,12 @@ This will start Bun in watch mode, automatically rebuilding when you make change
 
 ## Available Scripts
 
-| Script          | Description                           |
-| --------------- | ------------------------------------- |
-| `bun run dev`   | Start development build in watch mode |
+| Script               | Description                                                                    |
+| -------------------- | ------------------------------------------------------------------------------ |
+| `bun run dev`        | Start development build in watch mode                                          |
 | `bun run playground` | Serve the component playground at http://localhost:5173 (override with `PORT`) |
-| `bun run build` | Build the library for production      |
-| `bun run lint`  | Run linter (oxlint)                   |
+| `bun run build`      | Build the library for production                                               |
+| `bun run lint`       | Run linter (oxlint)                                                            |
 
 ## Project Structure
 
@@ -111,11 +111,15 @@ Create the following files in your component directory:
 
 ```tsx
 import classNames from "classnames";
-import type {MyComponentProps} from "./type";
+import type { MyComponentProps } from "./type";
 
-export const MyComponent = ({children, className, variant = "default"}: MyComponentProps) => {
+export const MyComponent = ({ children, className, variant = "default" }: MyComponentProps) => {
 	return (
-		<div className={classNames("base-styles", variant === "primary" && "primary-styles", className)}>{children}</div>
+		<div
+			className={classNames("base-styles", variant === "primary" && "primary-styles", className)}
+		>
+			{children}
+		</div>
 	);
 };
 ```
@@ -136,8 +140,8 @@ export interface MyComponentProps {
 #### `index.ts` (Export File - Optional)
 
 ```tsx
-export {MyComponent} from "./MyComponent";
-export type {MyComponentProps, MyComponentVariant} from "./type";
+export { MyComponent } from "./MyComponent";
+export type { MyComponentProps, MyComponentVariant } from "./type";
 ```
 
 ### Step 3: Add Styles (Optional)
@@ -162,7 +166,7 @@ Add your component to the main `index.ts` file in the root directory:
 
 ```ts
 // Add this line
-export {MyComponent} from "./ui-component/myComponent/MyComponent";
+export { MyComponent } from "./ui-component/myComponent/MyComponent";
 ```
 
 ### Step 5: Build and Test
@@ -240,7 +244,7 @@ export interface ButtonProps {
 Use `forwardRef` for components that wrap HTML elements:
 
 ```tsx
-import {forwardRef} from "react";
+import { forwardRef } from "react";
 
 const MyComponent = forwardRef<HTMLDivElement, MyComponentProps>((props, ref) => {
 	return <div ref={ref} {...props} />;
@@ -288,7 +292,11 @@ export type Size = "small" | "medium" | "large";
 Provide sensible defaults for optional props:
 
 ```tsx
-export const MyComponent = ({variant = "default", size = "md", disabled = false}: MyComponentProps) => {
+export const MyComponent = ({
+	variant = "default",
+	size = "md",
+	disabled = false,
+}: MyComponentProps) => {
 	// ...
 };
 ```
@@ -301,7 +309,7 @@ Create a new file in the `hooks/` directory:
 
 ```tsx
 // hooks/useMyHook.ts
-import {useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 
 export function useMyHook(initialValue: string) {
 	const [value, setValue] = useState(initialValue);
@@ -310,7 +318,7 @@ export function useMyHook(initialValue: string) {
 		// side effects
 	}, [value]);
 
-	return {value, setValue};
+	return { value, setValue };
 }
 ```
 
@@ -319,7 +327,7 @@ export function useMyHook(initialValue: string) {
 Add the hook to the main `index.ts`:
 
 ```ts
-export {useMyHook} from "./hooks/useMyHook";
+export { useMyHook } from "./hooks/useMyHook";
 ```
 
 ## Adding New Utilities
@@ -340,7 +348,7 @@ export function myUtility(input: string): string {
 Add the utility to the main `index.ts`:
 
 ```ts
-export {myUtility} from "./utils/myUtility";
+export { myUtility } from "./utils/myUtility";
 ```
 
 ## Testing Components

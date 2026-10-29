@@ -1,8 +1,8 @@
-import {QRCodeSVG} from "qrcode.react";
-import type {QrCodeProps} from "./type";
+import { QRCodeSVG } from "qrcode.react";
+import type { QrCodeProps } from "./type";
 
 // Re-export for consumers
-export type {QrCodeProps};
+export type { QrCodeProps };
 
 /**
  * Renders a QR code as an inline SVG from a string value using the

@@ -1,7 +1,7 @@
-import {Icon} from "@iconify/react";
-import {useSlicedPages} from "../../hooks/useSlicedPages";
-import {PaginationItem} from "./PaginationItem";
-import type {PaginationProps} from "./type";
+import { Icon } from "@iconify/react";
+import { useSlicedPages } from "../../hooks/useSlicedPages";
+import { PaginationItem } from "./PaginationItem";
+import type { PaginationProps } from "./type";
 import Skeleton from "../loadingAnimation/Skeleton";
 
 type DesktopViewPaginationProps = Pick<
@@ -12,9 +12,9 @@ type DesktopViewPaginationProps = Pick<
 };
 
 export const DesktopViewPagination = (props: DesktopViewPaginationProps) => {
-	const {currentPage, onChangeCurrentPage, isFetching, totalPage, name} = props;
+	const { currentPage, onChangeCurrentPage, isFetching, totalPage, name } = props;
 
-	const {slicedPages, showNavigation, showNext, showPrev} = useSlicedPages({
+	const { slicedPages, showNavigation, showNext, showPrev } = useSlicedPages({
 		currentPage,
 		totalPage,
 	});
@@ -23,7 +23,7 @@ export const DesktopViewPagination = (props: DesktopViewPaginationProps) => {
 	if (isFetching && totalPage === 0) {
 		return (
 			<div className="flex items-center gap-1">
-				{Array.from({length: 3}, (_, index) => (
+				{Array.from({ length: 3 }, (_, index) => (
 					<Skeleton key={index} className="w-12 h-12" />
 				))}
 			</div>

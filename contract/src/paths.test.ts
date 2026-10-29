@@ -25,9 +25,7 @@ describe("project-scoped crush client", () => {
 			defaultQuery: { client_id: "c1" },
 		});
 
-		expect(new EventsClient(api).url("w1")).toBe(
-			"/p/abc/v1/workspaces/w1/events?client_id=c1",
-		);
+		expect(new EventsClient(api).url("w1")).toBe("/p/abc/v1/workspaces/w1/events?client_id=c1");
 	});
 });
 

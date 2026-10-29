@@ -1,4 +1,4 @@
-import type {ReactNode} from "react";
+import type { ReactNode } from "react";
 
 export interface EmptyDataProps {
 	/** Text to display. Defaults to "No data yet". */

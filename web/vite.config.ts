@@ -18,11 +18,7 @@ export default defineConfig(({ mode }) => {
 		loadEnv(mode, process.cwd(), "").VITE_API_UPSTREAM ||
 		"http://127.0.0.1:8080";
 	return {
-		plugins: [
-			tanstackRouter({ target: "react", autoCodeSplitting: true }),
-			react(),
-			tailwindcss(),
-		],
+		plugins: [tanstackRouter({ target: "react", autoCodeSplitting: true }), react(), tailwindcss()],
 		resolve: {
 			// shared-ui is a workspace package with its own node_modules; without
 			// dedupe its dist can resolve a second React/ReactDOM copy, which

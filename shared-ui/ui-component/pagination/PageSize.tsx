@@ -1,11 +1,20 @@
 import Select from "../input/Select";
-import {defaultPaginationOptions, type PaginationProps} from "./type";
-import {translate} from "../../utils/translation";
+import { defaultPaginationOptions, type PaginationProps } from "./type";
+import { translate } from "../../utils/translation";
 
-type PageSizeProps = Pick<PaginationProps, "pageSize" | "onChangePageSize" | "name" | "pageSizeOptions" | "language">;
+type PageSizeProps = Pick<
+	PaginationProps,
+	"pageSize" | "onChangePageSize" | "name" | "pageSizeOptions" | "language"
+>;
 
 export const PageSize = (props: PageSizeProps) => {
-	const {pageSize = defaultPaginationOptions[0], onChangePageSize, name, pageSizeOptions = [], language = "en"} = props;
+	const {
+		pageSize = defaultPaginationOptions[0],
+		onChangePageSize,
+		name,
+		pageSizeOptions = [],
+		language = "en",
+	} = props;
 
 	const options = pageSizeOptions.map((item) => {
 		return {

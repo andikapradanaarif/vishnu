@@ -1,11 +1,11 @@
-import {useRef} from "react";
+import { useRef } from "react";
 import classNames from "classnames";
-import {createRipple} from "../../utils/ripple";
-import {Chip} from "../chip/Chip";
-import type {ChipProps} from "../chip/type";
+import { createRipple } from "../../utils/ripple";
+import { Chip } from "../chip/Chip";
+import type { ChipProps } from "../chip/type";
 import Tooltip from "../tooltip/Tooltip";
-import {menuRoundedClassMap, menuSize} from "./utils";
-import type {MenuRounded, MenuSize} from "./utils";
+import { menuRoundedClassMap, menuSize } from "./utils";
+import type { MenuRounded, MenuSize } from "./utils";
 
 interface MenuItemProps {
 	label: string;
@@ -21,7 +21,6 @@ interface MenuItemProps {
 	chip?: ChipProps;
 	isCollapsed?: boolean;
 	rounded?: MenuRounded;
-
 }
 
 function MenuItem({
@@ -37,13 +36,13 @@ function MenuItem({
 	activeClassName,
 	chip,
 	isCollapsed = false,
-	rounded = 'md',
+	rounded = "md",
 }: MenuItemProps) {
 	const navRef = useRef<HTMLElement>(null);
 
 	const handlePointerDown: React.PointerEventHandler<HTMLDivElement> = (event) => {
 		if (disabled) return;
-		createRipple(event.currentTarget, {clientX: event.clientX, clientY: event.clientY});
+		createRipple(event.currentTarget, { clientX: event.clientX, clientY: event.clientY });
 	};
 
 	const roundedClass = menuRoundedClassMap[rounded];
@@ -57,7 +56,9 @@ function MenuItem({
 				roundedClass,
 				isCollapsed ? "justify-center w-10 h-10" : "justify-between",
 				menuSize(size),
-				selectedMenu === value ? activeClassName || "bg-primary-50 text-primary-600" : "text-neutral-500",
+				selectedMenu === value
+					? activeClassName || "bg-primary-50 text-primary-600"
+					: "text-neutral-500",
 				disabled
 					? "text-neutral-400 cursor-not-allowed pointer-events-none select-none opacity-60"
 					: "hover:bg-primary-50 hover:text-primary-600 cursor-pointer",
@@ -74,14 +75,18 @@ function MenuItem({
 		>
 			<div className="flex gap-2 items-center text-center">
 				{PrefixIcon && (
-					<span className={classNames("w-5 h-5 grid place-items-center", isCollapsed && "text-base")}>
+					<span
+						className={classNames("w-5 h-5 grid place-items-center", isCollapsed && "text-base")}
+					>
 						{PrefixIcon}
 					</span>
 				)}
 				{!isCollapsed && <span>{label}</span>}
 				{!isCollapsed && chip && <Chip {...chip} />}
 			</div>
-			{!isCollapsed && SuffixIcon && <span className="w-5 h-5 grid place-items-center">{SuffixIcon}</span>}
+			{!isCollapsed && SuffixIcon && (
+				<span className="w-5 h-5 grid place-items-center">{SuffixIcon}</span>
+			)}
 		</nav>
 	);
 

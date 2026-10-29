@@ -63,9 +63,15 @@ Use the `classnames` package for conditional styling in your own components:
 ```tsx
 import classNames from "classnames";
 
-const MyComponent = ({isActive, variant}) => {
+const MyComponent = ({ isActive, variant }) => {
 	return (
-		<div className={classNames("base-class", isActive && "active-class", variant === "primary" && "primary-class")}>
+		<div
+			className={classNames(
+				"base-class",
+				isActive && "active-class",
+				variant === "primary" && "primary-class",
+			)}
+		>
 			Content
 		</div>
 	);
@@ -167,7 +173,7 @@ Implement dark mode by toggling a data attribute:
 
 ```tsx
 // App.tsx
-import {useEffect} from "react";
+import { useEffect } from "react";
 
 function App() {
 	const [isDark, setIsDark] = useState(false);
@@ -271,7 +277,7 @@ The library includes built-in animations:
 ### Loading Animation
 
 ```tsx
-import {LoadingAnimation} from "@vishnu/ui-component";
+import { LoadingAnimation } from "@vishnu/ui-component";
 
 <LoadingAnimation />;
 ```

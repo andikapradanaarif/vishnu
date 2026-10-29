@@ -1,8 +1,8 @@
 import classNames from "classnames";
-import {Button} from "./Button";
-import type {ButtonGroupProps} from "./type";
+import { Button } from "./Button";
+import type { ButtonGroupProps } from "./type";
 
-export const ButtonGroup = ({items, className, size}: ButtonGroupProps) => {
+export const ButtonGroup = ({ items, className, size }: ButtonGroupProps) => {
 	return (
 		<div className={classNames("flex items-center rounded-md", className)}>
 			{items.map((item, index) => {
@@ -21,7 +21,12 @@ export const ButtonGroup = ({items, className, size}: ButtonGroupProps) => {
 				}
 
 				return (
-					<Button key={index} size={size || item.size} {...item} className={classNames(item.className, groupClasses)} />
+					<Button
+						key={index}
+						size={size || item.size}
+						{...item}
+						className={classNames(item.className, groupClasses)}
+					/>
 				);
 			})}
 		</div>

@@ -1,7 +1,7 @@
-import {afterEach, describe, expect, it, mock} from "bun:test";
-import {cleanup, fireEvent, render, screen} from "@testing-library/react";
+import { afterEach, describe, expect, it, mock } from "bun:test";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
-import {Dialog} from "../Dialog";
+import { Dialog } from "../Dialog";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -39,7 +39,7 @@ describe("Dialog", () => {
 			</Dialog>,
 		);
 
-		fireEvent.click(screen.getByRole("button", {name: "Close"}));
+		fireEvent.click(screen.getByRole("button", { name: "Close" }));
 		expect(onClose).not.toHaveBeenCalled();
 
 		await sleep(120);

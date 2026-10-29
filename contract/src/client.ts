@@ -11,10 +11,12 @@ export type ResolvedPath = string & { readonly __resolved: unique symbol };
  * and maps them to required keys in a params object.
  * @example ExtractParam<"/workspaces/{id}"> → { id: string | number }
  */
-type ExtractParam<T extends string, Acc extends Record<string, string | number> = {}> =
-	T extends `${string}{${infer Param}}${infer Rest}`
-		? ExtractParam<Rest, Acc & { [K in Param]: string | number }>
-		: Acc;
+type ExtractParam<
+	T extends string,
+	Acc extends Record<string, string | number> = {},
+> = T extends `${string}{${infer Param}}${infer Rest}`
+	? ExtractParam<Rest, Acc & { [K in Param]: string | number }>
+	: Acc;
 
 /**
  * Builds a runtime URL path from a contract path template by substituting
@@ -23,16 +25,14 @@ type ExtractParam<T extends string, Acc extends Record<string, string | number> 
  * @example
  * buildPath("/workspaces/{id}", { id: "abc" }); // "/workspaces/abc"
  */
-export function buildPath<T extends string>(
-	template: T,
-	params: ExtractParam<T>,
-): ResolvedPath {
+export function buildPath<T extends string>(template: T, params: ExtractParam<T>): ResolvedPath {
 	let result = template as string;
-	const sortedKeys = (Object.keys(params) as string[]).sort(
-		(a, b) => b.length - a.length,
-	);
+	const sortedKeys = (Object.keys(params) as string[]).sort((a, b) => b.length - a.length);
 	for (const key of sortedKeys) {
-		result = result.replaceAll("{" + key + "}", encodeURIComponent(String((params as Record<string, string | number>)[key])));
+		result = result.replaceAll(
+			"{" + key + "}",
+			encodeURIComponent(String((params as Record<string, string | number>)[key])),
+		);
 	}
 	if (result.includes("{") || result.includes("}")) {
 		throw new Error(
@@ -46,7 +46,10 @@ export function buildPath<T extends string>(
  * Appends query params to a path. undefined/null values are skipped so
  * optional params don't produce `?key=undefined`.
  */
-export function withQuery(path: string, params?: Record<string, string | number | boolean | null | undefined>): ResolvedPath {
+export function withQuery(
+	path: string,
+	params?: Record<string, string | number | boolean | null | undefined>,
+): ResolvedPath {
 	if (!params) return path as ResolvedPath;
 	const qs = new URLSearchParams();
 	for (const [key, value] of Object.entries(params)) {
@@ -116,7 +119,7 @@ export class ApiClient {
 		this.baseUrl = (opts.baseUrl ?? "/v1").replace(/\/+$/, "");
 		this.fetchFn = opts.fetch ?? fetch;
 		this.defaultHeaders = {
-			"Accept": "application/json",
+			Accept: "application/json",
 			...opts.defaultHeaders,
 		};
 		this.defaultQuery = opts.defaultQuery ?? {};
@@ -128,7 +131,9 @@ export class ApiClient {
 		const headers = new Headers(this.defaultHeaders);
 		if (options.headers) {
 			const incoming = new Headers(options.headers);
-			incoming.forEach((value, key) => { headers.set(key, value); });
+			incoming.forEach((value, key) => {
+				headers.set(key, value);
+			});
 		}
 		if (options.body && !headers.has("Content-Type")) {
 			headers.set("Content-Type", "application/json");
@@ -138,9 +143,10 @@ export class ApiClient {
 			let body: ErrorBody;
 			try {
 				const parsed = await res.json();
-				body = (typeof parsed === "object" && parsed !== null)
-					? parsed as ErrorBody
-					: { message: res.statusText || `HTTP ${res.status}` };
+				body =
+					typeof parsed === "object" && parsed !== null
+						? (parsed as ErrorBody)
+						: { message: res.statusText || `HTTP ${res.status}` };
 			} catch {
 				body = { message: res.statusText || `HTTP ${res.status}` };
 			}

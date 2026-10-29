@@ -1,8 +1,8 @@
 import classNames from "classnames";
-import type {Tab, TabsProps} from "./type";
+import type { Tab, TabsProps } from "./type";
 import Skeleton from "../loadingAnimation/Skeleton";
 
-function Tabs<T>({items, active, className, onChange, id, isLoading}: TabsProps<T>) {
+function Tabs<T>({ items, active, className, onChange, id, isLoading }: TabsProps<T>) {
 	const handleTabClick = (tab: Tab<T>) => {
 		if (!tab.disabled) {
 			onChange(tab.value);
@@ -11,7 +11,14 @@ function Tabs<T>({items, active, className, onChange, id, isLoading}: TabsProps<
 
 	if (isLoading) {
 		return (
-			<nav className={classNames("-mb-px flex flex-1 min-w-0 overflow-x-auto overscroll-x-contain gap-1", className)} aria-label="Tabs" id={`tabs-${id}`}>
+			<nav
+				className={classNames(
+					"-mb-px flex flex-1 min-w-0 overflow-x-auto overscroll-x-contain gap-1",
+					className,
+				)}
+				aria-label="Tabs"
+				id={`tabs-${id}`}
+			>
 				{items.map((_, index) => (
 					<Skeleton key={index} className="h-8 w-24 shrink-0" />
 				))}
@@ -20,7 +27,14 @@ function Tabs<T>({items, active, className, onChange, id, isLoading}: TabsProps<
 	}
 
 	return (
-		<nav className={classNames("-mb-px flex flex-1 min-w-0 overflow-x-auto overscroll-x-contain gap-1", className)} aria-label="Tabs" id={`tabs-${id}`}>
+		<nav
+			className={classNames(
+				"-mb-px flex flex-1 min-w-0 overflow-x-auto overscroll-x-contain gap-1",
+				className,
+			)}
+			aria-label="Tabs"
+			id={`tabs-${id}`}
+		>
 			{items.map((tab) => {
 				const isActive = tab.value === active;
 				return (

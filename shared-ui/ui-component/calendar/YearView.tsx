@@ -1,8 +1,8 @@
 import classNames from "classnames";
-import {monthsNames, shortWeekNames} from "../../utils/date";
-import type {CalendarEvent} from "./type";
-import {getMonthGrid, isSameDay, getIsDayDisabled} from "./utils";
-import {useMemo} from "react";
+import { monthsNames, shortWeekNames } from "../../utils/date";
+import type { CalendarEvent } from "./type";
+import { getMonthGrid, isSameDay, getIsDayDisabled } from "./utils";
+import { useMemo } from "react";
 
 interface YearViewProps {
 	date: Date;
@@ -28,7 +28,18 @@ interface MiniMonthProps {
 }
 
 const MiniMonth = (props: MiniMonthProps) => {
-	const {year, monthIndex, today, selectedDate, daysWithEvents, onMonthClick, onDayClick, language = "en", minDate, maxDate} = props;
+	const {
+		year,
+		monthIndex,
+		today,
+		selectedDate,
+		daysWithEvents,
+		onMonthClick,
+		onDayClick,
+		language = "en",
+		minDate,
+		maxDate,
+	} = props;
 
 	const monthDate = useMemo(() => new Date(year, monthIndex, 1), [monthIndex, year]);
 	const weeks = useMemo(() => getMonthGrid(monthDate), [monthDate]);
@@ -46,7 +57,9 @@ const MiniMonth = (props: MiniMonthProps) => {
 				onClick={() => onMonthClick(monthDate)}
 				className={classNames(
 					"text-left text-sm font-medium mb-2 transition-colors",
-					isMonthDisabled ? "text-neutral-300 cursor-not-allowed" : "text-neutral-700 hover:text-primary-600 cursor-pointer",
+					isMonthDisabled
+						? "text-neutral-300 cursor-not-allowed"
+						: "text-neutral-700 hover:text-primary-600 cursor-pointer",
 				)}
 			>
 				{monthsNames(language)[monthIndex]}
@@ -123,7 +136,7 @@ const MiniMonth = (props: MiniMonthProps) => {
 };
 
 export const YearView = (props: YearViewProps) => {
-	const {date, events, onMonthClick, onDayClick, language = "en", minDate, maxDate} = props;
+	const { date, events, onMonthClick, onDayClick, language = "en", minDate, maxDate } = props;
 	const year = date.getFullYear();
 
 	const today = useMemo(() => new Date(), []);
@@ -165,7 +178,7 @@ export const YearView = (props: YearViewProps) => {
 	return (
 		<div className="flex-1 overflow-y-auto p-6 bg-white">
 			<div className="grid grid-cols-4 gap-8 max-xl:grid-cols-3 max-lg:grid-cols-2 max-sm:grid-cols-1">
-				{Array.from({length: 12}, (_, i) => (
+				{Array.from({ length: 12 }, (_, i) => (
 					<MiniMonth
 						key={i}
 						year={year}

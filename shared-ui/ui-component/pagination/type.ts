@@ -1,4 +1,4 @@
-import type {Language} from "../../types/translations";
+import type { Language } from "../../types/translations";
 
 export const defaultPaginationOptions = [10, 25, 50, 80, 120];
 

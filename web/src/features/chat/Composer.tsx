@@ -128,8 +128,7 @@ export function Composer({ wid, sid, busy }: ComposerProps) {
 				runShell.mutate(
 					{ sid, command: arg },
 					{
-						onSuccess: (r) =>
-							setShellOut({ cmd: arg, output: r.output, code: r.exit_code }),
+						onSuccess: (r) => setShellOut({ cmd: arg, output: r.output, code: r.exit_code }),
 						onError: (e) => cmdNotice(false, `shell failed: ${errorLabel(e)}`),
 					},
 				);
@@ -153,8 +152,7 @@ export function Composer({ wid, sid, busy }: ComposerProps) {
 			run: (arg) => {
 				if (arg === "inherit") {
 					setSessionSkip.mutate(null, {
-						onSuccess: () =>
-							cmdNotice(true, "auto-approve follows the workspace default"),
+						onSuccess: () => cmdNotice(true, "auto-approve follows the workspace default"),
 						onError: (e) => cmdNotice(false, `reset failed: ${errorLabel(e)}`),
 					});
 					return;
@@ -233,9 +231,7 @@ export function Composer({ wid, sid, busy }: ComposerProps) {
 								onMouseEnter={() => setMenuIdx(i)}
 								onClick={() => pick(cmd)}
 								className={`flex w-full items-baseline gap-3 px-3 py-2 text-left ${
-									i === activeIdx
-										? "bg-primary-500/20 text-on-surface"
-										: "text-on-surface-muted"
+									i === activeIdx ? "bg-primary-500/20 text-on-surface" : "text-on-surface-muted"
 								}`}
 							>
 								<span className="shrink-0 font-display text-sm text-primary-400">
@@ -256,11 +252,7 @@ export function Composer({ wid, sid, busy }: ComposerProps) {
 						<div className="flex items-start justify-between gap-2">
 							<span className="text-success-400">$ {shellOut.cmd}</span>
 							<span className="flex items-center gap-2">
-								<span
-									className={
-										shellOut.code === 0 ? "text-ghost" : "text-danger-400"
-									}
-								>
+								<span className={shellOut.code === 0 ? "text-ghost" : "text-danger-400"}>
 									exit {shellOut.code}
 								</span>
 								<button

@@ -1,10 +1,5 @@
 import type { ApiClient } from "../client";
-import {
-	vishnuAuthLogout,
-	vishnuAuthMe,
-	vishnuAuthRequestOtp,
-	vishnuAuthVerify,
-} from "../paths";
+import { vishnuAuthLogout, vishnuAuthMe, vishnuAuthRequestOtp, vishnuAuthVerify } from "../paths";
 import type { User, UserEnvelope } from "./index";
 
 /**

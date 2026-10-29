@@ -75,7 +75,7 @@ warning and cannot load the stylesheet correctly.
 ## Quick Start
 
 ```tsx
-import {Button, Input} from "@vishnu/ui-component";
+import { Button, Input } from "@vishnu/ui-component";
 
 function App() {
 	return (
@@ -110,8 +110,8 @@ required.
 For maximum tree-shaking, import from per-component subpaths instead of the root barrel:
 
 ```tsx
-import {Button} from "@vishnu/ui-component/button";
-import {Input, Select} from "@vishnu/ui-component/input";
+import { Button } from "@vishnu/ui-component/button";
+import { Input, Select } from "@vishnu/ui-component/input";
 ```
 
 ## Theming (Color Tokens)

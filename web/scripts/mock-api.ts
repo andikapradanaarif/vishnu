@@ -57,8 +57,22 @@ type Project = {
 };
 
 let projects: Project[] = [
-	{ id: "p1", name: "vishnu", mode: "managed", status: "up", path: "/Users/you/src/vishnu", port: 9201 },
-	{ id: "p2", name: "crush", mode: "managed", status: "up", path: "/Users/you/src/crush", port: 9202 },
+	{
+		id: "p1",
+		name: "vishnu",
+		mode: "managed",
+		status: "up",
+		path: "/Users/you/src/vishnu",
+		port: 9201,
+	},
+	{
+		id: "p2",
+		name: "crush",
+		mode: "managed",
+		status: "up",
+		path: "/Users/you/src/crush",
+		port: 9202,
+	},
 	{
 		id: "p3",
 		name: "legacy-daemon",
@@ -165,7 +179,13 @@ function message(
 
 const sampleMessages: Record<string, Message[]> = {
 	s1: [
-		message("m1", "user", "s1", [{ type: "text", data: { text: "Add a project picker with status chips." } }], 300),
+		message(
+			"m1",
+			"user",
+			"s1",
+			[{ type: "text", data: { text: "Add a project picker with status chips." } }],
+			300,
+		),
 		message(
 			"m2",
 			"assistant",
@@ -207,22 +227,44 @@ const sampleMessages: Record<string, Message[]> = {
 			],
 			250,
 		),
-		message("m3", "user", "s1", [{ type: "text", data: { text: "Looks good — what's next?" } }], 120),
+		message(
+			"m3",
+			"user",
+			"s1",
+			[{ type: "text", data: { text: "Looks good — what's next?" } }],
+			120,
+		),
 		message(
 			"m4",
 			"assistant",
 			"s1",
-			[{ type: "text", data: { text: "Next: the permission and question cards, then a theme pass." } }],
+			[
+				{
+					type: "text",
+					data: { text: "Next: the permission and question cards, then a theme pass." },
+				},
+			],
 			60,
 		),
 	],
 	s2: [
-		message("m5", "user", "s2", [{ type: "text", data: { text: "Make the HUD read like a game cabinet." } }], 7200),
+		message(
+			"m5",
+			"user",
+			"s2",
+			[{ type: "text", data: { text: "Make the HUD read like a game cabinet." } }],
+			7200,
+		),
 		message(
 			"m6",
 			"assistant",
 			"s2",
-			[{ type: "text", data: { text: "Done — VT323 for the HUD, mustard accents, scanlines behind the shell." } }],
+			[
+				{
+					type: "text",
+					data: { text: "Done — VT323 for the HUD, mustard accents, scanlines behind the shell." },
+				},
+			],
 			7100,
 		),
 	],
@@ -340,9 +382,13 @@ function events(): Response {
 // ── crush surface ───────────────────────────────────────────────────
 
 function replyTo(sessionId: string, prompt: string) {
-	const userMessage = message(`m-${Date.now()}`, "user", sessionId, [
-		{ type: "text", data: { text: prompt } },
-	], 0);
+	const userMessage = message(
+		`m-${Date.now()}`,
+		"user",
+		sessionId,
+		[{ type: "text", data: { text: prompt } }],
+		0,
+	);
 	sampleMessages[sessionId] = [...(sampleMessages[sessionId] ?? []), userMessage];
 
 	const target = sessions.find((s) => s.id === sessionId);
@@ -356,33 +402,39 @@ function replyTo(sessionId: string, prompt: string) {
 	broadcast("message", userMessage);
 
 	setTimeout(() => {
-		const reply = message(`m-${Date.now()}`, "assistant", sessionId, [
-			{
-				type: "text",
-				data: {
-					text: `Mock reply to **${prompt}**.\n\nThe real agent runs on the server; this is the local preview.`,
+		const reply = message(
+			`m-${Date.now()}`,
+			"assistant",
+			sessionId,
+			[
+				{
+					type: "text",
+					data: {
+						text: `Mock reply to **${prompt}**.\n\nThe real agent runs on the server; this is the local preview.`,
+					},
 				},
-			},
-			{
-				type: "tool_call",
-				data: {
-					id: `tc-${Date.now()}`,
-					name: "read_file",
-					input: '{"path":"web/src/App.tsx"}',
-					finished: true,
+				{
+					type: "tool_call",
+					data: {
+						id: `tc-${Date.now()}`,
+						name: "read_file",
+						input: '{"path":"web/src/App.tsx"}',
+						finished: true,
+					},
 				},
-			},
-			{
-				type: "tool_result",
-				data: {
-					tool_call_id: `tc-${Date.now()}`,
-					name: "read_file",
-					content: "export default function App() { /* mock */ }",
-					metadata: "",
-					is_error: false,
+				{
+					type: "tool_result",
+					data: {
+						tool_call_id: `tc-${Date.now()}`,
+						name: "read_file",
+						content: "export default function App() { /* mock */ }",
+						metadata: "",
+						is_error: false,
+					},
 				},
-			},
-		], 0);
+			],
+			0,
+		);
 		sampleMessages[sessionId] = [...(sampleMessages[sessionId] ?? []), reply];
 		const done = sessions.find((s) => s.id === sessionId);
 		if (done) {
@@ -396,7 +448,13 @@ function replyTo(sessionId: string, prompt: string) {
 	}, 900);
 }
 
-function crush(_pid: string, _wid: string, rest: string, method: string, req: Request): Response | Promise<Response> {
+function crush(
+	_pid: string,
+	_wid: string,
+	rest: string,
+	method: string,
+	req: Request,
+): Response | Promise<Response> {
 	if (rest === "/sessions" && method === "GET") return json(sessions);
 	if (rest === "/sessions" && method === "POST") {
 		return body(req).then((input) => {
@@ -497,11 +555,9 @@ Bun.serve({
 				return json({ message: "that code is wrong", code: "invalid_code" }, 401);
 			}
 			loggedIn = true;
-			return json(
-				{ user },
-				200,
-				{ "Set-Cookie": "vishnu_session=mock; HttpOnly; Path=/; SameSite=Lax" },
-			);
+			return json({ user }, 200, {
+				"Set-Cookie": "vishnu_session=mock; HttpOnly; Path=/; SameSite=Lax",
+			});
 		}
 		if (path === "/api/auth/logout" && method === "POST") {
 			loggedIn = false;
@@ -556,13 +612,7 @@ Bun.serve({
 
 		const crushMatch = path.match(/^\/p\/([^/]+)\/v1\/workspaces\/([^/]+)(\/.*)?$/);
 		if (crushMatch) {
-			return crush(
-				crushMatch[1],
-				crushMatch[2],
-				crushMatch[3] ?? "",
-				method,
-				req,
-			);
+			return crush(crushMatch[1], crushMatch[2], crushMatch[3] ?? "", method, req);
 		}
 
 		return json({ message: `no mock route for ${method} ${path}`, code: "not_found" }, 404);

@@ -1,36 +1,36 @@
 export type FormRules =
-  | 'required'
-  | 'maxLength'
-  | 'minLength'
-  | 'containsUrl'
-  | 'containsHtmlOrScript'
-  | 'containsSuspiciousPattern'
-  | 'containsDisallowedCharacters'
-  | 'invalidEmail';
+	| "required"
+	| "maxLength"
+	| "minLength"
+	| "containsUrl"
+	| "containsHtmlOrScript"
+	| "containsSuspiciousPattern"
+	| "containsDisallowedCharacters"
+	| "invalidEmail";
 
-export type DateTimeRules = 'mustBeInFuture' | 'mustBeInPast';
+export type DateTimeRules = "mustBeInFuture" | "mustBeInPast";
 
 export type PasswordRules =
-  | 'required'
-  | 'minLength'
-  | 'containLetter'
-  | 'containLowercase'
-  | 'containUppercase'
-  | 'containNumber'
-  | 'containSpecialCharacter';
+	| "required"
+	| "minLength"
+	| "containLetter"
+	| "containLowercase"
+	| "containUppercase"
+	| "containNumber"
+	| "containSpecialCharacter";
 
 export type TimeTrackingRules =
-  | 'required'
-  | 'startTimeInvalid'
-  | 'startTimeFuture'
-  | 'endTimeFuture'
-  | 'startAfterEnd'
-  | 'durationIsNotPositive'
-  | 'durationTooLong'
-  | 'endTimeInvalid';
+	| "required"
+	| "startTimeInvalid"
+	| "startTimeFuture"
+	| "endTimeFuture"
+	| "startAfterEnd"
+	| "durationIsNotPositive"
+	| "durationTooLong"
+	| "endTimeInvalid";
 
 export interface FormRulesOptions {
-  maxLength?: number;
-  minLength?: number;
-  disallowedCharacters?: string[];
+	maxLength?: number;
+	minLength?: number;
+	disallowedCharacters?: string[];
 }
