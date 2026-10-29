@@ -2,7 +2,6 @@ import classNames from "classnames";
 import type {
 	CircularProgressColor,
 	CircularProgressProps,
-	CircularProgressVariant,
 } from "./CircularProgressType";
 
 const colorMap: Record<CircularProgressColor, string> = {

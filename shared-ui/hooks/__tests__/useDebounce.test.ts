@@ -39,7 +39,7 @@ describe("useDebounce", () => {
 describe("useDebounceFunc", () => {
 	it("debounces callback execution", async () => {
 		let callCount = 0;
-		const {result} = renderHook(() => useDebounceFunc((arg: string) => {
+		const {result} = renderHook(() => useDebounceFunc((_arg: string) => {
 			callCount++;
 		}, 100));
 

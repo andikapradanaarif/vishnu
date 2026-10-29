@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import type {ProgressBarColor, ProgressBarProps, ProgressBarSize, ProgressBarVariant} from "./type";
+import type {ProgressBarColor, ProgressBarProps, ProgressBarSize} from "./type";
 import "./index.css";
 
 const sizeMap: Record<ProgressBarSize, string> = {
