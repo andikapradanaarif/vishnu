@@ -14,7 +14,7 @@ describe("projectBaseUrl", () => {
 	});
 
 	test("fills the project base template", () => {
-		expect(buildPath(vishnuProjectBase, { pid: "abc" })).toBe("/p/abc/v1");
+		expect(String(buildPath(vishnuProjectBase, { pid: "abc" }))).toBe("/p/abc/v1");
 	});
 });
 

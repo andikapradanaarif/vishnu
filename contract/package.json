@@ -80,13 +80,14 @@
 	},
 	"scripts": {
 		"build": "./scripts/build.sh",
-		"lint": "oxlint .",
+		"lint": "tsc --noEmit -p tsconfig.json && oxlint .",
 		"test": "bun test",
-		"typecheck": "tsc -b",
+		"typecheck": "tsc --noEmit -p tsconfig.json",
 		"prepare": "bun run build"
 	},
 	"devDependencies": {
 		"@types/react": "^19.3.0",
+		"bun-types": "^1.4.4",
 		"oxlint": "^1.88.0",
 		"typescript": "^7.0.2"
 	}
