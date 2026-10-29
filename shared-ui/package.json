@@ -203,7 +203,7 @@
 	"scripts": {
 		"build": "./scripts/build.sh",
 		"dev": "./scripts/dev.sh",
-		"lint": "oxlint .",
+		"lint": "tsc --noEmit -p tsconfig.json && oxlint --deny-warnings .",
 		"check": "bun check",
 		"test": "bun test",
 		"test:watch": "bun test --watch",

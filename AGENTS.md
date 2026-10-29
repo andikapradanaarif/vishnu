@@ -113,4 +113,6 @@ slide forward on use, so revoking means deleting the row.
 ## Conventions
 
 - Go: gofumpt → goimports; slog messages capitalized; JSON snake_case.
-- TS: oxlint/oxfmt; import UI only via `@vishnu/ui-component` subpath exports.
+- TS: lint = `tsc` + `oxlint --deny-warnings` (type check plus lint, warnings fail);
+  format = `oxfmt` run separately; import UI only via `@vishnu/ui-component`
+  subpath exports.
