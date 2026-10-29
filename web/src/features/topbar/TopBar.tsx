@@ -47,6 +47,7 @@ export function TopBar({
 			</div>
 
 			<AgentModelControls
+				pid={project.id}
 				wid={workspaceId}
 				sid={sessionId}
 				agentClassName="hidden w-28 shrink-0 font-display sm:block sm:w-36 md:ml-auto"

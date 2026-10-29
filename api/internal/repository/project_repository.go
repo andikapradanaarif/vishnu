@@ -88,6 +88,40 @@ func (r *projectRepository) SetStatus(ctx context.Context, id string, status dom
 	return nil
 }
 
+func (r *projectRepository) SetPermissionSkip(ctx context.Context, id string, skip bool) error {
+	if !isUUID(id) {
+		return errs.ErrProjectNotFound
+	}
+
+	result := r.db.WithContext(ctx).Model(&domain.Project{}).
+		Where("id = ?", id).
+		Update("permission_skip", skip)
+	if result.Error != nil {
+		return mapError(result.Error)
+	}
+	if result.RowsAffected == 0 {
+		return errs.ErrProjectNotFound
+	}
+	return nil
+}
+
+func (r *projectRepository) SetAgent(ctx context.Context, id string, agent string) error {
+	if !isUUID(id) {
+		return errs.ErrProjectNotFound
+	}
+
+	result := r.db.WithContext(ctx).Model(&domain.Project{}).
+		Where("id = ?", id).
+		Update("agent", agent)
+	if result.Error != nil {
+		return mapError(result.Error)
+	}
+	if result.RowsAffected == 0 {
+		return errs.ErrProjectNotFound
+	}
+	return nil
+}
+
 // isUUID guards id lookups: Postgres rejects a malformed uuid with a type
 // error rather than returning no rows, which turns an unknown id into a
 // 500 instead of a 404.

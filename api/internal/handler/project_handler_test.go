@@ -25,6 +25,16 @@ type fakeProjects struct {
 	workspace    dto.WorkspaceResponse
 	workspaceErr error
 	deleted      []string
+	skipProject  string
+	skip         bool
+	skipSet      bool
+	skipResponse dto.ProjectResponse
+	skipErr      error
+	agentID      string
+	agentSet     string
+	agentApplied bool
+	agentResp    dto.ProjectResponse
+	agentErr     error
 }
 
 func (f *fakeProjects) Create(context.Context, dto.CreateProjectRequest) (usecase.CreateResult, error) {
@@ -42,6 +52,20 @@ func (f *fakeProjects) Delete(_ context.Context, id string) error {
 
 func (f *fakeProjects) EnsureWorkspace(context.Context, string) (dto.WorkspaceResponse, error) {
 	return f.workspace, f.workspaceErr
+}
+
+func (f *fakeProjects) SetPermissionSkip(_ context.Context, id string, skip bool) (dto.ProjectResponse, error) {
+	f.skipProject = id
+	f.skip = skip
+	f.skipSet = true
+	return f.skipResponse, f.skipErr
+}
+
+func (f *fakeProjects) SetAgent(_ context.Context, id string, agent string) (dto.ProjectResponse, error) {
+	f.agentID = id
+	f.agentSet = agent
+	f.agentApplied = true
+	return f.agentResp, f.agentErr
 }
 
 func newTestApp(projects ProjectService) *fiber.App {
@@ -176,6 +200,54 @@ func TestEnsureWorkspaceReportsAnUnreachableServer(t *testing.T) {
 	status, body := request(t, app, "GET", "/api/projects/p1/workspace", "")
 	if status != fiber.StatusBadGateway || !strings.Contains(body, "crush_unreachable") {
 		t.Fatalf("got %d %s, want 502 crush_unreachable", status, body)
+	}
+}
+
+func TestSetPermissionSkipStoresTheWorkspaceDefault(t *testing.T) {
+	projects := &fakeProjects{
+		skipResponse: dto.ProjectResponse{ID: "p1", Name: "one", Status: "up", PermissionSkip: true},
+	}
+	app := newTestApp(projects)
+
+	status, body := request(t, app, "PUT", "/api/projects/p1/permissions/skip", `{"skip":true}`)
+	if status != fiber.StatusOK || !strings.Contains(body, `"permission_skip":true`) {
+		t.Fatalf("got %d %s, want the updated project", status, body)
+	}
+	if !projects.skipSet || projects.skipProject != "p1" || !projects.skip {
+		t.Fatalf("got %+v, want the skip stored for p1", projects)
+	}
+}
+
+func TestSetPermissionSkipRejectsAMalformedBody(t *testing.T) {
+	app := newTestApp(&fakeProjects{})
+
+	status, body := request(t, app, "PUT", "/api/projects/p1/permissions/skip", `{"skip":"yes"}`)
+	if status != fiber.StatusBadRequest || !strings.Contains(body, "invalid_request") {
+		t.Fatalf("got %d %s, want 400 invalid_request", status, body)
+	}
+}
+
+func TestSetAgentStoresTheChoice(t *testing.T) {
+	projects := &fakeProjects{
+		agentResp: dto.ProjectResponse{ID: "p1", Name: "one", Status: "up", Agent: "plan"},
+	}
+	app := newTestApp(projects)
+
+	status, body := request(t, app, "PUT", "/api/projects/p1/agent", `{"agent":"plan"}`)
+	if status != fiber.StatusOK || !strings.Contains(body, `"agent":"plan"`) {
+		t.Fatalf("got %d %s, want the updated project", status, body)
+	}
+	if !projects.agentApplied || projects.agentID != "p1" || projects.agentSet != "plan" {
+		t.Fatalf("got %+v, want plan stored for p1", projects)
+	}
+}
+
+func TestSetAgentRejectsAMalformedBody(t *testing.T) {
+	app := newTestApp(&fakeProjects{})
+
+	status, body := request(t, app, "PUT", "/api/projects/p1/agent", `{"agent":1}`)
+	if status != fiber.StatusBadRequest || !strings.Contains(body, "invalid_request") {
+		t.Fatalf("got %d %s, want 400 invalid_request", status, body)
 	}
 }
 

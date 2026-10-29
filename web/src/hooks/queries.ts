@@ -15,6 +15,7 @@ import type {
 	CreateProjectRequest,
 	PermissionAction,
 	PermissionRequest,
+	Project,
 	QuestionAnswer,
 	ResolvedResponse,
 	SelectedModel,
@@ -226,6 +227,26 @@ export function useSetMainAgent(wid: string | undefined) {
 	});
 }
 
+/**
+ * `PUT /api/projects/{id}/agent` — the persisted main agent. Crush keeps
+ * its coordinator on the coder default for every child start, so vishnu
+ * stores the choice and replays it whenever it ensures the workspace.
+ */
+export function useSetProjectAgent(wid: string | undefined) {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationKey: ["projects", "agent"],
+		mutationFn: ({ id, agent }: { id: string; agent: string }) =>
+			projectsClient.setAgent(id, agent),
+		onSuccess: (project) => {
+			qc.setQueryData<Project[]>(queryKeys.projects, (old) =>
+				old?.map((p) => (p.id === project.id ? project : p)),
+			);
+			qc.invalidateQueries({ queryKey: queryKeys.agent(wid!) });
+		},
+	});
+}
+
 export function useGrantPermission(wid: string | undefined) {
 	const qc = useQueryClient();
 	return useMutation<
@@ -373,6 +394,27 @@ export function useSetPermissionsSkip(wid: string | undefined) {
 		},
 		onSettled: () =>
 			qc.invalidateQueries({ queryKey: queryKeys.permissionsSkip(wid!) }),
+	});
+}
+
+/**
+ * `PUT /api/projects/{id}/permissions/skip` — the persisted workspace-wide
+ * auto-approve default. vishnu stores it and replays it onto the crush
+ * server whenever it ensures the workspace, so closing the tab (which
+ * recycles that server) no longer resets the setting.
+ */
+export function useSetProjectPermissionsSkip(wid: string | undefined) {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationKey: ["projects", "permissions", "skip"],
+		mutationFn: ({ id, skip }: { id: string; skip: boolean }) =>
+			projectsClient.setPermissionSkip(id, skip),
+		onSuccess: (project) => {
+			qc.setQueryData<Project[]>(queryKeys.projects, (old) =>
+				old?.map((p) => (p.id === project.id ? project : p)),
+			);
+			qc.invalidateQueries({ queryKey: queryKeys.permissionsSkip(wid!) });
+		},
 	});
 }
 

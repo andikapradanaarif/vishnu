@@ -4,7 +4,7 @@ import { Outlet, useNavigate, useParams } from "@tanstack/react-router";
 import { Button } from "@vishnu/ui-component/button";
 import { Drawer } from "@vishnu/ui-component/drawer";
 import { useCrushEvents } from "@/hooks/useCrushEvents";
-import { useLogout, useSessions } from "@/hooks/queries";
+import { useLogout, useProjects, useSessions } from "@/hooks/queries";
 import { resetCrushState } from "@/services/crushState";
 import { TopBar } from "@/features/topbar/TopBar";
 import { ProjectSwitcher } from "@/features/topbar/ProjectSwitcher";
@@ -20,12 +20,16 @@ interface AppShellProps {
 /** Session HUD layout: topbar, save slots, drawer and routed content. */
 export function AppShell({ project, wid }: AppShellProps) {
 	const { data: sessions, isFetching } = useSessions(wid);
+	const { data: projects } = useProjects();
 	const [drawerOpen, setDrawerOpen] = useState(false);
 	const [settingsOpen, setSettingsOpen] = useState(false);
 	const navigate = useNavigate();
 	const logout = useLogout();
 	const params = useParams({ strict: false }) as { sessionId?: string };
 	const activeSessionId = params.sessionId;
+	// The route loader's copy is a snapshot; the registry query is what
+	// the settings dialog writes to, so prefer the fresher one.
+	const current = projects?.find((p) => p.id === project.id) ?? project;
 
 	useCrushEvents(wid);
 
@@ -150,7 +154,10 @@ export function AppShell({ project, wid }: AppShellProps) {
 
 			{settingsOpen && (
 				<SettingsDialog
+					pid={current.id}
 					wid={wid}
+					sid={activeSessionId}
+					workspaceSkip={current.permission_skip}
 					isOpen
 					onClose={() => setSettingsOpen(false)}
 				/>

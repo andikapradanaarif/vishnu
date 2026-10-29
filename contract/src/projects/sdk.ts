@@ -1,6 +1,8 @@
 import { buildPath, type ApiClient } from "../client";
 import {
+	vishnuProjectAgent,
 	vishnuProjectById,
+	vishnuProjectPermissionsSkip,
 	vishnuProjectWorkspace,
 	vishnuProjects,
 } from "../paths";
@@ -8,6 +10,8 @@ import type {
 	CreateProjectRequest,
 	Project,
 	ProjectEnvelope,
+	SetAgentRequest,
+	SetPermissionSkipRequest,
 	WorkspaceResponse,
 } from "./index";
 
@@ -49,6 +53,31 @@ export class ProjectsClient {
 	workspace(id: string): Promise<WorkspaceResponse> {
 		return this.api.get<WorkspaceResponse>(
 			buildPath(vishnuProjectWorkspace, { id }),
+		);
+	}
+
+	/**
+	 * PUT `/projects/{id}/permissions/skip` — store the project's
+	 * workspace-wide auto-approve default. vishnu persists it and replays
+	 * it onto the crush server each time it ensures the workspace, so the
+	 * setting outlives the child that serves it.
+	 */
+	setPermissionSkip(id: string, skip: boolean): Promise<Project> {
+		return this.api.put<Project>(
+			buildPath(vishnuProjectPermissionsSkip, { id }),
+			{ skip } satisfies SetPermissionSkipRequest,
+		);
+	}
+
+	/**
+	 * PUT `/projects/{id}/agent` — store the project's main agent. Crush
+	 * resets its coordinator to coder on every child start, so vishnu
+	 * keeps the choice and replays it when it ensures the workspace.
+	 */
+	setAgent(id: string, agent: string): Promise<Project> {
+		return this.api.put<Project>(
+			buildPath(vishnuProjectAgent, { id }),
+			{ agent } satisfies SetAgentRequest,
 		);
 	}
 }

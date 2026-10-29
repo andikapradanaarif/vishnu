@@ -87,6 +87,24 @@ func (f *fakeRepo) SetStatus(_ context.Context, id string, status domain.Project
 	return nil
 }
 
+func (f *fakeRepo) SetPermissionSkip(_ context.Context, id string, skip bool) error {
+	project, ok := f.projects[id]
+	if !ok {
+		return errs.ErrProjectNotFound
+	}
+	project.PermissionSkip = skip
+	return nil
+}
+
+func (f *fakeRepo) SetAgent(_ context.Context, id string, agent string) error {
+	project, ok := f.projects[id]
+	if !ok {
+		return errs.ErrProjectNotFound
+	}
+	project.Agent = agent
+	return nil
+}
+
 type fakeProc struct {
 	status    process.Status
 	upstream  string
@@ -153,12 +171,16 @@ func (f *fakeCloner) AllocDir(slug string) (string, error) {
 }
 
 type fakeWorkspaces struct {
-	id         string
-	err        error
-	calls      int
-	create     bool
-	agentCalls int
-	agentErr   error
+	id          string
+	err         error
+	calls       int
+	create      bool
+	agentCalls  int
+	agentErr    error
+	skipCalls   []bool
+	skipErr     error
+	agentSets   []string
+	agentSetErr error
 }
 
 func (f *fakeWorkspaces) EnsureWorkspace(_ context.Context, _, _ string, create bool) (string, error) {
@@ -170,6 +192,16 @@ func (f *fakeWorkspaces) EnsureWorkspace(_ context.Context, _, _ string, create 
 func (f *fakeWorkspaces) EnsureAgent(_ context.Context, _, _ string) error {
 	f.agentCalls++
 	return f.agentErr
+}
+
+func (f *fakeWorkspaces) SetPermissionSkip(_ context.Context, _, _ string, skip bool) error {
+	f.skipCalls = append(f.skipCalls, skip)
+	return f.skipErr
+}
+
+func (f *fakeWorkspaces) SetMainAgent(_ context.Context, _, _, agent string) error {
+	f.agentSets = append(f.agentSets, agent)
+	return f.agentSetErr
 }
 
 func newUsecase(repo *fakeRepo, proc *fakeProc, c *fakeCloner, ws *fakeWorkspaces) *ProjectUsecase {
@@ -546,5 +578,189 @@ func TestExternalStatusFollowsReachability(t *testing.T) {
 	}
 	if len(projects) != 1 || projects[0].Status != string(process.StatusUp) {
 		t.Fatalf("got %+v, want the external server reported up", projects)
+	}
+}
+
+// A workspace is re-created from scratch every time the crush server
+// recycles (the last browser tab closing is enough), and crush keeps the
+// auto-approve flag in memory only. Replaying the persisted default is
+// what makes the setting survive leaving and coming back.
+func TestEnsureWorkspaceReplaysThePersistedPermissionSkip(t *testing.T) {
+	repo := newFakeRepo()
+	proc := &fakeProc{upstream: "http://127.0.0.1:9304", status: process.StatusUp}
+	workspaces := &fakeWorkspaces{id: "workspace-1"}
+	usecase := newUsecase(repo, proc, &fakeCloner{}, workspaces)
+
+	linked, err := usecase.Create(context.Background(), dto.CreateProjectRequest{Path: t.TempDir()})
+	if err != nil {
+		t.Fatalf("create link: %v", err)
+	}
+	if err := repo.SetPermissionSkip(context.Background(), linked.Project.ID, true); err != nil {
+		t.Fatalf("store skip: %v", err)
+	}
+
+	if _, err := usecase.EnsureWorkspace(context.Background(), linked.Project.ID); err != nil {
+		t.Fatalf("ensure workspace: %v", err)
+	}
+	if len(workspaces.skipCalls) != 1 || !workspaces.skipCalls[0] {
+		t.Fatalf("got skip calls %+v, want the persisted default replayed once", workspaces.skipCalls)
+	}
+}
+
+func TestEnsureWorkspaceSkipsTheReplayWhenTheDefaultIsOff(t *testing.T) {
+	repo := newFakeRepo()
+	proc := &fakeProc{upstream: "http://127.0.0.1:9304", status: process.StatusUp}
+	workspaces := &fakeWorkspaces{id: "workspace-1"}
+	usecase := newUsecase(repo, proc, &fakeCloner{}, workspaces)
+
+	linked, err := usecase.Create(context.Background(), dto.CreateProjectRequest{Path: t.TempDir()})
+	if err != nil {
+		t.Fatalf("create link: %v", err)
+	}
+
+	if _, err := usecase.EnsureWorkspace(context.Background(), linked.Project.ID); err != nil {
+		t.Fatalf("ensure workspace: %v", err)
+	}
+	if len(workspaces.skipCalls) != 0 {
+		t.Fatalf("got skip calls %+v, want none for an off default", workspaces.skipCalls)
+	}
+}
+
+func TestSetPermissionSkipPersistsThenPushesToTheLiveWorkspace(t *testing.T) {
+	repo := newFakeRepo()
+	proc := &fakeProc{upstream: "http://127.0.0.1:9304", status: process.StatusUp}
+	workspaces := &fakeWorkspaces{id: "workspace-1"}
+	usecase := newUsecase(repo, proc, &fakeCloner{}, workspaces)
+
+	linked, err := usecase.Create(context.Background(), dto.CreateProjectRequest{Path: t.TempDir()})
+	if err != nil {
+		t.Fatalf("create link: %v", err)
+	}
+
+	project, err := usecase.SetPermissionSkip(context.Background(), linked.Project.ID, true)
+	if err != nil {
+		t.Fatalf("set skip: %v", err)
+	}
+	if !project.PermissionSkip {
+		t.Fatalf("got %+v, want the response to report the new default", project)
+	}
+	if stored := repo.projects[linked.Project.ID]; stored == nil || !stored.PermissionSkip {
+		t.Fatalf("got %+v, want the skip persisted on the project row", stored)
+	}
+	if len(workspaces.skipCalls) != 1 || !workspaces.skipCalls[0] {
+		t.Fatalf("got skip calls %+v, want the live workspace updated", workspaces.skipCalls)
+	}
+}
+
+// The row is the source of truth: a crush server that is down (or came
+// back mid-restart) must not make the setting unsavable — the next
+// EnsureWorkspace replays it.
+func TestSetPermissionSkipSurvivesAnUnreachableCrushServer(t *testing.T) {
+	repo := newFakeRepo()
+	proc := &fakeProc{upstream: "http://127.0.0.1:9304", status: process.StatusDown}
+	workspaces := &fakeWorkspaces{id: "workspace-1"}
+	usecase := newUsecase(repo, proc, &fakeCloner{}, workspaces)
+
+	linked, err := usecase.Create(context.Background(), dto.CreateProjectRequest{Path: t.TempDir()})
+	if err != nil {
+		t.Fatalf("create link: %v", err)
+	}
+
+	project, err := usecase.SetPermissionSkip(context.Background(), linked.Project.ID, true)
+	if err != nil {
+		t.Fatalf("set skip: %v", err)
+	}
+	if !project.PermissionSkip {
+		t.Fatalf("got %+v, want the stored default reported", project)
+	}
+	if stored := repo.projects[linked.Project.ID]; stored == nil || !stored.PermissionSkip {
+		t.Fatalf("got %+v, want the skip persisted on the project row", stored)
+	}
+	if len(workspaces.skipCalls) != 0 {
+		t.Fatalf("got skip calls %+v, want no push to a server that is down", workspaces.skipCalls)
+	}
+}
+
+// Crush keeps its main agent in coordinator memory and starts every child
+// on the coder default, so the stored choice has to be replayed onto each
+// freshly ensured workspace — same reason as the skip default.
+func TestEnsureWorkspaceReplaysThePersistedAgent(t *testing.T) {
+	repo := newFakeRepo()
+	proc := &fakeProc{upstream: "http://127.0.0.1:9304", status: process.StatusUp}
+	workspaces := &fakeWorkspaces{id: "workspace-1"}
+	usecase := newUsecase(repo, proc, &fakeCloner{}, workspaces)
+
+	linked, err := usecase.Create(context.Background(), dto.CreateProjectRequest{Path: t.TempDir()})
+	if err != nil {
+		t.Fatalf("create link: %v", err)
+	}
+	if err := repo.SetAgent(context.Background(), linked.Project.ID, "plan"); err != nil {
+		t.Fatalf("store agent: %v", err)
+	}
+
+	if _, err := usecase.EnsureWorkspace(context.Background(), linked.Project.ID); err != nil {
+		t.Fatalf("ensure workspace: %v", err)
+	}
+	if len(workspaces.agentSets) != 1 || workspaces.agentSets[0] != "plan" {
+		t.Fatalf("got agent sets %+v, want the stored agent replayed once", workspaces.agentSets)
+	}
+}
+
+func TestEnsureWorkspaceSkipsTheAgentReplayOnTheDefault(t *testing.T) {
+	repo := newFakeRepo()
+	proc := &fakeProc{upstream: "http://127.0.0.1:9304", status: process.StatusUp}
+	workspaces := &fakeWorkspaces{id: "workspace-1"}
+	usecase := newUsecase(repo, proc, &fakeCloner{}, workspaces)
+
+	linked, err := usecase.Create(context.Background(), dto.CreateProjectRequest{Path: t.TempDir()})
+	if err != nil {
+		t.Fatalf("create link: %v", err)
+	}
+
+	if _, err := usecase.EnsureWorkspace(context.Background(), linked.Project.ID); err != nil {
+		t.Fatalf("ensure workspace: %v", err)
+	}
+	if len(workspaces.agentSets) != 0 {
+		t.Fatalf("got agent sets %+v, want none while the project sits on the default", workspaces.agentSets)
+	}
+}
+
+func TestSetAgentPersistsThenSwitchesTheLiveWorkspace(t *testing.T) {
+	repo := newFakeRepo()
+	proc := &fakeProc{upstream: "http://127.0.0.1:9304", status: process.StatusUp}
+	workspaces := &fakeWorkspaces{id: "workspace-1"}
+	usecase := newUsecase(repo, proc, &fakeCloner{}, workspaces)
+
+	linked, err := usecase.Create(context.Background(), dto.CreateProjectRequest{Path: t.TempDir()})
+	if err != nil {
+		t.Fatalf("create link: %v", err)
+	}
+
+	project, err := usecase.SetAgent(context.Background(), linked.Project.ID, "plan")
+	if err != nil {
+		t.Fatalf("set agent: %v", err)
+	}
+	if project.Agent != "plan" {
+		t.Fatalf("got %+v, want the new agent reported", project)
+	}
+	if stored := repo.projects[linked.Project.ID]; stored == nil || stored.Agent != "plan" {
+		t.Fatalf("got %+v, want the agent persisted on the project row", stored)
+	}
+	if len(workspaces.agentSets) != 1 || workspaces.agentSets[0] != "plan" {
+		t.Fatalf("got agent sets %+v, want the live workspace switched", workspaces.agentSets)
+	}
+}
+
+func TestSetAgentRejectsAnEmptyChoice(t *testing.T) {
+	repo := newFakeRepo()
+	usecase := newUsecase(repo, &fakeProc{}, &fakeCloner{}, &fakeWorkspaces{id: "workspace-1"})
+
+	linked, err := usecase.Create(context.Background(), dto.CreateProjectRequest{Path: t.TempDir()})
+	if err != nil {
+		t.Fatalf("create link: %v", err)
+	}
+
+	if _, err := usecase.SetAgent(context.Background(), linked.Project.ID, "  "); !errors.Is(err, errs.ErrInvalidProject) {
+		t.Fatalf("got %v, want ErrInvalidProject for an empty agent", err)
 	}
 }

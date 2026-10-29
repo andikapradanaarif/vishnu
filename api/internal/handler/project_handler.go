@@ -19,6 +19,8 @@ type ProjectService interface {
 	List(ctx context.Context) ([]dto.ProjectResponse, error)
 	Delete(ctx context.Context, id string) error
 	EnsureWorkspace(ctx context.Context, id string) (dto.WorkspaceResponse, error)
+	SetPermissionSkip(ctx context.Context, id string, skip bool) (dto.ProjectResponse, error)
+	SetAgent(ctx context.Context, id string, agent string) (dto.ProjectResponse, error)
 }
 
 type ProjectHandler struct {
@@ -34,6 +36,8 @@ func (h *ProjectHandler) Register(app *fiber.App) {
 	app.Post("/api/projects", h.Create)
 	app.Delete("/api/projects/:id", h.Delete)
 	app.Get("/api/projects/:id/workspace", h.EnsureWorkspace)
+	app.Put("/api/projects/:id/permissions/skip", h.SetPermissionSkip)
+	app.Put("/api/projects/:id/agent", h.SetAgent)
 }
 
 func (h *ProjectHandler) List(c fiber.Ctx) error {
@@ -75,6 +79,32 @@ func (h *ProjectHandler) EnsureWorkspace(c fiber.Ctx) error {
 		return h.fail(c, err)
 	}
 	return c.JSON(workspace)
+}
+
+func (h *ProjectHandler) SetPermissionSkip(c fiber.Ctx) error {
+	var req dto.SetPermissionSkipRequest
+	if err := c.Bind().Body(&req); err != nil {
+		return errorJSON(c, fiber.StatusBadRequest, "invalid_request", "malformed request body")
+	}
+
+	project, err := h.projects.SetPermissionSkip(c.RequestCtx(), c.Params("id"), req.Skip)
+	if err != nil {
+		return h.fail(c, err)
+	}
+	return c.JSON(project)
+}
+
+func (h *ProjectHandler) SetAgent(c fiber.Ctx) error {
+	var req dto.SetAgentRequest
+	if err := c.Bind().Body(&req); err != nil {
+		return errorJSON(c, fiber.StatusBadRequest, "invalid_request", "malformed request body")
+	}
+
+	project, err := h.projects.SetAgent(c.RequestCtx(), c.Params("id"), req.Agent)
+	if err != nil {
+		return h.fail(c, err)
+	}
+	return c.JSON(project)
 }
 
 func (h *ProjectHandler) fail(c fiber.Ctx, err error) error {

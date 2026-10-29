@@ -77,6 +77,8 @@ export const vishnuAuthMe = "/auth/me";
 export const vishnuProjects = "/projects";
 export const vishnuProjectById = "/projects/{id}";
 export const vishnuProjectWorkspace = "/projects/{id}/workspace";
+export const vishnuProjectPermissionsSkip = "/projects/{id}/permissions/skip";
+export const vishnuProjectAgent = "/projects/{id}/agent";
 
 export const vishnuUsers = "/users";
 

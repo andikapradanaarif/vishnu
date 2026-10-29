@@ -83,6 +83,23 @@ func (c *CrushClient) EnsureAgent(ctx context.Context, upstream, workspaceID str
 	return c.call(ctx, upstream, http.MethodPost, path, nil, nil)
 }
 
+// SetMainAgent applies the project's persisted agent choice to a live
+// workspace. Crush holds its main agent in coordinator memory only and
+// starts every child on the coder default, so a recycled workspace needs
+// the stored choice replayed.
+func (c *CrushClient) SetMainAgent(ctx context.Context, upstream, workspaceID, agent string) error {
+	path := "/v1/workspaces/" + workspaceID + "/agent/main"
+	return c.call(ctx, upstream, http.MethodPost, path, map[string]string{"agent_id": agent}, nil)
+}
+
+// SetPermissionSkip applies the project's persisted auto-approve
+// default to a live workspace. Crush keeps this flag in memory only, so
+// every freshly ensured workspace starts at "off" and needs it replayed.
+func (c *CrushClient) SetPermissionSkip(ctx context.Context, upstream, workspaceID string, skip bool) error {
+	path := "/v1/workspaces/" + workspaceID + "/permissions/skip"
+	return c.call(ctx, upstream, http.MethodPost, path, map[string]bool{"skip": skip}, nil)
+}
+
 func (c *CrushClient) listWorkspaces(ctx context.Context, upstream string) ([]Workspace, error) {
 	var workspaces []Workspace
 	if err := c.call(ctx, upstream, http.MethodGet, "/v1/workspaces", nil, &workspaces); err != nil {
