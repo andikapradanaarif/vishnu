@@ -17,6 +17,23 @@ type ProjectResponse struct {
 	Port     int    `json:"port,omitempty"`
 	Status   string `json:"status"`
 	Error    string `json:"error,omitempty"`
+	// PermissionSkip is the workspace-wide auto-approve default. Sessions
+	// may still carry their own override on top of it.
+	PermissionSkip bool `json:"permission_skip"`
+	// Agent is the project's main agent, replayed onto the workspace
+	// whenever vishnu ensures it.
+	Agent string `json:"agent"`
+}
+
+// SetPermissionSkipRequest updates a project's workspace-level
+// auto-approve default.
+type SetPermissionSkipRequest struct {
+	Skip bool `json:"skip"`
+}
+
+// SetAgentRequest updates a project's main agent (coder/plan/task).
+type SetAgentRequest struct {
+	Agent string `json:"agent"`
 }
 
 type CreateProjectResponse struct {

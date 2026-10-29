@@ -57,6 +57,8 @@ wire shapes. Wiring lives in `cmd/server/main.go`.
 | `POST /api/projects` | `project_handler` | three add modes — see below |
 | `DELETE /api/projects/:id` | `project_handler` | stops the child, deletes the row — files on disk untouched |
 | `GET /api/projects/:id/workspace` | `project_handler` | lazy-starts crush + resolves/creates the workspace id — the route loader calls this before rendering a project |
+| `PUT /api/projects/:id/permissions/skip` | `project_handler` | stores the workspace-wide auto-approve default on the project row and pushes it to the live crush server |
+| `PUT /api/projects/:id/agent` | `project_handler` | stores the main agent on the project row and switches the live crush workspace |
 | `POST /api/users` | `user_handler` | admin-only user creation |
 | `ALL /p/:pid/v1/*` | `proxy_handler` | reverse proxy to that project's crush upstream — includes the SSE stream |
 
@@ -163,7 +165,7 @@ a new id, and a stale cached id self-heals via SSE-error →
 | `prompts/` | `PermissionCard`, `QuestionCard` — interactive prompt UI |
 | `sessions/` | `SessionSidebar` — list, new, rename, delete (with confirm dialog) |
 | `projects/` | `ProjectPicker`, `AddProjectDialog` (GitHub/Link/Remote tabs), states |
-| `settings/` | `SettingsDialog` — permission skip toggle etc. |
+| `settings/` | `SettingsDialog` — the persisted workspace auto-approve default plus the active room's override |
 | `topbar/` | `TopBar`, `ProjectSwitcher`, `AgentModelControls` |
 | `auth/` | `LoginScreen` |
 

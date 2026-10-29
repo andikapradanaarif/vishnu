@@ -3,10 +3,11 @@ import { Select, type SelectOption } from "@vishnu/ui-component/input";
 import {
 	useAgentInfo,
 	useConfig,
+	useProjects,
 	useProviders,
 	useSessions,
-	useSetMainAgent,
 	useSetModel,
+	useSetProjectAgent,
 	useSetSessionModel,
 } from "@/hooks/queries";
 
@@ -21,6 +22,8 @@ const AGENT_LABELS: Record<string, string> = {
 const INHERIT_MODEL = "__inherit__";
 
 interface AgentModelControlsProps {
+	/** Project id — the agent choice is persisted on the project row. */
+	pid: string;
 	wid: string;
 	/** Active room — when set, the model picker writes the session's
 	    model override instead of the shared config. */
@@ -32,10 +35,10 @@ interface AgentModelControlsProps {
 }
 
 /** Agent + model selects — shared between the topbar and the settings
-    dialog. With a `sid` the model picker is room-scoped (session
-    override, persisted server-side); without one it's the workspace
-    default every room inherits. */
+    dialog. The agent is workspace-wide and stored by vishnu (crush resets
+    it per child start); with a `sid` the model picker is room-scoped. */
 export function AgentModelControls({
+	pid,
 	wid,
 	sid,
 	agentClassName,
@@ -46,9 +49,14 @@ export function AgentModelControls({
 	const { data: config } = useConfig(wid);
 	const { data: providers } = useProviders(wid);
 	const { data: sessions } = useSessions(wid);
+	const { data: projects } = useProjects();
 	const setModel = useSetModel(wid);
 	const setSessionModel = useSetSessionModel(wid, sid);
-	const setMainAgent = useSetMainAgent(wid);
+	const setAgent = useSetProjectAgent(wid);
+
+	// The agent the workspace is running: vishnu's persisted choice, which
+	// is what gets replayed onto every re-created crush workspace.
+	const currentAgent = projects?.find((p) => p.id === pid)?.agent;
 
 	const session = useMemo(
 		() => (sid ? sessions?.find((s) => s.id === sid) : undefined),
@@ -120,10 +128,10 @@ export function AgentModelControls({
 				label={showLabels ? "Agent" : undefined}
 				placeholder="Agent"
 				options={agentOptions}
-				value={undefined}
-				onChange={(v) => setMainAgent.mutate(v)}
+				value={currentAgent}
+				onChange={(v) => setAgent.mutate({ id: pid, agent: v })}
 				className={agentClassName}
-				isLoading={setMainAgent.isPending}
+				isLoading={setAgent.isPending}
 			/>
 			<Select
 				name={`${namePrefix}-model`}

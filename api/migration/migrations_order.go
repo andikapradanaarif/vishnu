@@ -16,6 +16,8 @@ var MigrationOrder = []string{
 	"create_users_table",
 	"create_otp_codes_table",
 	"create_auth_sessions_table",
+	"add_projects_permission_skip",
+	"add_projects_agent",
 }
 
 func GetCreateMigrationsTableSQL() (string, error) {

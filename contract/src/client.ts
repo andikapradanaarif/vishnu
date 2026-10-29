@@ -167,6 +167,13 @@ export class ApiClient {
 		});
 	}
 
+	put<T>(path: string | ResolvedPath, body?: unknown): Promise<T> {
+		return this.request<T>(path, {
+			method: "PUT",
+			body: body === undefined ? undefined : JSON.stringify(body),
+		});
+	}
+
 	delete<T>(path: string | ResolvedPath): Promise<T> {
 		return this.request<T>(path, { method: "DELETE" });
 	}
