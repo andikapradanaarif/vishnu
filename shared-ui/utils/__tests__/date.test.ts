@@ -19,7 +19,6 @@ import {
 	getYearsUntilNow,
 	listYears,
 	getFormattedDateString,
-	getFormattedTimeString,
 	mergeDateAndTime,
 	formatDuration,
 	getDurationMs,

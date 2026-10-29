@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import {useCallback, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent} from "react";
+import {useCallback, useEffect, useId, useRef, useState, type KeyboardEvent, type PointerEvent} from "react";
 import Caption from "../text/Caption";
 import Input from "../input/Input";
 import type {SliderInputProps, SliderProps} from "./type";
