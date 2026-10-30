@@ -1,13 +1,13 @@
 import classNames from "classnames";
-import {useId} from "react";
-import type {MouseEventHandler, PointerEventHandler, ReactNode} from "react";
+import { useId } from "react";
+import type { MouseEventHandler, PointerEventHandler, ReactNode } from "react";
 
-import {createRipple} from "../../utils/ripple";
-import {Chip} from "../chip/Chip";
-import type {ChipProps} from "../chip/type";
+import { createRipple } from "../../utils/ripple";
+import { Chip } from "../chip/Chip";
+import type { ChipProps } from "../chip/type";
 import Tooltip from "../tooltip/Tooltip";
-import {menuRoundedClassMap, menuSize} from "./utils";
-import type {MenuRounded, MenuSize} from "./utils";
+import { menuRoundedClassMap, menuSize } from "./utils";
+import type { MenuRounded, MenuSize } from "./utils";
 
 export interface MenuLinkProps {
 	/** Text shown for the link. */
@@ -31,7 +31,6 @@ export interface MenuLinkProps {
 	isCollapsed?: boolean;
 }
 
-
 /**
  * Link-styled menu entry, the anchor counterpart to `MenuItem`. Router-agnostic:
  * it renders a plain `<a>` and takes an `active` flag, so consumers can wire it
@@ -54,7 +53,7 @@ export const MenuLink = ({
 	const tooltipId = useId().replace(/:/g, "");
 	const handlePointerDown: PointerEventHandler<HTMLAnchorElement> = (event) => {
 		if (disabled) return;
-		createRipple(event.currentTarget, {clientX: event.clientX, clientY: event.clientY});
+		createRipple(event.currentTarget, { clientX: event.clientX, clientY: event.clientY });
 	};
 
 	const link = (
@@ -94,7 +93,12 @@ export const MenuLink = ({
 			)}
 		>
 			{PrefixIcon && (
-				<span className={classNames("shrink-0 w-5 h-5 grid place-items-center", isCollapsed && "text-base")}>
+				<span
+					className={classNames(
+						"shrink-0 w-5 h-5 grid place-items-center",
+						isCollapsed && "text-base",
+					)}
+				>
 					{PrefixIcon}
 				</span>
 			)}
@@ -111,7 +115,9 @@ export const MenuLink = ({
 				</span>
 			)}
 
-			{!isCollapsed && SuffixIcon && <span className="ml-auto shrink-0 w-5 h-5 grid place-items-center">{SuffixIcon}</span>}
+			{!isCollapsed && SuffixIcon && (
+				<span className="ml-auto shrink-0 w-5 h-5 grid place-items-center">{SuffixIcon}</span>
+			)}
 		</a>
 	);
 

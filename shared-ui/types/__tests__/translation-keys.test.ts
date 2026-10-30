@@ -1,6 +1,6 @@
 // This file tests that the TranslationKey type properly validates translation keys
 
-import type {TranslationKey} from "../translations";
+import type { TranslationKey } from "../translations";
 
 // Valid keys (should work)
 export const validKey1: TranslationKey = "validation.required";

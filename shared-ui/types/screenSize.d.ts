@@ -1,1 +1,1 @@
-export type ScreenSize = 'smallPhone' | 'phone' | 'tablet' | 'desktop';
+export type ScreenSize = "smallPhone" | "phone" | "tablet" | "desktop";

@@ -1,2 +1,2 @@
-export {Chip} from "./Chip";
-export type {ChipColorsType, ChipSizeType, ChipVariant, ChipProps} from "./type";
+export { Chip } from "./Chip";
+export type { ChipColorsType, ChipSizeType, ChipVariant, ChipProps } from "./type";

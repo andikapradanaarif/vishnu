@@ -32,10 +32,7 @@ export class SessionsClient {
 
 	/** POST `/workspaces/{id}/sessions` — create a session with a title. */
 	create(workspaceId: string, title?: string): Promise<Session> {
-		return this.api.post<Session>(
-			buildPath(v1WorkspaceSessions, { id: workspaceId }),
-			{ title },
-		);
+		return this.api.post<Session>(buildPath(v1WorkspaceSessions, { id: workspaceId }), { title });
 	}
 
 	/** DELETE `/workspaces/{id}/sessions/{session_id}` — delete a session. */
@@ -58,11 +55,7 @@ export class SessionsClient {
 	 * session and writes no global config; `null` clears the override so
 	 * the session follows the shared selection again.
 	 */
-	setModel(
-		workspaceId: string,
-		sessionId: string,
-		model: SelectedModel | null,
-	): Promise<void> {
+	setModel(workspaceId: string, sessionId: string, model: SelectedModel | null): Promise<void> {
 		return this.api.post<void>(
 			buildPath(v1WorkspaceSessionModel, { id: workspaceId, sid: sessionId }),
 			{ model } satisfies SessionModelRequest,
@@ -75,9 +68,8 @@ export class SessionsClient {
 	 * rides via the ApiClient defaultQuery.
 	 */
 	setCurrent(workspaceId: string, sessionId: string): Promise<void> {
-		return this.api.post<void>(
-			buildPath(v1WorkspaceCurrentSession, { id: workspaceId }),
-			{ session_id: sessionId },
-		);
+		return this.api.post<void>(buildPath(v1WorkspaceCurrentSession, { id: workspaceId }), {
+			session_id: sessionId,
+		});
 	}
 }

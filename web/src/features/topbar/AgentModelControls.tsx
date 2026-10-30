@@ -79,18 +79,13 @@ export function AgentModelControls({
 			}));
 		// Room-scoped picker with an override gets a way back to inherit.
 		if (sid && override) {
-			return [
-				{ value: INHERIT_MODEL, label: "Default (workspace)" },
-				...groups,
-			];
+			return [{ value: INHERIT_MODEL, label: "Default (workspace)" }, ...groups];
 		}
 		return groups;
 	}, [providers, sid, override]);
 
 	const effective = override ?? agentInfo?.model_cfg;
-	const currentModelValue = effective
-		? `${effective.provider}/${effective.model}`
-		: undefined;
+	const currentModelValue = effective ? `${effective.provider}/${effective.model}` : undefined;
 
 	const agentOptions = useMemo<SelectOption<string>[]>(() => {
 		const ids = Object.keys(config?.agents ?? {});

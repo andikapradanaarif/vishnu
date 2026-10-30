@@ -1,10 +1,10 @@
 import classNames from "classnames";
-import {forwardRef} from "react";
+import { forwardRef } from "react";
 import Paragraph from "../text/Paragraph";
-import type {CheckboxProps} from "./types";
+import type { CheckboxProps } from "./types";
 
 const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>((props, forwardedRef) => {
-	const {id, label, onChecked, checked, disabled, indeterminate = false, className} = props;
+	const { id, label, onChecked, checked, disabled, indeterminate = false, className } = props;
 
 	const handleChange = () => {
 		if (!disabled) {
@@ -13,7 +13,11 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>((props, forwardedRe
 	};
 
 	return (
-		<span className={classNames(label && "flex items-center gap-2", className)} ref={forwardedRef} aria-label={id}>
+		<span
+			className={classNames(label && "flex items-center gap-2", className)}
+			ref={forwardedRef}
+			aria-label={id}
+		>
 			<span
 				className={classNames(
 					"w-4 h-4 rounded border flex items-center justify-center transition-colors",
@@ -27,7 +31,12 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>((props, forwardedRe
 				onClick={handleChange}
 			>
 				{indeterminate ? (
-					<span className={classNames("w-2 h-0.5 rounded-sm block", disabled ? "bg-neutral-400" : "bg-primary-500")} />
+					<span
+						className={classNames(
+							"w-2 h-0.5 rounded-sm block",
+							disabled ? "bg-neutral-400" : "bg-primary-500",
+						)}
+					/>
 				) : checked ? (
 					<svg
 						className={classNames("w-2.5 h-2.5", disabled ? "text-neutral-400" : "text-on-primary")}
@@ -41,7 +50,9 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>((props, forwardedRe
 			</span>
 			{label && (
 				<Paragraph
-					className={classNames(disabled ? "text-neutral-400 cursor-not-allowed" : "cursor-pointer")}
+					className={classNames(
+						disabled ? "text-neutral-400 cursor-not-allowed" : "cursor-pointer",
+					)}
 					onClick={handleChange}
 				>
 					{label}
@@ -53,4 +64,4 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>((props, forwardedRe
 
 Checkbox.displayName = "Checkbox";
 
-export {Checkbox};
+export { Checkbox };

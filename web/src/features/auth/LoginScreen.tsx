@@ -67,8 +67,7 @@ export function LoginScreen({ onSuccess }: { onSuccess?: () => void }) {
 					focusCell(0);
 				}
 			},
-			onError: (error) =>
-				setBanner(`Couldn't send a code — ${errorLabel(error, "try again")}`),
+			onError: (error) => setBanner(`Couldn't send a code — ${errorLabel(error, "try again")}`),
 		});
 	};
 
@@ -161,13 +160,9 @@ export function LoginScreen({ onSuccess }: { onSuccess?: () => void }) {
 		<div className="flex min-h-dvh items-center justify-center bg-cabinet px-4">
 			<div className="w-full max-w-sm pixel-border bg-surface p-6">
 				<div className="text-center">
-					<h1 className="glow font-logo text-xl tracking-[0.2em] text-primary-400">
-						VISHNU
-					</h1>
+					<h1 className="glow font-logo text-xl tracking-[0.2em] text-primary-400">VISHNU</h1>
 					<p className="mt-4 font-display text-lg text-on-surface-muted">
-						{phase === "email"
-							? "Enter your email to continue"
-							: "Enter the six-digit code"}
+						{phase === "email" ? "Enter your email to continue" : "Enter the six-digit code"}
 					</p>
 				</div>
 

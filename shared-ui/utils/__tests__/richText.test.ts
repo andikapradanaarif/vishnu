@@ -1,9 +1,17 @@
-import {describe, it, expect} from "bun:test";
-import {serializeRichTextToHtml} from "../richText";
+import { describe, it, expect } from "bun:test";
+import { serializeRichTextToHtml } from "../richText";
 
 describe("serializeRichTextToHtml", () => {
 	it("serializes a paragraph with text marks", () => {
-		const value = [{type: "paragraph", children: [{text: "Hello ", bold: true}, {text: "world", italic: true}]}];
+		const value = [
+			{
+				type: "paragraph",
+				children: [
+					{ text: "Hello ", bold: true },
+					{ text: "world", italic: true },
+				],
+			},
+		];
 		expect(serializeRichTextToHtml(value as any)).toBe("<p><b>Hello </b><i>world</i></p>");
 	});
 
@@ -12,8 +20,8 @@ describe("serializeRichTextToHtml", () => {
 			{
 				type: "bulleted-list",
 				children: [
-					{type: "list-item", children: [{text: "a"}]},
-					{type: "list-item", children: [{text: "b"}]},
+					{ type: "list-item", children: [{ text: "a" }] },
+					{ type: "list-item", children: [{ text: "b" }] },
 				],
 			},
 		];
@@ -28,16 +36,18 @@ describe("serializeRichTextToHtml", () => {
 					{
 						type: "list-item",
 						children: [
-							{text: "Item 1"},
+							{ text: "Item 1" },
 							{
 								type: "numbered-list",
-								children: [{type: "list-item", children: [{text: "Nested"}]}],
+								children: [{ type: "list-item", children: [{ text: "Nested" }] }],
 							},
 						],
 					},
 				],
 			},
 		];
-		expect(serializeRichTextToHtml(value as any)).toBe("<ul><li>Item 1<ol><li>Nested</li></ol></li></ul>");
+		expect(serializeRichTextToHtml(value as any)).toBe(
+			"<ul><li>Item 1<ol><li>Nested</li></ol></li></ul>",
+		);
 	});
 });

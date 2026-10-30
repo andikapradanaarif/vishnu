@@ -1,11 +1,11 @@
 import classNames from "classnames";
-import {useEffect, useRef, useState, type RefObject} from "react";
-import {createPortal} from "react-dom";
-import {Button} from "../button/Button";
-import {Icon} from "@iconify/react";
+import { useEffect, useRef, useState, type RefObject } from "react";
+import { createPortal } from "react-dom";
+import { Button } from "../button/Button";
+import { Icon } from "@iconify/react";
 import "./index.css";
-import type {Language} from "../../types/translations";
-import {translate} from "../../utils/translation";
+import type { Language } from "../../types/translations";
+import { translate } from "../../utils/translation";
 
 interface ActionBarProps {
 	selectedIds: string[] | number[];
@@ -19,8 +19,8 @@ interface ActionBarProps {
 const SLIDE_DURATION = 150;
 
 export const ActionBar = (props: ActionBarProps) => {
-	const {language = "en"} = props;
-	const {selectedIds, containerRef, renderActions, onClearSelection, selectionLabel} = props;
+	const { language = "en" } = props;
+	const { selectedIds, containerRef, renderActions, onClearSelection, selectionLabel } = props;
 
 	const hasSelection = selectedIds.length > 0;
 
@@ -65,7 +65,9 @@ export const ActionBar = (props: ActionBarProps) => {
 
 	const label =
 		selectionLabel?.(selectedIds.length) ??
-		translate(language, "actionBar.selection.label", "{count} selected", {count: String(selectedIds.length)});
+		translate(language, "actionBar.selection.label", "{count} selected", {
+			count: String(selectedIds.length),
+		});
 
 	if (!visible || !container) return null;
 
@@ -79,15 +81,22 @@ export const ActionBar = (props: ActionBarProps) => {
 					"gap-2 py-3 px-3 pl-4 md:flex-row sm:items-center sm:gap-4 sm:py-2",
 					isExiting ? "action-bar-panel-out" : "action-bar-panel",
 				)}
-				style={{transitionDuration: `${SLIDE_DURATION}ms`}}
+				style={{ transitionDuration: `${SLIDE_DURATION}ms` }}
 			>
 				<div>
-					<span className="text-[13px] font-semibold text-neutral-200 tracking-[0.01em] whitespace-nowrap">{label}</span>
+					<span className="text-[13px] font-semibold text-neutral-200 tracking-[0.01em] whitespace-nowrap">
+						{label}
+					</span>
 				</div>
 
 				<div className="flex items-center gap-2">
 					{onClearSelection && (
-						<Button onClick={onClearSelection} aria-label="Clear selection" variant="text" className="!text-white p-2">
+						<Button
+							onClick={onClearSelection}
+							aria-label="Clear selection"
+							variant="text"
+							className="!text-white p-2"
+						>
 							<Icon icon="ri-checkbox-indeterminate-line" className="mr-2 text-xl" />
 							{translate(language, "common.clear", "Clear")}
 						</Button>

@@ -1,9 +1,9 @@
 import classNames from "classnames";
-import {forwardRef} from "react";
-import {Icon} from "@iconify/react";
+import { forwardRef } from "react";
+import { Icon } from "@iconify/react";
 import Paragraph from "../text/Paragraph";
 import Tooltip from "../tooltip/Tooltip";
-import type {RadioProps} from "./types";
+import type { RadioProps } from "./types";
 
 const Radio = forwardRef<HTMLDivElement, RadioProps>((props, forwardedRef) => {
 	const {
@@ -27,7 +27,11 @@ const Radio = forwardRef<HTMLDivElement, RadioProps>((props, forwardedRef) => {
 
 	return (
 		<div
-			className={classNames("flex w-full", direction === "row" ? "flex-row gap-4" : "flex-col", className)}
+			className={classNames(
+				"flex w-full",
+				direction === "row" ? "flex-row gap-4" : "flex-col",
+				className,
+			)}
 			ref={forwardedRef}
 		>
 			{label && (
@@ -49,7 +53,10 @@ const Radio = forwardRef<HTMLDivElement, RadioProps>((props, forwardedRef) => {
 				)}
 			>
 				{options.map((option) => (
-					<span key={option.value} className={classNames("flex items-center gap-2", option.disabled && "opacity-50")}>
+					<span
+						key={option.value}
+						className={classNames("flex items-center gap-2", option.disabled && "opacity-50")}
+					>
 						<input
 							type="radio"
 							name={name}
@@ -63,8 +70,11 @@ const Radio = forwardRef<HTMLDivElement, RadioProps>((props, forwardedRef) => {
 							className={classNames(
 								"w-4 h-4 rounded-full border flex items-center justify-center transition-colors flex-shrink-0 cursor-pointer",
 								!(disabled || option.disabled) && value === option.value && "border-primary-500",
-								!(disabled || option.disabled) && value !== option.value && "border-neutral-300 bg-surface",
-								(disabled || option.disabled) && "bg-surface-alt border-neutral-200 cursor-not-allowed",
+								!(disabled || option.disabled) &&
+									value !== option.value &&
+									"border-neutral-300 bg-surface",
+								(disabled || option.disabled) &&
+									"bg-surface-alt border-neutral-200 cursor-not-allowed",
 							)}
 							onClick={() => handleChange(option.value, option.disabled)}
 						>
@@ -83,7 +93,9 @@ const Radio = forwardRef<HTMLDivElement, RadioProps>((props, forwardedRef) => {
 									<div
 										className={classNames(
 											"flex items-center gap-1",
-											disabled || option.disabled ? "text-neutral-400 cursor-not-allowed" : "cursor-pointer",
+											disabled || option.disabled
+												? "text-neutral-400 cursor-not-allowed"
+												: "cursor-pointer",
 										)}
 										onClick={() => handleChange(option.value, option.disabled)}
 									>
@@ -94,7 +106,9 @@ const Radio = forwardRef<HTMLDivElement, RadioProps>((props, forwardedRef) => {
 							) : (
 								<Paragraph
 									className={classNames(
-										disabled || option.disabled ? "text-neutral-400 cursor-not-allowed" : "cursor-pointer",
+										disabled || option.disabled
+											? "text-neutral-400 cursor-not-allowed"
+											: "cursor-pointer",
 									)}
 									onClick={() => handleChange(option.value, option.disabled)}
 								>
@@ -110,4 +124,4 @@ const Radio = forwardRef<HTMLDivElement, RadioProps>((props, forwardedRef) => {
 
 Radio.displayName = "Radio";
 
-export {Radio};
+export { Radio };

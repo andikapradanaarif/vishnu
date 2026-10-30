@@ -1,10 +1,10 @@
-import {describe, it, expect} from "bun:test";
-import {validator, passwordValidator, startTimeValidator, endTimeValidator} from "../form";
-import type {FormRules, PasswordRules, TimeTrackingRules} from "../../types/form";
+import { describe, it, expect } from "bun:test";
+import { validator, passwordValidator, startTimeValidator, endTimeValidator } from "../form";
+import type { FormRules, PasswordRules, TimeTrackingRules } from "../../types/form";
 
 describe("validator", () => {
 	it("returns undefined when all rules pass", () => {
-		expect(validator("hello", ["required", "minLength"], {minLength: 3})).toBeUndefined();
+		expect(validator("hello", ["required", "minLength"], { minLength: 3 })).toBeUndefined();
 	});
 
 	it("returns 'required' for empty string", () => {
@@ -16,11 +16,13 @@ describe("validator", () => {
 	});
 
 	it("returns 'minLength' when value is too short", () => {
-		expect(validator("ab", ["required", "minLength"], {minLength: 3})).toBe("minLength" as FormRules);
+		expect(validator("ab", ["required", "minLength"], { minLength: 3 })).toBe(
+			"minLength" as FormRules,
+		);
 	});
 
 	it("returns 'maxLength' when value is too long", () => {
-		expect(validator("abcdef", ["maxLength"], {maxLength: 3})).toBe("maxLength" as FormRules);
+		expect(validator("abcdef", ["maxLength"], { maxLength: 3 })).toBe("maxLength" as FormRules);
 	});
 
 	it("returns 'containsUrl' when value has URL", () => {
@@ -36,19 +38,27 @@ describe("validator", () => {
 	});
 
 	it("returns 'containsHtmlOrScript' for HTML tags", () => {
-		expect(validator("<script>alert(1)</script>", ["containsHtmlOrScript"])).toBe("containsHtmlOrScript" as FormRules);
+		expect(validator("<script>alert(1)</script>", ["containsHtmlOrScript"])).toBe(
+			"containsHtmlOrScript" as FormRules,
+		);
 	});
 
 	it("returns 'containsHtmlOrScript' for javascript: pattern", () => {
-		expect(validator("javascript:alert(1)", ["containsHtmlOrScript"])).toBe("containsHtmlOrScript" as FormRules);
+		expect(validator("javascript:alert(1)", ["containsHtmlOrScript"])).toBe(
+			"containsHtmlOrScript" as FormRules,
+		);
 	});
 
 	it("returns 'containsSuspiciousPattern' for SQL injection", () => {
-		expect(validator("' or 1=1", ["containsSuspiciousPattern"])).toBe("containsSuspiciousPattern" as FormRules);
+		expect(validator("' or 1=1", ["containsSuspiciousPattern"])).toBe(
+			"containsSuspiciousPattern" as FormRules,
+		);
 	});
 
 	it("returns 'containsSuspiciousPattern' for template literal", () => {
-		expect(validator("${x}", ["containsSuspiciousPattern"])).toBe("containsSuspiciousPattern" as FormRules);
+		expect(validator("${x}", ["containsSuspiciousPattern"])).toBe(
+			"containsSuspiciousPattern" as FormRules,
+		);
 	});
 
 	it("returns 'containsDisallowedCharacters' for default disallowed chars", () => {
@@ -66,9 +76,9 @@ describe("validator", () => {
 	});
 
 	it("supports custom disallowed characters", () => {
-		expect(validator("hello@world", ["containsDisallowedCharacters"], {disallowedCharacters: ["@"]})).toBe(
-			"containsDisallowedCharacters" as FormRules,
-		);
+		expect(
+			validator("hello@world", ["containsDisallowedCharacters"], { disallowedCharacters: ["@"] }),
+		).toBe("containsDisallowedCharacters" as FormRules);
 	});
 
 	it("returns 'invalidEmail' for bad email", () => {
@@ -85,7 +95,9 @@ describe("validator", () => {
 
 	it("returns first failing rule in order", () => {
 		// 'required' should be checked before 'minLength'
-		expect(validator("", ["required", "minLength"], {minLength: 3})).toBe("required" as FormRules);
+		expect(validator("", ["required", "minLength"], { minLength: 3 })).toBe(
+			"required" as FormRules,
+		);
 	});
 });
 
@@ -131,11 +143,15 @@ describe("startTimeValidator", () => {
 	});
 
 	it("returns 'startTimeInvalid' for invalid time format", () => {
-		expect(startTimeValidator("invalid", selectedDate)).toBe("startTimeInvalid" as TimeTrackingRules);
+		expect(startTimeValidator("invalid", selectedDate)).toBe(
+			"startTimeInvalid" as TimeTrackingRules,
+		);
 	});
 
 	it("returns 'startAfterEnd' when start is after end", () => {
-		expect(startTimeValidator("15:00", selectedDate, "13:00")).toBe("startAfterEnd" as TimeTrackingRules);
+		expect(startTimeValidator("15:00", selectedDate, "13:00")).toBe(
+			"startAfterEnd" as TimeTrackingRules,
+		);
 	});
 
 	it("returns undefined when start is before end", () => {
@@ -143,11 +159,15 @@ describe("startTimeValidator", () => {
 	});
 
 	it("returns 'durationIsNotPositive' when start equals end", () => {
-		expect(startTimeValidator("14:00", selectedDate, "14:00")).toBe("durationIsNotPositive" as TimeTrackingRules);
+		expect(startTimeValidator("14:00", selectedDate, "14:00")).toBe(
+			"durationIsNotPositive" as TimeTrackingRules,
+		);
 	});
 
 	it("returns 'durationTooLong' when duration exceeds 3 hours", () => {
-		expect(startTimeValidator("08:00", selectedDate, "12:00")).toBe("durationTooLong" as TimeTrackingRules);
+		expect(startTimeValidator("08:00", selectedDate, "12:00")).toBe(
+			"durationTooLong" as TimeTrackingRules,
+		);
 	});
 });
 
@@ -163,7 +183,9 @@ describe("endTimeValidator", () => {
 	});
 
 	it("returns 'startAfterEnd' when end is before start", () => {
-		expect(endTimeValidator("13:00", selectedDate, "15:00")).toBe("startAfterEnd" as TimeTrackingRules);
+		expect(endTimeValidator("13:00", selectedDate, "15:00")).toBe(
+			"startAfterEnd" as TimeTrackingRules,
+		);
 	});
 
 	it("returns undefined when end is after start", () => {
@@ -171,10 +193,14 @@ describe("endTimeValidator", () => {
 	});
 
 	it("returns 'durationIsNotPositive' when end equals start", () => {
-		expect(endTimeValidator("14:00", selectedDate, "14:00")).toBe("durationIsNotPositive" as TimeTrackingRules);
+		expect(endTimeValidator("14:00", selectedDate, "14:00")).toBe(
+			"durationIsNotPositive" as TimeTrackingRules,
+		);
 	});
 
 	it("returns 'durationTooLong' when duration exceeds 3 hours", () => {
-		expect(endTimeValidator("12:00", selectedDate, "08:00")).toBe("durationTooLong" as TimeTrackingRules);
+		expect(endTimeValidator("12:00", selectedDate, "08:00")).toBe(
+			"durationTooLong" as TimeTrackingRules,
+		);
 	});
 });

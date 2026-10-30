@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import type {ProgressBarColor, ProgressBarProps, ProgressBarSize} from "./type";
+import type { ProgressBarColor, ProgressBarProps, ProgressBarSize } from "./type";
 import "./index.css";
 
 const sizeMap: Record<ProgressBarSize, string> = {
@@ -22,7 +22,8 @@ const roundedMap: Record<NonNullable<ProgressBarProps["rounded"]>, string> = {
 	full: "rounded-full",
 };
 
-const clamp = (value: number, min: number, max: number): number => Math.min(Math.max(value, min), max);
+const clamp = (value: number, min: number, max: number): number =>
+	Math.min(Math.max(value, min), max);
 
 export const ProgressBar = ({
 	value = 0,
@@ -54,7 +55,11 @@ export const ProgressBar = ({
 	return (
 		<div className={classNames("flex items-center gap-2 w-full", className)}>
 			<div
-				className={classNames("relative w-full overflow-hidden bg-neutral-200", sizeMap[size], roundedMap[rounded])}
+				className={classNames(
+					"relative w-full overflow-hidden bg-neutral-200",
+					sizeMap[size],
+					roundedMap[rounded],
+				)}
 				role="progressbar"
 				aria-label={ariaLabel}
 				aria-valuemin={0}

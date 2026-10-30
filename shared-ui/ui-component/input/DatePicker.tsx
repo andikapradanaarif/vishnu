@@ -1,15 +1,15 @@
 import classNames from "classnames";
-import {useCallback, useMemo, useState} from "react";
-import {Icon} from "@iconify/react";
-import {intlFormatDate, listYears, monthsNames, shortWeekNames} from "../../utils/date";
+import { useCallback, useMemo, useState } from "react";
+import { Icon } from "@iconify/react";
+import { intlFormatDate, listYears, monthsNames, shortWeekNames } from "../../utils/date";
 import Select from "./Select";
-import type {DatePickerProps} from "./types";
+import type { DatePickerProps } from "./types";
 import GeneratedDays from "./GeneratedDays";
 import Popover from "../popover/Popover";
-import {Button} from "../button/Button";
-import {useIsSmallPhone} from "../../hooks/useScreenSize";
+import { Button } from "../button/Button";
+import { useIsSmallPhone } from "../../hooks/useScreenSize";
 import Caption from "../text/Caption";
-import {translate} from "../../utils/translation";
+import { translate } from "../../utils/translation";
 
 const year = new Date().getFullYear();
 
@@ -114,10 +114,13 @@ export const DatePicker = (props: DatePickerProps) => {
 	const prevDisabled = !!minDate && prevMonthStart < startOfMonth(minDate);
 	const nextDisabled = !!maxDate && nextMonthStart > startOfMonth(maxDate);
 
-	const placeholderText = placeholder || translate(language, "datePicker.selectDate", "Select date");
+	const placeholderText =
+		placeholder || translate(language, "datePicker.selectDate", "Select date");
 
 	return (
-		<div className={classNames("flex", direction === "row" ? "flex-row gap-4" : "flex-col", className)}>
+		<div
+			className={classNames("flex", direction === "row" ? "flex-row gap-4" : "flex-col", className)}
+		>
 			{label && (
 				<label
 					htmlFor={name}
@@ -199,7 +202,7 @@ export const DatePicker = (props: DatePickerProps) => {
 
 						{isSmallPhone || size === "sm" ? (
 							<div className="text-sm text-neutral-700 text-center">
-								{showedMonth.toLocaleString("default", {month: "long", year: "numeric"})}
+								{showedMonth.toLocaleString("default", { month: "long", year: "numeric" })}
 							</div>
 						) : (
 							<div className="text-neutral-700 flex-1">
@@ -269,7 +272,7 @@ export const DatePicker = (props: DatePickerProps) => {
 							handleDateClick={handleDateClick}
 							maxDate={maxDate}
 							minDate={minDate}
-							dateRange={{startDate: value, endDate: null}}
+							dateRange={{ startDate: value, endDate: null }}
 							size={size}
 							dateClassName={dateClassName}
 						/>
@@ -302,7 +305,9 @@ export const DatePicker = (props: DatePickerProps) => {
 					</div>
 				</Popover>
 				{message && <Caption className="text-neutral-600 mt-1">{message}</Caption>}
-				{typeof error === "string" && error && <Caption className="text-danger-500 mt-1">{error}</Caption>}
+				{typeof error === "string" && error && (
+					<Caption className="text-danger-500 mt-1">{error}</Caption>
+				)}
 				{success && <Caption className="text-success-700 mt-1">{success}</Caption>}
 			</div>
 		</div>

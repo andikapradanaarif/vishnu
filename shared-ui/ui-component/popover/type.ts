@@ -1,14 +1,7 @@
-import type {RefObject} from "react";
+import type { RefObject } from "react";
 
 export type PopoverPosition =
-	| "top"
-	| "top-right"
-	| "top-left"
-	| "bottom"
-	| "bottom-right"
-	| "bottom-left"
-	| "left"
-	| "right";
+	"top" | "top-right" | "top-left" | "bottom" | "bottom-right" | "bottom-left" | "left" | "right";
 
 export interface GetPopoverPositionParams {
 	fullWidth: boolean;

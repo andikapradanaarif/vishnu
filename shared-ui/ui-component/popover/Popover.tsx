@@ -1,9 +1,9 @@
 import classNames from "classnames";
-import {type ReactNode, useState, useRef, useEffect, useCallback, useLayoutEffect} from "react";
-import {createPortal} from "react-dom";
-import {type PopoverPosition} from "./type";
+import { type ReactNode, useState, useRef, useEffect, useCallback, useLayoutEffect } from "react";
+import { createPortal } from "react-dom";
+import { type PopoverPosition } from "./type";
 import "./index.css";
-import {getPopoverPosition} from "./utils";
+import { getPopoverPosition } from "./utils";
 
 const POPOVER_DURATION = 80; // ms — should match --shared-popover-duration
 
@@ -57,7 +57,7 @@ export function Popover({
 	const isControlled = isOpenProp !== undefined;
 	const isOpen = isControlled ? isOpenProp : isOpenState;
 
-	const [popoverPosition, setPopoverPosition] = useState({top: 0, left: 0});
+	const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 });
 	const [popoverWidth, setPopoverWidth] = useState<number | undefined>(undefined);
 
 	// exit animation
@@ -160,8 +160,11 @@ export function Popover({
 			const isClickInsideTrigger = triggerRef.current?.contains(target);
 
 			// Find if clicked popover's trigger is inside current popover
-			const clickedPopoverTrigger = document.querySelector(`[aria-controls="${clickedPopover.id}"]`);
-			const isChildPopoverTrigger = clickedPopoverTrigger && popoverRef.current?.contains(clickedPopoverTrigger);
+			const clickedPopoverTrigger = document.querySelector(
+				`[aria-controls="${clickedPopover.id}"]`,
+			);
+			const isChildPopoverTrigger =
+				clickedPopoverTrigger && popoverRef.current?.contains(clickedPopoverTrigger);
 
 			if (!isClickInsideCurrentPopover && !isClickInsideTrigger && !isChildPopoverTrigger) {
 				closePopover();

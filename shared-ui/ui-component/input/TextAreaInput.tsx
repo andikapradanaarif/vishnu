@@ -1,6 +1,6 @@
 import classNames from "classnames";
-import {useCallback, useEffect, useRef, forwardRef} from "react";
-import type {TextAreaInputProps} from "./types";
+import { useCallback, useEffect, useRef, forwardRef } from "react";
+import type { TextAreaInputProps } from "./types";
 import Caption from "../text/Caption";
 import LoadingSpinner from "../loadingAnimation/LoadingSpinner";
 
@@ -79,7 +79,9 @@ const TextAreaInput = forwardRef<HTMLTextAreaElement, TextAreaInputProps>(
 						htmlFor={name}
 						className={classNames(
 							"block text-neutral-700",
-							direction === "row" ? "flex items-center text-sm flex-shrink-0 w-32 h-9.5" : "text-xs mb-1",
+							direction === "row"
+								? "flex items-center text-sm flex-shrink-0 w-32 h-9.5"
+								: "text-xs mb-1",
 						)}
 					>
 						{required && <span className="text-danger-500 mr-1">*</span>}

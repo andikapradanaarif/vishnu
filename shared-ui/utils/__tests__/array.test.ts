@@ -1,5 +1,5 @@
-import {describe, it, expect} from "bun:test";
-import {filterTree, flatten} from "../array";
+import { describe, it, expect } from "bun:test";
+import { filterTree, flatten } from "../array";
 
 type TreeNode = {
 	id: string;
@@ -12,11 +12,11 @@ const tree: TreeNode[] = [
 		id: "1",
 		name: "Root",
 		children: [
-			{id: "2", name: "Child A", children: [{id: "4", name: "Grandchild"}]},
-			{id: "3", name: "Child B"},
+			{ id: "2", name: "Child A", children: [{ id: "4", name: "Grandchild" }] },
+			{ id: "3", name: "Child B" },
 		],
 	},
-	{id: "5", name: "Standalone"},
+	{ id: "5", name: "Standalone" },
 ];
 
 describe("flatten", () => {
@@ -30,8 +30,8 @@ describe("flatten", () => {
 	});
 
 	it("handles nodes without children", () => {
-		const nodes: TreeNode[] = [{id: "a", name: "A"}];
-		expect(flatten(nodes, (node) => node.children)).toEqual([{id: "a", name: "A"}]);
+		const nodes: TreeNode[] = [{ id: "a", name: "A" }];
+		expect(flatten(nodes, (node) => node.children)).toEqual([{ id: "a", name: "A" }]);
 	});
 
 	it("preserves node references", () => {
@@ -45,7 +45,7 @@ describe("filterTree", () => {
 		const result = filterTree(
 			tree,
 			(node) => node.children,
-			(node, children) => ({...node, children}),
+			(node, children) => ({ ...node, children }),
 			(node) => node.name.includes("Child"),
 		);
 		const ids = result.map((n) => n.id);
@@ -58,7 +58,7 @@ describe("filterTree", () => {
 		const result = filterTree(
 			[],
 			(node: TreeNode) => node.children,
-			(node, children) => ({...node, children}),
+			(node, children) => ({ ...node, children }),
 			() => true,
 		);
 		expect(result).toEqual([]);
@@ -68,7 +68,7 @@ describe("filterTree", () => {
 		const result = filterTree(
 			tree,
 			(node) => node.children,
-			(node, children) => ({...node, children}),
+			(node, children) => ({ ...node, children }),
 			() => true,
 		);
 		// All items should be included: root, child A, grandchild, child B, standalone
@@ -79,7 +79,7 @@ describe("filterTree", () => {
 		const result = filterTree(
 			tree,
 			(node) => node.children,
-			(node, children) => ({...node, children}),
+			(node, children) => ({ ...node, children }),
 			() => false,
 		);
 		// Parent nodes are excluded but children are still pushed
@@ -91,7 +91,7 @@ describe("filterTree", () => {
 		const result = filterTree(
 			tree,
 			(node) => node.children,
-			(node, children) => ({...node, children}),
+			(node, children) => ({ ...node, children }),
 			(node) => node.id === "5",
 		);
 		expect(result.map((n) => n.id)).toEqual(["5"]);

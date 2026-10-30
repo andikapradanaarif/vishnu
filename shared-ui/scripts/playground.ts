@@ -13,10 +13,18 @@ import index from "../playground/index.html";
 
 const port = Number(process.env.PORT ?? 5173);
 // Spawn via the running Bun binary — `bunx` isn't guaranteed on PATH.
-const tailwindArgs = [process.execPath, "x", "@tailwindcss/cli", "-i", "playground/index.css", "-o", "playground/output.css"];
+const tailwindArgs = [
+	process.execPath,
+	"x",
+	"@tailwindcss/cli",
+	"-i",
+	"playground/index.css",
+	"-o",
+	"playground/output.css",
+];
 
 // Initial build so the stylesheet exists before the first request.
-const initialCss = Bun.spawnSync(tailwindArgs, {stdio: ["ignore", "inherit", "inherit"]});
+const initialCss = Bun.spawnSync(tailwindArgs, { stdio: ["ignore", "inherit", "inherit"] });
 if (initialCss.exitCode !== 0) {
 	console.error("Tailwind build failed — run `bun install` in shared-ui/ and retry.");
 	process.exit(initialCss.exitCode);
@@ -29,12 +37,16 @@ const server = Bun.serve({
 	routes: {
 		"/": index,
 		"/output.css": () =>
-			new Response(Bun.file("playground/output.css"), {headers: {"content-type": "text/css; charset=utf-8"}}),
+			new Response(Bun.file("playground/output.css"), {
+				headers: { "content-type": "text/css; charset=utf-8" },
+			}),
 	},
 });
 
 // Rebuild on change — spawned after Bun.serve so a failed bind can't orphan it.
-const tailwind = Bun.spawn([...tailwindArgs, "--watch"], {stdio: ["ignore", "inherit", "inherit"]});
+const tailwind = Bun.spawn([...tailwindArgs, "--watch"], {
+	stdio: ["ignore", "inherit", "inherit"],
+});
 
 console.log(`\n▶ Nexus UI playground → ${server.url}\n`);
 

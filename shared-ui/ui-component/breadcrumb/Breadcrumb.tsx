@@ -1,9 +1,9 @@
-import {Icon} from "@iconify/react";
+import { Icon } from "@iconify/react";
 import classNames from "classnames";
 
-import type {BreadcrumbProps} from "./type";
+import type { BreadcrumbProps } from "./type";
 
-export const Breadcrumb = ({items, className}: BreadcrumbProps) => {
+export const Breadcrumb = ({ items, className }: BreadcrumbProps) => {
 	if (items.length === 0) return null;
 
 	return (
@@ -36,7 +36,12 @@ export const Breadcrumb = ({items, className}: BreadcrumbProps) => {
 							)}
 
 							{!isLast && (
-								<Icon icon="material-symbols:chevron-right" className="text-neutral-400" width={16} height={16} />
+								<Icon
+									icon="material-symbols:chevron-right"
+									className="text-neutral-400"
+									width={16}
+									height={16}
+								/>
 							)}
 						</li>
 					);

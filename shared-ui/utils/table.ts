@@ -1,4 +1,4 @@
-import type {InitRecordType} from "../ui-component/table/type";
+import type { InitRecordType } from "../ui-component/table/type";
 
 /**
  * This function is used to transform api response to suits with the table data source format

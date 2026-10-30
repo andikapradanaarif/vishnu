@@ -1,7 +1,11 @@
 import { Dialog } from "@vishnu/ui-component/dialog";
 import { Switch } from "@vishnu/ui-component";
 import { Button } from "@vishnu/ui-component/button";
-import { useSessions, useSetProjectPermissionsSkip, useSetSessionPermissionsSkip } from "../../hooks/queries";
+import {
+	useSessions,
+	useSetProjectPermissionsSkip,
+	useSetSessionPermissionsSkip,
+} from "../../hooks/queries";
 import { AgentModelControls } from "../topbar/AgentModelControls";
 import { errorLabel } from "../../utils/errors";
 
@@ -46,8 +50,8 @@ export function SettingsDialog({
 			<section>
 				<h3 className="font-display text-lg text-on-surface">Agent &amp; model</h3>
 				<p className="mt-1 text-xs text-on-surface-muted">
-					The defaults every session inherits — a room can pin its own
-					model from the top bar without changing these.
+					The defaults every session inherits — a room can pin its own model from the top bar
+					without changing these.
 				</p>
 				<div className="mt-3 flex flex-col gap-3">
 					<AgentModelControls
@@ -63,9 +67,9 @@ export function SettingsDialog({
 			<section className="mt-5 border-t-2 border-border pt-4">
 				<h3 className="font-display text-lg text-on-surface">Permissions</h3>
 				<p className="mt-1 text-xs text-on-surface-muted">
-					When skip is on, crush auto-allows tool permission requests instead
-					of showing a decision card. This default is stored with the project,
-					so it survives closing the tab and the agent server restarting.
+					When skip is on, crush auto-allows tool permission requests instead of showing a decision
+					card. This default is stored with the project, so it survives closing the tab and the
+					agent server restarting.
 				</p>
 				<div className="mt-3 flex items-center justify-between gap-3">
 					<label
@@ -89,9 +93,7 @@ export function SettingsDialog({
 				{sid && (
 					<div className="mt-4 border-t-2 border-border pt-3">
 						<div className="flex items-center justify-between gap-3">
-							<span className="font-display text-base text-on-surface">
-								This room
-							</span>
+							<span className="font-display text-base text-on-surface">This room</span>
 							<Button
 								variant="outlined"
 								size="sm"
@@ -104,9 +106,7 @@ export function SettingsDialog({
 						</div>
 						<p className="mt-1 font-display text-xs text-on-surface-muted">
 							{override == null
-								? `Inherits the workspace default — currently ${
-										effective ? "on" : "off"
-									}.`
+								? `Inherits the workspace default — currently ${effective ? "on" : "off"}.`
 								: `Pinned ${override ? "on" : "off"} for this room; the workspace default is ${
 										workspaceSkip ? "on" : "off"
 									}.`}{" "}
@@ -115,11 +115,7 @@ export function SettingsDialog({
 					</div>
 				)}
 
-				{error && (
-					<p className="mt-1 font-display text-xs text-danger-400">
-						{errorLabel(error)}
-					</p>
-				)}
+				{error && <p className="mt-1 font-display text-xs text-danger-400">{errorLabel(error)}</p>}
 			</section>
 		</Dialog>
 	);

@@ -59,10 +59,9 @@ export class PermissionsClient {
 
 	/** POST `/workspaces/{id}/permissions/skip` — toggle auto-allow (yolo-ish). */
 	setSkip(workspaceId: string, skip: boolean): Promise<void> {
-		return this.api.post<void>(
-			buildPath(v1WorkspacePermissionsSkip, { id: workspaceId }),
-			{ skip } satisfies PermissionSkipRequest,
-		);
+		return this.api.post<void>(buildPath(v1WorkspacePermissionsSkip, { id: workspaceId }), {
+			skip,
+		} satisfies PermissionSkipRequest);
 	}
 
 	/**
@@ -71,11 +70,7 @@ export class PermissionsClient {
 	 * row (survives child restarts); `null` clears the override so the
 	 * session inherits the workspace flag again.
 	 */
-	setSessionSkip(
-		workspaceId: string,
-		sessionId: string,
-		skip: boolean | null,
-	): Promise<void> {
+	setSessionSkip(workspaceId: string, sessionId: string, skip: boolean | null): Promise<void> {
 		return this.api.post<void>(
 			buildPath(v1WorkspaceSessionPermissionsSkip, {
 				id: workspaceId,

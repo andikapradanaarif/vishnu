@@ -1,14 +1,7 @@
-import type {ReactNode, RefObject} from "react";
+import type { ReactNode, RefObject } from "react";
 
 export type TooltipPosition =
-	| "top"
-	| "bottom"
-	| "left"
-	| "right"
-	| "top-left"
-	| "top-right"
-	| "bottom-left"
-	| "bottom-right";
+	"top" | "bottom" | "left" | "right" | "top-left" | "top-right" | "bottom-left" | "bottom-right";
 
 export interface GetTooltipPositionParams {
 	position: TooltipPosition;

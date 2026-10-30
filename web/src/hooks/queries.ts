@@ -288,12 +288,7 @@ export function useCancelQuestions(wid: string | undefined) {
 
 export function useSetModel(wid: string | undefined) {
 	const qc = useQueryClient();
-	return useMutation<
-		void,
-		Error,
-		{ modelType: SelectedModelType; model: SelectedModel },
-		unknown
-	>({
+	return useMutation<void, Error, { modelType: SelectedModelType; model: SelectedModel }, unknown>({
 		mutationKey: ["config", "set-model"],
 		mutationFn: async ({ modelType, model }) => {
 			await configClient.setModel(wid!, modelType, model);
@@ -317,8 +312,7 @@ export function useSetSessionModel(wid: string | undefined, sid: string | undefi
 	const qc = useQueryClient();
 	return useMutation({
 		mutationKey: ["sessions", "set-model"],
-		mutationFn: (model: SelectedModel | null) =>
-			sessionsClient.setModel(wid!, sid!, model),
+		mutationFn: (model: SelectedModel | null) => sessionsClient.setModel(wid!, sid!, model),
 		onSettled: () => qc.invalidateQueries({ queryKey: queryKeys.sessions(wid!) }),
 	});
 }
@@ -381,9 +375,7 @@ export function useSetPermissionsSkip(wid: string | undefined) {
 		mutationFn: (skip: boolean) => permissionsClient.setSkip(wid!, skip),
 		onMutate: async (skip) => {
 			await qc.cancelQueries({ queryKey: queryKeys.permissionsSkip(wid!) });
-			const previous = qc.getQueryData<{ skip: boolean }>(
-				queryKeys.permissionsSkip(wid!),
-			);
+			const previous = qc.getQueryData<{ skip: boolean }>(queryKeys.permissionsSkip(wid!));
 			qc.setQueryData(queryKeys.permissionsSkip(wid!), { skip });
 			return { previous };
 		},
@@ -392,8 +384,7 @@ export function useSetPermissionsSkip(wid: string | undefined) {
 				qc.setQueryData(queryKeys.permissionsSkip(wid!), context.previous);
 			}
 		},
-		onSettled: () =>
-			qc.invalidateQueries({ queryKey: queryKeys.permissionsSkip(wid!) }),
+		onSettled: () => qc.invalidateQueries({ queryKey: queryKeys.permissionsSkip(wid!) }),
 	});
 }
 
@@ -431,15 +422,11 @@ export function useReportCurrentSession(wid: string | undefined) {
  * auto-approve override, persisted on the session row. `null` clears the
  * override so the session inherits the workspace flag again.
  */
-export function useSetSessionPermissionsSkip(
-	wid: string | undefined,
-	sid: string | undefined,
-) {
+export function useSetSessionPermissionsSkip(wid: string | undefined, sid: string | undefined) {
 	const qc = useQueryClient();
 	return useMutation({
 		mutationKey: ["sessions", "permissions", "skip"],
-		mutationFn: (skip: boolean | null) =>
-			permissionsClient.setSessionSkip(wid!, sid!, skip),
+		mutationFn: (skip: boolean | null) => permissionsClient.setSessionSkip(wid!, sid!, skip),
 		onSettled: () => qc.invalidateQueries({ queryKey: queryKeys.sessions(wid!) }),
 	});
 }

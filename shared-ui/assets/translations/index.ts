@@ -1,5 +1,5 @@
 // Translation index - safely loads all language files
-import type {Language, TranslationMap} from "../../types/translations";
+import type { Language, TranslationMap } from "../../types/translations";
 import en from "./en.json";
 import id from "./id.json";
 

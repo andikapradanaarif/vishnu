@@ -1,10 +1,13 @@
-import type {PaginationProps} from "./type";
-import {translate} from "../../utils/translation";
+import type { PaginationProps } from "./type";
+import { translate } from "../../utils/translation";
 
-type PageInformationProps = Pick<PaginationProps, "total" | "pageSize" | "currentPage" | "language">;
+type PageInformationProps = Pick<
+	PaginationProps,
+	"total" | "pageSize" | "currentPage" | "language"
+>;
 
 export const PageInformation = (props: PageInformationProps) => {
-	const {total, pageSize = 0, currentPage, language = "en"} = props;
+	const { total, pageSize = 0, currentPage, language = "en" } = props;
 
 	const firstItem = (currentPage - 1) * pageSize + 1;
 	const lastItem = Math.min(currentPage * pageSize, total);

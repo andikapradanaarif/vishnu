@@ -6,4 +6,4 @@ export * from "./useScreenSize";
 export * from "./useSlicedPages";
 export * from "./useTimer";
 
-export type {Language, TranslationKey, TranslationMap} from "../types/translations";
+export type { Language, TranslationKey, TranslationMap } from "../types/translations";

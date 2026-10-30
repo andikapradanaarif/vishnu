@@ -1,6 +1,6 @@
-import type {SegmentedControlOption} from "../input/types";
-import type {Language} from "../../types/translations";
-import {translate} from "../../utils/translation";
+import type { SegmentedControlOption } from "../input/types";
+import type { Language } from "../../types/translations";
+import { translate } from "../../utils/translation";
 
 export type CalendarView = "day" | "week" | "month" | "year";
 
@@ -41,10 +41,34 @@ export const getViews = (
 	language: Language = "en",
 	translations?: Record<string, string>,
 ): SegmentedControlOption<CalendarView>[] => [
-	{value: "day", label: translate(language, "calendar.view.day", translations?.["calendar.view.day"] ?? "Day")},
-	{value: "week", label: translate(language, "calendar.view.week", translations?.["calendar.view.week"] ?? "Week")},
-	{value: "month", label: translate(language, "calendar.view.month", translations?.["calendar.view.month"] ?? "Month")},
-	{value: "year", label: translate(language, "calendar.view.year", translations?.["calendar.view.year"] ?? "Year")},
+	{
+		value: "day",
+		label: translate(language, "calendar.view.day", translations?.["calendar.view.day"] ?? "Day"),
+	},
+	{
+		value: "week",
+		label: translate(
+			language,
+			"calendar.view.week",
+			translations?.["calendar.view.week"] ?? "Week",
+		),
+	},
+	{
+		value: "month",
+		label: translate(
+			language,
+			"calendar.view.month",
+			translations?.["calendar.view.month"] ?? "Month",
+		),
+	},
+	{
+		value: "year",
+		label: translate(
+			language,
+			"calendar.view.year",
+			translations?.["calendar.view.year"] ?? "Year",
+		),
+	},
 ];
 
 export const COLORS = {

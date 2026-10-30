@@ -1,7 +1,7 @@
 import classNames from "classnames";
-import {forwardRef} from "react";
+import { forwardRef } from "react";
 import LoadingSpinner from "../loadingAnimation/LoadingSpinner";
-import type {InputProps} from "./types";
+import type { InputProps } from "./types";
 import Caption from "../text/Caption";
 
 const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
@@ -41,13 +41,21 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 	ref,
 ) {
 	return (
-		<div className={classNames("flex", wrapperClassName, direction === "row" ? "flex-row gap-4" : "flex-col")}>
+		<div
+			className={classNames(
+				"flex",
+				wrapperClassName,
+				direction === "row" ? "flex-row gap-4" : "flex-col",
+			)}
+		>
 			{label && (
 				<label
 					htmlFor={id ?? name}
 					className={classNames(
 						"block text-neutral-700",
-						direction === "row" ? "flex items-center flex-shrink-0 w-32 text-sm h-9.5" : "text-xs mb-1",
+						direction === "row"
+							? "flex items-center flex-shrink-0 w-32 text-sm h-9.5"
+							: "text-xs mb-1",
 					)}
 				>
 					{required && <span className="text-danger-500 mr-1">*</span>}
@@ -76,7 +84,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 						placeholder={placeholder}
 						className={classNames(
 							"appearance-none block w-full px-3 py-2 border border-neutral-400/65 rounded-md placeholder-neutral-400 focus:outline-none focus:shadow-none focus:border-[var(--color-primary)] text-sm",
-							disabled ? "bg-neutral-100 cursor-not-allowed text-neutral-700" : "bg-surface text-neutral-800",
+							disabled
+								? "bg-neutral-100 cursor-not-allowed text-neutral-700"
+								: "bg-surface text-neutral-800",
 							suffixIcon || isLoading ? "pr-10" : "",
 							suffixIcon && isLoading ? "pr-16" : "",
 							prefixIcon ? "pl-9" : "",
@@ -130,7 +140,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 					)}
 				</div>
 				{message && <Caption className="text-neutral-600 mt-1">{message}</Caption>}
-				{typeof error === "string" && error && <Caption className="text-danger-500 mt-1">{error}</Caption>}
+				{typeof error === "string" && error && (
+					<Caption className="text-danger-500 mt-1">{error}</Caption>
+				)}
 				{success && <Caption className="text-success-700 mt-1">{success}</Caption>}
 			</div>
 		</div>

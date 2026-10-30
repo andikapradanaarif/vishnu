@@ -1,15 +1,21 @@
-import {useCallback, useMemo, useState} from "react";
+import { useCallback, useMemo, useState } from "react";
 import classNames from "classnames";
-import {Button} from "../button/Button";
-import {Icon} from "@iconify/react";
-import {intlFormatDate, getStartOfDay, listYears, monthsNames, shortWeekNames} from "../../utils/date";
-import type {DateRangePickerProps} from "./types";
+import { Button } from "../button/Button";
+import { Icon } from "@iconify/react";
+import {
+	intlFormatDate,
+	getStartOfDay,
+	listYears,
+	monthsNames,
+	shortWeekNames,
+} from "../../utils/date";
+import type { DateRangePickerProps } from "./types";
 import GeneratedDays from "./GeneratedDays";
 import Popover from "../popover/Popover";
 import Select from "./Select";
-import {useIsSmallPhone} from "../../hooks/useScreenSize";
+import { useIsSmallPhone } from "../../hooks/useScreenSize";
 import Caption from "../text/Caption";
-import {translate} from "../../utils/translation";
+import { translate } from "../../utils/translation";
 
 const year = new Date().getFullYear();
 
@@ -89,7 +95,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
 		if (!selectedStartDate || endDate) {
 			setHoveredDate(null);
 			setSelectedStartDate(date);
-			onDateRangeChange({startDate: getStartOfDay(date), endDate: null});
+			onDateRangeChange({ startDate: getStartOfDay(date), endDate: null });
 			return;
 		}
 
@@ -131,10 +137,13 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
 			: `${intlFormatDate(startDate, language)} → `
 		: "";
 
-	const placeholderText = placeholder || translate(language, "dateRangePicker.selectDate", "Select date");
+	const placeholderText =
+		placeholder || translate(language, "dateRangePicker.selectDate", "Select date");
 
 	return (
-		<div className={classNames("flex", direction === "row" ? "flex-row gap-4" : "flex-col", className)}>
+		<div
+			className={classNames("flex", direction === "row" ? "flex-row gap-4" : "flex-col", className)}
+		>
 			{label && (
 				<label
 					htmlFor={name}
@@ -223,7 +232,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
 						</div>
 						{isSmallPhone || size === "sm" ? (
 							<div className="text-sm text-neutral-700 text-center">
-								{showedMonth.toLocaleString("default", {month: "long", year: "numeric"})}
+								{showedMonth.toLocaleString("default", { month: "long", year: "numeric" })}
 							</div>
 						) : (
 							<div className="text-neutral-700 flex-1">
@@ -281,7 +290,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
 					<div className="mt-2 grid grid-cols-7 gap-2">
 						<GeneratedDays
 							currentMonth={showedMonth}
-							dateRange={{startDate: selectedStartDate, endDate}}
+							dateRange={{ startDate: selectedStartDate, endDate }}
 							handleDateClick={handleDateClick}
 							maxDate={maxDate}
 							minDate={minDate}
@@ -300,7 +309,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
 								variant="outlined"
 								onClick={() => {
 									setSelectedStartDate(null);
-									onDateRangeChange({startDate: null, endDate: null});
+									onDateRangeChange({ startDate: null, endDate: null });
 									setIsOpen(false);
 								}}
 							>
@@ -322,7 +331,9 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
 					</div>
 				</Popover>
 				{message && <Caption className="text-neutral-600 mt-1">{message}</Caption>}
-				{typeof error === "string" && error && <Caption className="text-danger-500 mt-1">{error}</Caption>}
+				{typeof error === "string" && error && (
+					<Caption className="text-danger-500 mt-1">{error}</Caption>
+				)}
 				{success && <Caption className="text-success-700 mt-1">{success}</Caption>}
 			</div>
 		</div>

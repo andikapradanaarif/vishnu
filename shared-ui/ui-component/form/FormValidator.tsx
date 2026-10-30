@@ -1,8 +1,8 @@
-import type {FormRules, FormRulesOptions} from "../../types/form";
-import {useMemo} from "react";
-import type {FieldApi} from "@tanstack/react-form";
-import {translate} from "../../utils/translation";
-import type {Language, TranslationKey} from "../../types/translations";
+import type { FormRules, FormRulesOptions } from "../../types/form";
+import { useMemo } from "react";
+import type { FieldApi } from "@tanstack/react-form";
+import { translate } from "../../utils/translation";
+import type { Language, TranslationKey } from "../../types/translations";
 
 interface FormValidatorProps {
 	validationKey: FormRules | string;
@@ -36,7 +36,13 @@ interface FormValidatorProps {
 	language?: Language;
 }
 
-function FormValidator({validationKey, children, fieldAPI, options, language = "en"}: FormValidatorProps) {
+function FormValidator({
+	validationKey,
+	children,
+	fieldAPI,
+	options,
+	language = "en",
+}: FormValidatorProps) {
 	const errorText: string = useMemo(() => {
 		// invalid validation
 		if (fieldAPI.state.meta.isTouched && fieldAPI.state.meta.errors.length > 0) {
@@ -48,7 +54,11 @@ function FormValidator({validationKey, children, fieldAPI, options, language = "
 				maxLength: translate(language, "validation.maxLength", "Maximum length is {max}", {
 					max: String(options?.maxLength || ""),
 				}),
-				containsUrl: translate(language, "validation.containsUrl", "This field cannot contain URLs"),
+				containsUrl: translate(
+					language,
+					"validation.containsUrl",
+					"This field cannot contain URLs",
+				),
 				containsHtmlOrScript: translate(
 					language,
 					"validation.containsHtmlScript",
@@ -71,7 +81,11 @@ function FormValidator({validationKey, children, fieldAPI, options, language = "
 				return ruleCheckers[validationKey as FormRules];
 			}
 
-			return translate(language, validationKey as string as TranslationKey, validationKey as string);
+			return translate(
+				language,
+				validationKey as string as TranslationKey,
+				validationKey as string,
+			);
 		}
 
 		return "";

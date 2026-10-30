@@ -78,8 +78,8 @@ export function SessionSidebar({ wid, activeId, onSelect, header }: SessionSideb
 				className="w-full"
 			>
 				<p className="text-sm text-on-surface-muted">
-					Delete “{deleting?.title || "New session"}”? Its messages and plan are
-					removed permanently.
+					Delete “{deleting?.title || "New session"}”? Its messages and plan are removed
+					permanently.
 				</p>
 				<div className="mt-4 flex justify-end gap-2">
 					<Button
@@ -124,9 +124,7 @@ function SessionRow({ session, active, busy, onSelect, onDelete }: SessionRowPro
 			onClick={onSelect}
 			onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onSelect()}
 			className={`group mb-0.5 cursor-pointer border-l-2 px-2.5 py-2 ${
-				active
-					? "border-primary-500 bg-raised"
-					: "border-transparent hover:bg-raised"
+				active ? "border-primary-500 bg-raised" : "border-transparent hover:bg-raised"
 			}`}
 		>
 			<div className="flex items-start gap-2">
@@ -146,8 +144,7 @@ function SessionRow({ session, active, busy, onSelect, onDelete }: SessionRowPro
 							</span>
 						) : session.attached_clients > 0 ? (
 							<span className="text-success-400">
-								● {session.attached_clients}{" "}
-								{session.attached_clients === 1 ? "client" : "clients"}
+								● {session.attached_clients} {session.attached_clients === 1 ? "client" : "clients"}
 							</span>
 						) : (
 							<span className="text-ghost">idle</span>

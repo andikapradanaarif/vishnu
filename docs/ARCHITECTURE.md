@@ -336,6 +336,6 @@ cd web && bun run dev               # SPA on :5173, proxies to :8080
                                   # (VITE_API_UPSTREAM for a remote api)
 ```
 
-Gates: `make test` + `make lint` (api), `tsc -b && oxlint .` (web),
-`bun run lint` (contract). Style: gofumpt→goimports, slog capitalized,
-JSON snake_case; oxlint/oxfmt for TS; semantic commits.
+Gates: `make test` + `make lint` (api), `bun run lint` + `bun run format:check`
+for the TS workspaces. Style: gofumpt→goimports, slog capitalized, JSON
+snake_case; `tsc` + `oxlint` for lint, `bun fmt` for format; semantic commits.

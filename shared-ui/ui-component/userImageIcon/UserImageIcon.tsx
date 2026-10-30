@@ -1,10 +1,10 @@
 import classNames from "classnames";
-import {useState} from "react";
+import { useState } from "react";
 
-import {presenceAvailabilityConfig} from "../../constants/presenceStatus";
+import { presenceAvailabilityConfig } from "../../constants/presenceStatus";
 import LoadingSpinner from "../loadingAnimation/LoadingSpinner";
-import {PresenceAvailability} from "../../types/presence";
-import {UserAvatarFallback, type UserImageIconSize} from "./UserAvatarFallback";
+import { PresenceAvailability } from "../../types/presence";
+import { UserAvatarFallback, type UserImageIconSize } from "./UserAvatarFallback";
 
 function UserImageIcon({
 	name,
@@ -26,7 +26,9 @@ function UserImageIcon({
 	const [failedSrc, setFailedSrc] = useState<string | null>(null);
 
 	const availabilityColor = availability
-		? (presenceAvailabilityConfig as Record<string, {color: string} | undefined>)[String(availability)]?.color
+		? (presenceAvailabilityConfig as Record<string, { color: string } | undefined>)[
+				String(availability)
+			]?.color
 		: undefined;
 
 	// A dead URL falls back to the initials instead of the browser broken-image
@@ -51,9 +53,7 @@ function UserImageIcon({
 					className,
 				)}
 			>
-				<LoadingSpinner
-					size={size === "sm" ? 12 : size === "md" ? 16 : size === "lg" ? 24 : 32}
-				/>
+				<LoadingSpinner size={size === "sm" ? 12 : size === "md" ? 16 : size === "lg" ? 24 : 32} />
 			</div>
 		);
 	}

@@ -76,7 +76,9 @@ export function ProjectSwitcher({ project, onBack, onSelectProject }: ProjectSwi
 									{p.status === "cloning" && (
 										<span className="shrink-0 text-[10px] uppercase text-info-400">cloning</span>
 									)}
-									{blocked && <span className="shrink-0 text-[10px] uppercase text-danger-400">error</span>}
+									{blocked && (
+										<span className="shrink-0 text-[10px] uppercase text-danger-400">error</span>
+									)}
 									{active && <Icon icon="ri:check-line" width={14} className="shrink-0" />}
 								</button>
 							);

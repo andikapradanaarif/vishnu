@@ -33,9 +33,7 @@ export function useCrushEvents(workspaceId: string | undefined) {
 	// resets the map to server truth.
 	useEffect(() => {
 		if (!sessions.data) return;
-		pendingStore.reconcileBusy(
-			Object.fromEntries(sessions.data.map((s) => [s.id, s.is_busy])),
-		);
+		pendingStore.reconcileBusy(Object.fromEntries(sessions.data.map((s) => [s.id, s.is_busy])));
 	}, [sessions.data]);
 
 	useEffect(() => {
@@ -105,12 +103,10 @@ function dispatch(
 		case "message": {
 			const msg = payload as Message;
 			if (!msg?.session_id) break;
-			queryClient.setQueryData<Message[]>(
-				queryKeys.messages(workspaceId, msg.session_id),
-				(old) =>
-					innerType === "deleted"
-						? (old ?? []).filter((m) => m.id !== msg.id)
-						: mergeMessage(old ?? [], msg),
+			queryClient.setQueryData<Message[]>(queryKeys.messages(workspaceId, msg.session_id), (old) =>
+				innerType === "deleted"
+					? (old ?? []).filter((m) => m.id !== msg.id)
+					: mergeMessage(old ?? [], msg),
 			);
 			if (innerType !== "deleted") pendingStore.setBusy(msg.session_id, true);
 			break;

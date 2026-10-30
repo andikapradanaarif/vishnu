@@ -1,11 +1,26 @@
-import {Icon} from "@iconify/react";
+import { Icon } from "@iconify/react";
 import classNames from "classnames";
-import type {StepStatus, StepperProps} from "./type";
+import type { StepStatus, StepperProps } from "./type";
 
 const sizeMap = {
-	sm: {circle: "h-6 w-6 text-xs", icon: "text-sm", connector: "flex-1 h-0.5 min-w-6", connectorMarginTop: "0.6875rem"},
-	md: {circle: "h-8 w-8 text-sm", icon: "text-base", connector: "flex-1 h-0.5 min-w-8", connectorMarginTop: "0.9375rem"},
-	lg: {circle: "h-10 w-10 text-base", icon: "text-lg", connector: "flex-1 h-0.5 min-w-10", connectorMarginTop: "1.1875rem"},
+	sm: {
+		circle: "h-6 w-6 text-xs",
+		icon: "text-sm",
+		connector: "flex-1 h-0.5 min-w-6",
+		connectorMarginTop: "0.6875rem",
+	},
+	md: {
+		circle: "h-8 w-8 text-sm",
+		icon: "text-base",
+		connector: "flex-1 h-0.5 min-w-8",
+		connectorMarginTop: "0.9375rem",
+	},
+	lg: {
+		circle: "h-10 w-10 text-base",
+		icon: "text-lg",
+		connector: "flex-1 h-0.5 min-w-10",
+		connectorMarginTop: "1.1875rem",
+	},
 } as const;
 
 function getStepStatus(stepNum: number, currentStep: number): StepStatus {
@@ -52,7 +67,12 @@ export function Stepper({
 					const isLast = i === steps.length - 1;
 
 					return (
-						<div key={step.id ?? stepNum} className="flex gap-3" role="listitem" aria-current={status === "current" ? "step" : undefined}>
+						<div
+							key={step.id ?? stepNum}
+							className="flex gap-3"
+							role="listitem"
+							aria-current={status === "current" ? "step" : undefined}
+						>
 							<div className="flex flex-col items-center min-w-0">
 								<div
 									className={classNames(
@@ -70,7 +90,7 @@ export function Stepper({
 								{!isLast && (
 									<div
 										className={classNames("w-0.5 flex-1 my-1", connectorClassMap[status])}
-										style={{minHeight: "1.5rem"}}
+										style={{ minHeight: "1.5rem" }}
 									/>
 								)}
 							</div>
@@ -88,7 +108,9 @@ export function Stepper({
 								{step.description && (
 									<span className="text-xs text-neutral-500 mt-0.5">{step.description}</span>
 								)}
-								{renderStepContent && <div className="mt-2">{renderStepContent(step, i, status)}</div>}
+								{renderStepContent && (
+									<div className="mt-2">{renderStepContent(step, i, status)}</div>
+								)}
 							</div>
 						</div>
 					);
@@ -105,7 +127,12 @@ export function Stepper({
 				const isLast = i === steps.length - 1;
 
 				return (
-					<div key={step.id ?? stepNum} className={classNames("flex items-start", !isLast && "flex-1")} role="listitem" aria-current={status === "current" ? "step" : undefined}>
+					<div
+						key={step.id ?? stepNum}
+						className={classNames("flex items-start", !isLast && "flex-1")}
+						role="listitem"
+						aria-current={status === "current" ? "step" : undefined}
+					>
 						<div className="flex flex-col items-center min-w-0">
 							<div
 								className={classNames(
@@ -130,14 +157,16 @@ export function Stepper({
 									{step.label}
 								</span>
 							)}
-						{step.description && (
-							<span className="mt-0.5 text-xs text-neutral-500 w-full max-w-full truncate block text-center">{step.description}</span>
-						)}
+							{step.description && (
+								<span className="mt-0.5 text-xs text-neutral-500 w-full max-w-full truncate block text-center">
+									{step.description}
+								</span>
+							)}
 						</div>
 						{!isLast && (
 							<div
 								className={classNames(sizes.connector, connectorClassMap[status])}
-								style={{marginTop: sizes.connectorMarginTop}}
+								style={{ marginTop: sizes.connectorMarginTop }}
 							/>
 						)}
 					</div>

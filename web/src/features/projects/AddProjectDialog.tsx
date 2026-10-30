@@ -26,8 +26,7 @@ function createError(error: unknown): string {
 		if (error.status === 409) return "[conflict] already registered";
 		if (error.status === 403)
 			return "[forbidden] server can't reach that repo — check its git auth";
-		if (error.code === "invalid_path")
-			return "[invalid_path] directory not found on the server";
+		if (error.code === "invalid_path") return "[invalid_path] directory not found on the server";
 	}
 	return errorLabel(error, "couldn't create the project — try again");
 }
@@ -158,9 +157,7 @@ export function AddProjectDialog({ isOpen, onClose }: AddProjectDialogProps) {
 					onChange={(event) => setName(event.target.value)}
 				/>
 
-				{fieldError && (
-					<p className="font-display text-sm text-danger-400">{fieldError}</p>
-				)}
+				{fieldError && <p className="font-display text-sm text-danger-400">{fieldError}</p>}
 				{error && <p className="font-display text-sm text-danger-400">{error}</p>}
 
 				<div className="mt-1 flex justify-end gap-2">

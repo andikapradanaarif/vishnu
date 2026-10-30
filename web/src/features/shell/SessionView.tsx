@@ -28,10 +28,7 @@ export function SessionView({ wid, sessionId }: SessionViewProps) {
 	// resolution event was missed while the stream was down.
 	useEffect(() => {
 		if (!pending.data || !sessions.data) return;
-		pendingStore.reconcilePermissions(
-			descendantsOf(sessions.data, sessionId),
-			pending.data,
-		);
+		pendingStore.reconcilePermissions(descendantsOf(sessions.data, sessionId), pending.data);
 	}, [pending.data, sessions.data, sessionId]);
 
 	return (

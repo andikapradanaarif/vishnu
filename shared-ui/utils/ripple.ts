@@ -33,6 +33,6 @@ export function createRipple(container: HTMLElement, pointer: RipplePointer) {
 		() => {
 			ripple.remove();
 		},
-		{once: true},
+		{ once: true },
 	);
 }

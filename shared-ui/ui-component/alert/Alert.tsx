@@ -1,9 +1,9 @@
-import {type ReactNode, useCallback, useEffect, useRef, useState} from "react";
+import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import classNames from "classnames";
-import {Icon} from "@iconify/react";
+import { Icon } from "@iconify/react";
 
-import type {AlertItem, AlertSeverity} from "./type";
-import type {AlertOverlayPosition} from "./type";
+import type { AlertItem, AlertSeverity } from "./type";
+import type { AlertOverlayPosition } from "./type";
 
 const EXIT_ANIMATION_MS = 180;
 
@@ -16,7 +16,7 @@ const overlayPositionClass: Record<AlertOverlayPosition, string> = {
 	"bottom-center": "fixed left-1/2 bottom-4 -translate-x-1/2 z-50 w-[min(320px,calc(100vw-2rem))]",
 };
 
-const severityStyles: Record<AlertSeverity, {container: string}> = {
+const severityStyles: Record<AlertSeverity, { container: string }> = {
 	success: {
 		container: "bg-success-700/90 text-white",
 	},
@@ -101,7 +101,7 @@ export default function Alert({
 
 	const closeWithTransition = useCallback(
 		(id: string) => {
-			setClosingIds((prev) => (prev[id] ? prev : {...prev, [id]: true}));
+			setClosingIds((prev) => (prev[id] ? prev : { ...prev, [id]: true }));
 
 			const autoTimer = autoCloseTimersRef.current[id];
 			if (autoTimer) {
@@ -116,7 +116,7 @@ export default function Alert({
 			exitTimersRef.current[id] = setTimeout(() => {
 				onClose(id);
 				setClosingIds((prev) => {
-					const {[id]: _, ...rest} = prev;
+					const { [id]: _, ...rest } = prev;
 					return rest;
 				});
 				delete exitTimersRef.current[id];
@@ -129,8 +129,15 @@ export default function Alert({
 		const currentIds = new Set(alerts.map((a) => a.id));
 
 		alerts.forEach((alert) => {
-			if (typeof alert.duration === "number" && alert.duration > 0 && !autoCloseTimersRef.current[alert.id]) {
-				autoCloseTimersRef.current[alert.id] = setTimeout(() => closeWithTransition(alert.id), alert.duration * 1000);
+			if (
+				typeof alert.duration === "number" &&
+				alert.duration > 0 &&
+				!autoCloseTimersRef.current[alert.id]
+			) {
+				autoCloseTimersRef.current[alert.id] = setTimeout(
+					() => closeWithTransition(alert.id),
+					alert.duration * 1000,
+				);
 			}
 		});
 
@@ -206,7 +213,10 @@ export default function Alert({
 	return (
 		<>
 			{Object.entries(alertsByPosition).map(([pos, positionAlerts]) => (
-				<div key={pos} className={classNames(className, overlayPositionClass[pos as AlertOverlayPosition])}>
+				<div
+					key={pos}
+					className={classNames(className, overlayPositionClass[pos as AlertOverlayPosition])}
+				>
 					<div className="space-y-2">
 						{positionAlerts.map((alert) => (
 							<AlertItem

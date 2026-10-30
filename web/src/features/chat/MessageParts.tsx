@@ -46,12 +46,14 @@ export function MessagePart({ part, role }: { part: ContentPart; role: Message["
 					<div className="flex items-center gap-1.5 font-display text-sm text-info-300">
 						<span className="font-mono">{call.name}</span>
 						{!call.finished && (
-							<span className="blink ml-auto font-display text-xs text-warning-400">
-								running
-							</span>
+							<span className="blink ml-auto font-display text-xs text-warning-400">running</span>
 						)}
 					</div>
-					{plan && <div className="mt-1"><TodoList todos={plan} /></div>}
+					{plan && (
+						<div className="mt-1">
+							<TodoList todos={plan} />
+						</div>
+					)}
 					{!plan && call.input && (
 						<details className="mt-1">
 							<summary className="cursor-pointer font-display text-sm text-ghost select-none">
@@ -71,9 +73,7 @@ export function MessagePart({ part, role }: { part: ContentPart; role: Message["
 			return (
 				<details
 					className={`border px-3 py-2 ${
-						res.is_error
-							? "border-danger-500/60 bg-danger-950/30"
-							: "border-border bg-raised"
+						res.is_error ? "border-danger-500/60 bg-danger-950/30" : "border-border bg-raised"
 					}`}
 				>
 					<summary className="cursor-pointer font-display text-sm text-on-surface-muted select-none">

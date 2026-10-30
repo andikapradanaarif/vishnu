@@ -1,22 +1,24 @@
-import {afterEach, describe, expect, it, spyOn} from "bun:test";
-import {cleanup, render} from "@testing-library/react";
+import { afterEach, describe, expect, it, spyOn } from "bun:test";
+import { cleanup, render } from "@testing-library/react";
 import DOMPurify from "dompurify";
 
-import {RichDescription} from "../RichDescription";
+import { RichDescription } from "../RichDescription";
 
 afterEach(() => cleanup());
 
 describe("RichDescription", () => {
 	it("renders plain text split into paragraphs", () => {
-		const {container} = render(<RichDescription text={"First paragraph\n\nSecond paragraph"} />);
+		const { container } = render(<RichDescription text={"First paragraph\n\nSecond paragraph"} />);
 
 		expect(container.textContent).toContain("First paragraph");
 		expect(container.textContent).toContain("Second paragraph");
 	});
 
 	it("renders allowlisted HTML markup", () => {
-		const {container} = render(
-			<RichDescription text={'<ul><li>a</li></ul><strong>x</strong><a href="https://example.com">link</a>'} />,
+		const { container } = render(
+			<RichDescription
+				text={'<ul><li>a</li></ul><strong>x</strong><a href="https://example.com">link</a>'}
+			/>,
 		);
 
 		expect(container.querySelector("li")?.textContent).toBe("a");
@@ -34,11 +36,12 @@ describe("RichDescription", () => {
 		// allows — must be gone from the output.
 		const sanitizeSpy = spyOn(DOMPurify, "sanitize");
 		try {
-			const {container} = render(<RichDescription text={'<h1>Title</h1><img src="x"><p>keep</p>'} />);
+			const { container } = render(
+				<RichDescription text={'<h1>Title</h1><img src="x"><p>keep</p>'} />,
+			);
 
 			const config = sanitizeSpy.mock.calls[0]?.[1] as
-				| {ALLOWED_TAGS?: string[]; ALLOWED_ATTR?: string[]}
-				| undefined;
+				{ ALLOWED_TAGS?: string[]; ALLOWED_ATTR?: string[] } | undefined;
 			expect(config?.ALLOWED_TAGS).toBeDefined();
 			expect(config?.ALLOWED_TAGS).not.toContain("h1");
 			expect(config?.ALLOWED_TAGS).not.toContain("script");

@@ -1,4 +1,4 @@
-import {useState, useEffect, useRef, useCallback} from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 export const useDebounce = (value: string, delay: number = 500): string => {
 	const [debouncedValue, setDebouncedValue] = useState<string>(value);
@@ -23,7 +23,10 @@ export const useDebounce = (value: string, delay: number = 500): string => {
 	return debouncedValue;
 };
 
-export const useDebounceFunc = <T>(callback: (arg: T) => void, delay: number = 500): ((arg: T) => void) => {
+export const useDebounceFunc = <T>(
+	callback: (arg: T) => void,
+	delay: number = 500,
+): ((arg: T) => void) => {
 	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const callbackRef = useRef(callback);
 	const lastArgRef = useRef<T | undefined>(undefined);
@@ -57,19 +60,16 @@ export const useDebounceFunc = <T>(callback: (arg: T) => void, delay: number = 5
 		}
 	}, [delay]);
 
-	return useCallback(
-		(arg: T) => {
-			if (timeoutRef.current) {
-				clearTimeout(timeoutRef.current);
-			}
+	return useCallback((arg: T) => {
+		if (timeoutRef.current) {
+			clearTimeout(timeoutRef.current);
+		}
 
-			lastArgRef.current = arg;
-			hasPendingRef.current = true;
-			timeoutRef.current = setTimeout(() => {
-				callbackRef.current(arg);
-				hasPendingRef.current = false;
-			}, delayRef.current);
-		},
-		[],
-	);
+		lastArgRef.current = arg;
+		hasPendingRef.current = true;
+		timeoutRef.current = setTimeout(() => {
+			callbackRef.current(arg);
+			hasPendingRef.current = false;
+		}, delayRef.current);
+	}, []);
 };

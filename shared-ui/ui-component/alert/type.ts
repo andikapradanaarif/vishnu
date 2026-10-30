@@ -1,12 +1,7 @@
-import {ReactNode} from "react";
+import { ReactNode } from "react";
 
 export type AlertOverlayPosition =
-	| "top-right"
-	| "top-left"
-	| "bottom-right"
-	| "bottom-left"
-	| "top-center"
-	| "bottom-center";
+	"top-right" | "top-left" | "bottom-right" | "bottom-left" | "top-center" | "bottom-center";
 
 export type AlertSeverity = "success" | "info" | "warning" | "error" | "custom";
 

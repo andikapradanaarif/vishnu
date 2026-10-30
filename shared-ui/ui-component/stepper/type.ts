@@ -1,4 +1,4 @@
-import type {ReactNode} from "react";
+import type { ReactNode } from "react";
 
 /** State of a single step in the stepper. */
 export type StepStatus = "completed" | "current" | "upcoming";

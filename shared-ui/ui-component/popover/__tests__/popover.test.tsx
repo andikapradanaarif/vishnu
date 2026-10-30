@@ -1,7 +1,7 @@
-import {afterEach, describe, expect, it} from "bun:test";
-import {cleanup, render} from "@testing-library/react";
+import { afterEach, describe, expect, it } from "bun:test";
+import { cleanup, render } from "@testing-library/react";
 
-import {Popover} from "../Popover";
+import { Popover } from "../Popover";
 
 afterEach(() => cleanup());
 

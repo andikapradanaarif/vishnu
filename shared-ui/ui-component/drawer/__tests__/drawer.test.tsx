@@ -1,7 +1,7 @@
-import {afterEach, describe, expect, it, mock} from "bun:test";
-import {cleanup, fireEvent, render, screen} from "@testing-library/react";
+import { afterEach, describe, expect, it, mock } from "bun:test";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
-import {Drawer} from "../Drawer";
+import { Drawer } from "../Drawer";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -38,7 +38,7 @@ describe("Drawer", () => {
 			</Drawer>,
 		);
 
-		fireEvent.keyDown(document, {key: "Escape"});
+		fireEvent.keyDown(document, { key: "Escape" });
 		expect(onClose).not.toHaveBeenCalled();
 
 		await sleep(260);
@@ -52,6 +52,6 @@ describe("Drawer", () => {
 			</Drawer>,
 		);
 
-		expect(screen.getByRole("button", {name: "Close drawer"})).toBeDefined();
+		expect(screen.getByRole("button", { name: "Close drawer" })).toBeDefined();
 	});
 });

@@ -1,9 +1,5 @@
 import { buildPath, type ApiClient } from "../client";
-import {
-	v1WorkspaceConfig,
-	v1WorkspaceConfigModel,
-	v1WorkspaceProviders,
-} from "../paths";
+import { v1WorkspaceConfig, v1WorkspaceConfigModel, v1WorkspaceProviders } from "../paths";
 import type {
 	ConfigModelRequest,
 	ConfigScope,
@@ -30,9 +26,7 @@ export class ConfigClient {
 
 	/** GET `/workspaces/{id}/providers` — available providers + models. */
 	providers(workspaceId: string): Promise<ProviderConfig[]> {
-		return this.api.get<ProviderConfig[]>(
-			buildPath(v1WorkspaceProviders, { id: workspaceId }),
-		);
+		return this.api.get<ProviderConfig[]>(buildPath(v1WorkspaceProviders, { id: workspaceId }));
 	}
 
 	/**

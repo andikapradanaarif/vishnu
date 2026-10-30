@@ -1,4 +1,4 @@
-import type {ReactNode} from "react";
+import type { ReactNode } from "react";
 import PageTitle from "../text/PageTitle";
 import classNames from "classnames";
 
@@ -23,7 +23,14 @@ export default function PageWrapper({
 
 	return (
 		// set max width to 1600 px to handle extra large screens
-		<div className={classNames(className, `overflow-y-${overFlow}`, "h-full", isConstrained && "flex flex-col")}>
+		<div
+			className={classNames(
+				className,
+				`overflow-y-${overFlow}`,
+				"h-full",
+				isConstrained && "flex flex-col",
+			)}
+		>
 			<div
 				className={classNames(
 					"px-4 md:px-8 mx-auto max-w-[1600px] py-6 w-full",
@@ -34,7 +41,9 @@ export default function PageWrapper({
 					{title && <PageTitle title={title} subtitle={subtitle} />}
 					{actions && <div className="flex items-center gap-2">{actions}</div>}
 				</div>
-				<div className={classNames("mt-4", isConstrained && "flex flex-col flex-1 min-h-0")}>{children}</div>
+				<div className={classNames("mt-4", isConstrained && "flex flex-col flex-1 min-h-0")}>
+					{children}
+				</div>
 			</div>
 		</div>
 	);

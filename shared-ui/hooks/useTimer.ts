@@ -1,4 +1,4 @@
-import {useState, useEffect, useRef} from "react";
+import { useState, useEffect, useRef } from "react";
 
 export type TimerFormatter = (elapsedMs: number) => string;
 
@@ -18,7 +18,10 @@ const defaultFormatter: TimerFormatter = (ms) => {
  *   displays as "90:00"). For multi-hour timers, provide a custom formatter
  *   that outputs HH:MM:SS.
  */
-export function useTimer(startTime: Date | null, formatter: TimerFormatter = defaultFormatter): string {
+export function useTimer(
+	startTime: Date | null,
+	formatter: TimerFormatter = defaultFormatter,
+): string {
 	const [duration, setDuration] = useState(() => formatter(0));
 	const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const formatterRef = useRef(formatter);

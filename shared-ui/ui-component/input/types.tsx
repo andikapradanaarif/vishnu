@@ -1,5 +1,13 @@
-import type {ChangeEvent, FocusEvent, HTMLInputTypeAttribute, ReactNode, MouseEvent, JSX, KeyboardEvent} from "react";
-import type {Language} from "../../types/translations";
+import type {
+	ChangeEvent,
+	FocusEvent,
+	HTMLInputTypeAttribute,
+	ReactNode,
+	MouseEvent,
+	JSX,
+	KeyboardEvent,
+} from "react";
+import type { Language } from "../../types/translations";
 
 export interface InputProps {
 	label?: string;

@@ -17,9 +17,7 @@ export function StartingProject({
 			<p className="flex items-center gap-3 font-display text-2xl text-primary-400">
 				<LoadingSpinner size={18} className="text-primary-400" /> {label}
 			</p>
-			{project && (
-				<p className="font-display text-lg text-on-surface-muted">{project.name}</p>
-			)}
+			{project && <p className="font-display text-lg text-on-surface-muted">{project.name}</p>}
 			<Button variant="text" size="sm" className="font-display" onClick={onBack}>
 				BACK TO PROJECTS
 			</Button>
@@ -46,9 +44,7 @@ export function ProjectError({
 			<p className="glow font-display text-2xl text-danger-400">
 				{external ? "EXTERNAL DOWN" : "START FAILED"}
 			</p>
-			{project && (
-				<p className="font-display text-lg text-on-surface">{project.name}</p>
-			)}
+			{project && <p className="font-display text-lg text-on-surface">{project.name}</p>}
 			<p className="max-w-md text-xs text-on-surface-muted">
 				{external && project?.upstream
 					? `vishnu can't reach ${project.upstream}. ${detail}`

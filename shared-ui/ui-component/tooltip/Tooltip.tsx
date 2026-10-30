@@ -1,12 +1,15 @@
 import classNames from "classnames";
-import {RefObject, useEffect, useRef, useState} from "react";
-import {createPortal} from "react-dom";
-import {GetTooltipPositionParams, TooltipProps} from "./type";
+import { RefObject, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { GetTooltipPositionParams, TooltipProps } from "./type";
 
-const getTooltipPosition = (triggerRef: RefObject<HTMLDivElement | null>, options: GetTooltipPositionParams) => {
-	const {position, tooltipRef} = options;
+const getTooltipPosition = (
+	triggerRef: RefObject<HTMLDivElement | null>,
+	options: GetTooltipPositionParams,
+) => {
+	const { position, tooltipRef } = options;
 
-	if (!triggerRef.current) return {top: 0, left: 0};
+	if (!triggerRef.current) return { top: 0, left: 0 };
 
 	const triggerRect = triggerRef.current.getBoundingClientRect();
 
@@ -78,7 +81,7 @@ export function Tooltip({
 	triggerTabIndex = 0,
 }: TooltipProps) {
 	const [isVisible, setIsVisible] = useState(false);
-	const [tooltipPosition, setTooltipPosition] = useState({top: 0, left: 0});
+	const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
 	// exit animation
 	const [isExiting, setIsExiting] = useState(false);
 

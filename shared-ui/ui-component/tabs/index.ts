@@ -1,2 +1,2 @@
-export {default as Tabs} from "./Tabs";
-export type {Tab, TabsProps} from "./type";
+export { default as Tabs } from "./Tabs";
+export type { Tab, TabsProps } from "./type";

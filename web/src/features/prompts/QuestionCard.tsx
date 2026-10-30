@@ -66,9 +66,7 @@ export function QuestionCard({ wid, request }: QuestionCardProps) {
 
 				<div className="border-t-2 border-pink-500/40 px-4 py-3">
 					{request.confirm_description && (
-						<p className="text-xs text-on-surface-muted">
-							{request.confirm_description}
-						</p>
+						<p className="text-xs text-on-surface-muted">{request.confirm_description}</p>
 					)}
 
 					<div className="mt-3 flex flex-col gap-2">
@@ -183,9 +181,7 @@ function QuestionField({
 								className="accent-primary-500"
 							/>
 							<span>{c.label}</span>
-							{c.description && (
-								<span className="text-[11px] text-ghost">— {c.description}</span>
-							)}
+							{c.description && <span className="text-[11px] text-ghost">— {c.description}</span>}
 						</label>
 					))}
 				</div>
@@ -211,9 +207,7 @@ function QuestionField({
 								className="accent-primary-500"
 							/>
 							<span>{c.label}</span>
-							{c.description && (
-								<span className="text-[11px] text-ghost">— {c.description}</span>
-							)}
+							{c.description && <span className="text-[11px] text-ghost">— {c.description}</span>}
 						</label>
 					))}
 				</div>
@@ -254,9 +248,7 @@ function QuestionField({
 				<span className="min-w-0 flex-1 truncate font-display text-base text-on-surface">
 					{label}
 				</span>
-				<span
-					className={`shrink-0 text-xs ${answered ? "text-success-400" : "text-ghost"}`}
-				>
+				<span className={`shrink-0 text-xs ${answered ? "text-success-400" : "text-ghost"}`}>
 					{summary}
 				</span>
 			</summary>

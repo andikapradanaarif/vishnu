@@ -1,4 +1,4 @@
-import {useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 
 export type BrowserName = "chrome" | "firefox" | "safari" | "edge" | "other";
 
@@ -21,7 +21,7 @@ export const DEFAULT_MIN_VERSIONS: MinBrowserVersions = {
 
 export function detectBrowser(minVersions: MinBrowserVersions, userAgent?: string): BrowserInfo {
 	if (typeof navigator === "undefined" && !userAgent) {
-		return {name: "other", version: 0, isSupported: true, ready: false};
+		return { name: "other", version: 0, isSupported: true, ready: false };
 	}
 
 	const ua = userAgent ?? navigator.userAgent;
@@ -81,16 +81,16 @@ export function detectBrowser(minVersions: MinBrowserVersions, userAgent?: strin
 	}
 
 	if (name === "other") {
-		return {name, version: 0, isSupported: true, ready: true};
+		return { name, version: 0, isSupported: true, ready: true };
 	}
 
 	const minVersion = minVersions[name];
 	const isSupported = typeof minVersion === "number" ? version >= minVersion : true;
 
-	return {name, version, isSupported, ready: true};
+	return { name, version, isSupported, ready: true };
 }
 
-const SSR_DEFAULT: BrowserInfo = {name: "other", version: 0, isSupported: true, ready: false};
+const SSR_DEFAULT: BrowserInfo = { name: "other", version: 0, isSupported: true, ready: false };
 
 /**
  * Detects the current browser and checks whether it meets the minimum version requirements.
@@ -111,9 +111,9 @@ const SSR_DEFAULT: BrowserInfo = {name: "other", version: 0, isSupported: true, 
  *   The `ready` flag is false during SSR/first render and true after detection.
  */
 export function useBrowserSupport(minVersions: MinBrowserVersions = {}): BrowserInfo {
-	const [browserInfo, setBrowserInfo] = useState<BrowserInfo>(() => ({...SSR_DEFAULT}));
+	const [browserInfo, setBrowserInfo] = useState<BrowserInfo>(() => ({ ...SSR_DEFAULT }));
 
-	const merged = {...DEFAULT_MIN_VERSIONS, ...minVersions};
+	const merged = { ...DEFAULT_MIN_VERSIONS, ...minVersions };
 	const minVersionsKey = JSON.stringify(merged);
 
 	useEffect(() => {

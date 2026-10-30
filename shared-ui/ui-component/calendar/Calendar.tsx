@@ -1,18 +1,24 @@
-import {useMemo, useState} from "react";
-import {getViews, type CalendarEvent, type CalendarProps} from "./type";
-import {DayView} from "./DayView";
-import {WeekView} from "./WeekView";
-import {MonthView} from "./MonthView";
-import {YearView} from "./YearView";
-import {getAdjacentDate, getPeriodBounds, getTitle, isSameDay} from "./utils";
-import {Button} from "../button/Button";
-import {Checkbox} from "../input/Checkbox";
-import {SegmentedControl} from "../input/SegmentedControl";
-import {addDays, getEndOfDay, getEndOfWeek, getStartOfDay, getStartOfWeek} from "../../utils/date";
-import {CalendarSkeleton} from "./CalendarSkeleton";
+import { useMemo, useState } from "react";
+import { getViews, type CalendarEvent, type CalendarProps } from "./type";
+import { DayView } from "./DayView";
+import { WeekView } from "./WeekView";
+import { MonthView } from "./MonthView";
+import { YearView } from "./YearView";
+import { getAdjacentDate, getPeriodBounds, getTitle, isSameDay } from "./utils";
+import { Button } from "../button/Button";
+import { Checkbox } from "../input/Checkbox";
+import { SegmentedControl } from "../input/SegmentedControl";
+import {
+	addDays,
+	getEndOfDay,
+	getEndOfWeek,
+	getStartOfDay,
+	getStartOfWeek,
+} from "../../utils/date";
+import { CalendarSkeleton } from "./CalendarSkeleton";
 import classNames from "classnames";
-import type {CalendarView} from "./type";
-import {translate} from "../../utils/translation";
+import type { CalendarView } from "./type";
+import { translate } from "../../utils/translation";
 
 const DEFAULT_SLOT_DURATION_MINUTES = 30;
 
@@ -95,7 +101,9 @@ export const Calendar = (props: CalendarProps) => {
 	// With weekends hidden, WeekView renders only Mon–Fri — a bound landing on a
 	// hidden weekend day must not enable navigation into a fully-disabled week.
 	const lastRenderedDayPrev =
-		view === "week" && !showWeekend ? addDays(periodBounds.start, -2) : addDays(periodBounds.start, -1);
+		view === "week" && !showWeekend
+			? addDays(periodBounds.start, -2)
+			: addDays(periodBounds.start, -1);
 	const firstRenderedDayNext =
 		view === "week" && !showWeekend ? addDays(periodBounds.start, 8) : addDays(periodBounds.end, 1);
 
@@ -136,7 +144,7 @@ export const Calendar = (props: CalendarProps) => {
 		if (isControlledSlot) {
 			onChangeSelectedSlot(slotDate);
 		} else {
-			setSelectedSlotState({slotDate, viewDate: date, view});
+			setSelectedSlotState({ slotDate, viewDate: date, view });
 		}
 		onSlotClick?.(slotDate);
 	};

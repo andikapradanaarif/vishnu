@@ -60,10 +60,11 @@ export const pendingStore = {
 		const live = new Set(requests.map((r) => r.id));
 		const byId = new Map(state.permissions.map((p) => [p.id, p]));
 		for (const r of requests) byId.set(r.id, r);
-		const next = [...byId.values()].filter(
-			(p) => !coveredIds.has(p.session_id) || live.has(p.id),
-		);
-		if (next.length !== state.permissions.length || next.some((p, i) => p !== state.permissions[i])) {
+		const next = [...byId.values()].filter((p) => !coveredIds.has(p.session_id) || live.has(p.id));
+		if (
+			next.length !== state.permissions.length ||
+			next.some((p, i) => p !== state.permissions[i])
+		) {
 			set({ permissions: next });
 		}
 	},

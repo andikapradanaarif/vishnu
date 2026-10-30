@@ -1,2 +1,2 @@
-export {QrCode} from "./QrCode";
-export type {QrCodeProps} from "./type";
+export { QrCode } from "./QrCode";
+export type { QrCodeProps } from "./type";

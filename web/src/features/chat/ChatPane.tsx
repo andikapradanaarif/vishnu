@@ -68,7 +68,11 @@ export function ChatPane({ wid, sid }: ChatPaneProps) {
 	};
 
 	return (
-		<div ref={scrollRef} onScroll={onScroll} className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
+		<div
+			ref={scrollRef}
+			onScroll={onScroll}
+			className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto"
+		>
 			<div className="mx-auto flex max-w-3xl flex-col gap-3 px-3 py-4 sm:px-6">
 				{isLoading && (
 					<div className="flex items-center justify-center gap-3 py-10 text-center font-display text-lg text-on-surface-muted">
@@ -99,7 +103,9 @@ export function ChatPane({ wid, sid }: ChatPaneProps) {
 				{conn !== "open" && (
 					<div className="flex items-center justify-center gap-2 border border-dashed border-warning-500/50 bg-warning-950/20 px-3 py-1.5 font-display text-xs text-warning-400">
 						<LoadingSpinner size={12} className="text-warning-400" />
-						{conn === "closed" ? "event stream closed — reconnecting…" : "reconnecting to event stream…"}
+						{conn === "closed"
+							? "event stream closed — reconnecting…"
+							: "reconnecting to event stream…"}
 					</div>
 				)}
 

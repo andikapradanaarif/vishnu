@@ -27,9 +27,7 @@ function reverseComparisonFn<T>(fn: (a: T, b: T) => number) {
  * given an accessor to the compared field.
  */
 export function dateComparisonFn<T>(fn: (item: T) => Date | null) {
-	return reverseComparisonFn(
-		numberComparisonFn<T>((item) => fn(item)?.getTime() || null),
-	);
+	return reverseComparisonFn(numberComparisonFn<T>((item) => fn(item)?.getTime() || null));
 }
 
 /**

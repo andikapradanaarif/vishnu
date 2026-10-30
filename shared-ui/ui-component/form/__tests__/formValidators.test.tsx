@@ -1,16 +1,16 @@
-import {describe, expect, it} from "bun:test";
-import {render} from "@testing-library/react";
+import { describe, expect, it } from "bun:test";
+import { render } from "@testing-library/react";
 
-import {DateTimeValidator} from "../DateTimeValidator";
+import { DateTimeValidator } from "../DateTimeValidator";
 import TimeTrackingValidator from "../TimeTrackingValidator";
 
 function fakeField(isTouched: boolean, errors: unknown[]) {
-	return {state: {meta: {isTouched, errors}}} as never;
+	return { state: { meta: { isTouched, errors } } } as never;
 }
 
 describe("DateTimeValidator", () => {
 	it("renders the message for a failed mustBeInFuture rule", () => {
-		const {container} = render(
+		const { container } = render(
 			<DateTimeValidator fieldAPI={fakeField(true, ["mustBeInFuture"])}>
 				{(text) => <span>{text}</span>}
 			</DateTimeValidator>,
@@ -20,7 +20,7 @@ describe("DateTimeValidator", () => {
 	});
 
 	it("renders nothing before the field is touched", () => {
-		const {container} = render(
+		const { container } = render(
 			<DateTimeValidator fieldAPI={fakeField(false, ["mustBeInPast"])}>
 				{(text) => <span>{text}</span>}
 			</DateTimeValidator>,
@@ -32,8 +32,11 @@ describe("DateTimeValidator", () => {
 
 describe("TimeTrackingValidator", () => {
 	it("maps built-in time-tracking rules to messages", () => {
-		const {container} = render(
-			<TimeTrackingValidator fieldAPI={fakeField(true, ["startAfterEnd"])} validationKey="startAfterEnd">
+		const { container } = render(
+			<TimeTrackingValidator
+				fieldAPI={fakeField(true, ["startAfterEnd"])}
+				validationKey="startAfterEnd"
+			>
 				{(text) => <span>{text}</span>}
 			</TimeTrackingValidator>,
 		);
@@ -42,8 +45,11 @@ describe("TimeTrackingValidator", () => {
 	});
 
 	it("falls back to the translated key for unknown rules", () => {
-		const {container} = render(
-			<TimeTrackingValidator fieldAPI={fakeField(true, ["validation.invalidTime"])} validationKey="validation.invalidTime">
+		const { container } = render(
+			<TimeTrackingValidator
+				fieldAPI={fakeField(true, ["validation.invalidTime"])}
+				validationKey="validation.invalidTime"
+			>
 				{(text) => <span>{text}</span>}
 			</TimeTrackingValidator>,
 		);

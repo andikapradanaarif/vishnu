@@ -12,5 +12,11 @@ export * from "./table";
 export * from "./time";
 export * from "./translation";
 
-export type {FormRules, FormRulesOptions, PasswordRules, DateTimeRules, TimeTrackingRules} from "../types/form";
-export type {Language, TranslationKey, TranslationMap} from "../types/translations";
+export type {
+	FormRules,
+	FormRulesOptions,
+	PasswordRules,
+	DateTimeRules,
+	TimeTrackingRules,
+} from "../types/form";
+export type { Language, TranslationKey, TranslationMap } from "../types/translations";

@@ -1,8 +1,17 @@
 import classNames from "classnames";
-import type {SwitchProps} from "./types";
+import type { SwitchProps } from "./types";
 
 export const Switch = (props: SwitchProps) => {
-	const {name, checked, onChange, label, className, labelClassName, direction, labelPosition = "left"} = props;
+	const {
+		name,
+		checked,
+		onChange,
+		label,
+		className,
+		labelClassName,
+		direction,
+		labelPosition = "left",
+	} = props;
 
 	return (
 		<div
