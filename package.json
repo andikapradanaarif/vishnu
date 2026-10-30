@@ -2,6 +2,7 @@
 	"name": "vishnu",
 	"version": "1.0.0",
 	"private": true,
+	"packageManager": "bun@1.4.4",
 	"workspaces": [
 		"shared-ui",
 		"contract",
@@ -11,6 +12,7 @@
 		"build": "cd shared-ui && bun run build && cd ../contract && bun run build && cd ../web && bun run build",
 		"lint": "cd shared-ui && bun run lint && cd ../contract && bun run lint && cd ../web && bun run lint",
 		"format": "cd shared-ui && bun run format && cd ../contract && bun run format && cd ../web && bun run format",
+		"format:check": "cd shared-ui && bun run format:check && cd ../contract && bun run format:check && cd ../web && bun run format:check",
 		"clean": "rm -rf */dist */node_modules",
 		"syncpack:check": "syncpack lint",
 		"syncpack:fix": "syncpack fix"

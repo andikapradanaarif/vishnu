@@ -13,6 +13,7 @@
 		"lint": "tsc -b && oxlint .",
 		"lint:fix": "oxlint . --fix",
 		"format": "bun fmt --use-tabs --print-width=100 . '!src/routeTree.gen.ts'",
+		"format:check": "bun fmt --check --use-tabs --print-width=100 . '!src/routeTree.gen.ts'",
 		"preview": "vite preview"
 	},
 	"dependencies": {
