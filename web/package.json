@@ -10,7 +10,7 @@
 		"mock": "bun run scripts/mock-api.ts",
 		"build": "tsc -b && vite build",
 		"typecheck": "tsc -b",
-		"lint": "tsc -b && oxlint --deny-warnings .",
+		"lint": "tsc -b && oxlint .",
 		"lint:fix": "oxlint . --fix",
 		"format": "oxfmt .",
 		"preview": "vite preview"

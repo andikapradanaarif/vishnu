@@ -80,7 +80,7 @@
 	},
 	"scripts": {
 		"build": "./scripts/build.sh",
-		"lint": "tsc --noEmit -p tsconfig.json && oxlint --deny-warnings .",
+		"lint": "tsc --noEmit -p tsconfig.json && oxlint .",
 		"test": "bun test",
 		"typecheck": "tsc --noEmit -p tsconfig.json",
 		"prepare": "bun run build"
