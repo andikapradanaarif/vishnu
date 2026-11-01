@@ -7,6 +7,7 @@ import { EventsClient } from "@vishnu/api-contract/events";
 import { PermissionsClient } from "@vishnu/api-contract/permissions";
 import { ProjectsClient } from "@vishnu/api-contract/projects";
 import { QuestionsClient } from "@vishnu/api-contract/questions";
+import { ServerClient } from "@vishnu/api-contract/server";
 import { SessionsClient } from "@vishnu/api-contract/sessions";
 import { UsersClient } from "@vishnu/api-contract/users";
 import { WorkspacesClient } from "@vishnu/api-contract/workspaces";
@@ -62,6 +63,7 @@ export let configClient = new ConfigClient(crushClient);
 export let permissionsClient = new PermissionsClient(crushClient);
 export let questionsClient = new QuestionsClient(crushClient);
 export let eventsClient = new EventsClient(crushClient);
+export let serverClient = new ServerClient(crushClient);
 
 /**
  * Rebind the crush domain clients to a project. Call this whenever the
@@ -77,4 +79,5 @@ export function bindProject(pid: string | undefined): void {
 	permissionsClient = new PermissionsClient(crushClient);
 	questionsClient = new QuestionsClient(crushClient);
 	eventsClient = new EventsClient(crushClient);
+	serverClient = new ServerClient(crushClient);
 }

@@ -2,6 +2,7 @@ import { Dialog } from "@vishnu/ui-component/dialog";
 import { Switch } from "@vishnu/ui-component";
 import { Button } from "@vishnu/ui-component/button";
 import {
+	useCrushVersion,
 	useSessions,
 	useSetProjectPermissionsSkip,
 	useSetSessionPermissionsSkip,
@@ -33,6 +34,7 @@ export function SettingsDialog({
 	const setWorkspaceSkip = useSetProjectPermissionsSkip(wid);
 	const setSessionSkip = useSetSessionPermissionsSkip(wid, sid);
 	const { data: sessions } = useSessions(wid);
+	const { data: version } = useCrushVersion(pid);
 	const session = sid ? sessions?.find((s) => s.id === sid) : undefined;
 	const override = session?.permission_skip;
 	const effective = override ?? workspaceSkip;
@@ -118,6 +120,15 @@ export function SettingsDialog({
 
 				{error && <p className="mt-1 font-display text-xs text-danger-400">{errorLabel(error)}</p>}
 			</section>
+
+			{version && (
+				<p
+					className="mt-5 border-t-2 border-border pt-3 font-display text-xs text-on-surface-muted"
+					title={`commit ${version.commit} · ${version.platform} · ${version.go_version}`}
+				>
+					crush {version.version}
+				</p>
+			)}
 		</Dialog>
 	);
 }

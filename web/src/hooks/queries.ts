@@ -6,6 +6,7 @@ import {
 	permissionsClient,
 	projectsClient,
 	questionsClient,
+	serverClient,
 	sessionsClient,
 	workspacesClient,
 } from "@/services/api";
@@ -34,6 +35,7 @@ export const queryKeys = {
 	providers: (wid: string) => ["providers", wid] as const,
 	config: (wid: string) => ["config", wid] as const,
 	permissionsSkip: (wid: string) => ["permissions-skip", wid] as const,
+	crushVersion: (pid: string) => ["crush-version", pid] as const,
 	pendingPermissions: (wid: string, sid?: string) =>
 		sid ? (["pending-permissions", wid, sid] as const) : (["pending-permissions", wid] as const),
 	needsInit: (wid: string) => ["needs-init", wid] as const,
@@ -179,6 +181,19 @@ export function useNeedsInit(wid: string | undefined) {
 		queryKey: queryKeys.needsInit(wid ?? ""),
 		queryFn: () => workspacesClient.needsInit(wid!),
 		enabled: !!wid,
+	});
+}
+
+/**
+ * `GET /version` — build info of the bound project's crush child.
+ * Project-scoped, not workspace-scoped, so the key carries the pid.
+ */
+export function useCrushVersion(pid: string | undefined) {
+	return useQuery({
+		queryKey: queryKeys.crushVersion(pid ?? ""),
+		queryFn: () => serverClient.version(),
+		enabled: !!pid,
+		staleTime: 60_000,
 	});
 }
 
