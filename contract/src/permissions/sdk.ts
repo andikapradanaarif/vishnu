@@ -1,15 +1,18 @@
 import { buildPath, type ApiClient } from "../client";
 import {
+	v1WorkspaceById,
 	v1WorkspacePermissionsGrant,
-	v1WorkspacePermissionsSkip,
+	v1WorkspacePermissionsMode,
 	v1WorkspaceSessionPermissionsPending,
 	v1WorkspaceSessionPermissionsSkip,
 } from "../paths";
 import type {
 	PermissionAction,
 	PermissionRequest,
+	PermissionSetModeRequest,
 	PermissionSkipRequest,
 	ResolvedResponse,
+	Workspace,
 } from "../types";
 
 /**
@@ -50,18 +53,27 @@ export class PermissionsClient {
 		);
 	}
 
-	/** GET `/workspaces/{id}/permissions/skip` — read the skip toggle. */
-	getSkip(workspaceId: string): Promise<PermissionSkipRequest> {
-		return this.api.get<PermissionSkipRequest>(
-			buildPath(v1WorkspacePermissionsSkip, { id: workspaceId }),
+	/**
+	 * Workspace-level skip was replaced by permission modes in v0.99.1 —
+	 * there is no dedicated read endpoint, so this derives the legacy
+	 * bool from the workspace resource's `permission_mode`.
+	 */
+	async getSkip(workspaceId: string): Promise<PermissionSkipRequest> {
+		const workspace = await this.api.get<Workspace>(
+			buildPath(v1WorkspaceById, { id: workspaceId }),
 		);
+		return { skip: (workspace.permission_mode ?? "normal") !== "normal" };
 	}
 
-	/** POST `/workspaces/{id}/permissions/skip` — toggle auto-allow (yolo-ish). */
+	/**
+	 * POST `/workspaces/{id}/permissions/mode` — toggle auto-allow.
+	 * Maps the legacy bool onto the mode enum (yolo ⇄ normal); the
+	 * fork's `sysadmin` mode is settable only through crush itself.
+	 */
 	setSkip(workspaceId: string, skip: boolean): Promise<void> {
-		return this.api.post<void>(buildPath(v1WorkspacePermissionsSkip, { id: workspaceId }), {
-			skip,
-		} satisfies PermissionSkipRequest);
+		return this.api.post<void>(buildPath(v1WorkspacePermissionsMode, { id: workspaceId }), {
+			mode: skip ? "yolo" : "normal",
+		} satisfies PermissionSetModeRequest);
 	}
 
 	/**

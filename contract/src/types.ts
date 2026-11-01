@@ -8,7 +8,7 @@
 export interface Workspace {
 	id: string;
 	path: string;
-	yolo?: boolean;
+	permission_mode?: WorkspacePermissionMode;
 	debug?: boolean;
 	data_dir?: string;
 	version?: string;
@@ -34,7 +34,7 @@ export interface SkillState {
 export interface CreateWorkspaceRequest {
 	path: string;
 	client_id: string;
-	yolo?: boolean;
+	permission_mode?: WorkspacePermissionMode;
 	debug?: boolean;
 	data_dir?: string;
 }
@@ -274,6 +274,14 @@ export interface PermissionNotification {
 export interface PermissionSkipRequest {
 	/** Workspace scope rejects null; session scope sends null to inherit. */
 	skip: boolean | null;
+}
+
+/** Workspace-level permission enforcement — replaced the `skip` bool in v0.99.1. */
+export type WorkspacePermissionMode = "normal" | "yolo" | "sysadmin";
+
+/** Body for `POST /workspaces/{id}/permissions/mode`. */
+export interface PermissionSetModeRequest {
+	mode: WorkspacePermissionMode;
 }
 
 /** Sets or clears a session's large-model override; null = inherit. */

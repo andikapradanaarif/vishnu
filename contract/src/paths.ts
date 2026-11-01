@@ -38,7 +38,7 @@ export const v1WorkspaceSessionPermissionsPending =
 export const v1WorkspaceSessionPermissionsSkip = "/workspaces/{id}/sessions/{sid}/permissions/skip";
 export const v1WorkspaceSessionModel = "/workspaces/{id}/sessions/{sid}/model";
 export const v1WorkspacePermissionsGrant = "/workspaces/{id}/permissions/grant";
-export const v1WorkspacePermissionsSkip = "/workspaces/{id}/permissions/skip";
+export const v1WorkspacePermissionsMode = "/workspaces/{id}/permissions/mode";
 export const v1WorkspaceQuestionsAnswer = "/workspaces/{id}/questions/answer";
 export const v1WorkspaceQuestionsCancel = "/workspaces/{id}/questions/cancel";
 
