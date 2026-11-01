@@ -247,8 +247,10 @@ item shrink-wraps), Tabs, Button, Input, etc. Web consumes its built
 ## The crush fork
 
 `api/Dockerfile` builds `crush` from a pinned commit of
-`andikapradanaarif/crush` (`CRUSH_REF` + `CRUSH_VERSION` args — bump
-both together). The fork keeps upstream's module path and adds
+`andikapradanaarif/crush` (`CRUSH_REF` + `CRUSH_VERSION` args —
+`api/scripts/bump-crush.sh [ref]` rewrites both from `git describe`,
+also syncing the compose fallback). The fork keeps upstream's module
+path and adds
 server-mode features vishnu depends on:
 
 - multi-pending permission tracking + `…/permissions/pending` list

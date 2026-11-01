@@ -98,9 +98,11 @@ slide forward on use, so revoking means deleting the row.
 - Events: `GET /v1/workspaces/{id}/events?client_id=<uuid>` (SSE).
 - Content parts are `{type, data}` envelopes; SSE payloads are `{type, payload}`.
 - The image bakes a pinned `andikapradanaarif/crush` fork commit
-  (`CRUSH_REF`/`CRUSH_VERSION` args in `api/Dockerfile` — bump both
-  together); the fork is the supported engine — an upstream binary is
-  not a drop-in (missing endpoints, `crushrc` keys hard-fail).
+  (`CRUSH_REF`/`CRUSH_VERSION` args in `api/Dockerfile` — bump via
+  `make bump-crush` / `api/scripts/bump-crush.sh [ref]`, which rewrites
+  both args and the compose fallback); the fork is the supported
+  engine — an upstream binary is not a drop-in (missing endpoints,
+  `crushrc` keys hard-fail).
 - Pending prompts: server republishes pending permission/question
   requests on `POST …/current-session` (the web reports it on room
   mount); `GET …/sessions/{sid}/permissions/pending` is the truth

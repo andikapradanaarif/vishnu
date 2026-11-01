@@ -1,4 +1,4 @@
-.PHONY: db migrate migratedown migratestatus dev build test lint format tidy up logs deploy push-api push-web
+.PHONY: db migrate migratedown migratestatus dev build test lint format tidy up logs deploy push-api push-web bump-crush
 
 # Host-side targets read api/.env via godotenv (internal/config init) —
 # no env plumbing needed here. deploy/.env stays compose-only so its
@@ -23,6 +23,11 @@ logs:
 # server run `make deploy` — pulls, migrates, recreates, health-checks.
 deploy:
 	./deploy/deploy.sh
+
+# Bump the pinned crush fork commit + stamped version in the Dockerfile.
+# REF defaults to main: `make bump-crush` or `make bump-crush REF=<sha|tag>`.
+bump-crush:
+	./scripts/bump-crush.sh $(REF)
 
 push-api:
 	./scripts/deploy-ghcr.sh
