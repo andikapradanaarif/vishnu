@@ -125,7 +125,10 @@ func (u *ProjectUsecase) EnsureWorkspace(ctx context.Context, id string) (dto.Wo
 		path = *project.Path
 	}
 
-	workspaceID, err := u.workspaces.EnsureWorkspace(ctx, upstream, path, project.Mode == domain.ProjectModeManaged)
+	// The ensure work warms shared process state — a dropped client
+	// (Cloudflare's ~100s edge timeout, a closed tab) that cancels it
+	// mid-init aborts the init and the next caller pays it again.
+	workspaceID, err := u.workspaces.EnsureWorkspace(context.WithoutCancel(ctx), upstream, path, project.Mode == domain.ProjectModeManaged)
 	if err != nil {
 		return dto.WorkspaceResponse{}, err
 	}
