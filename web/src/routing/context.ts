@@ -26,7 +26,11 @@ export async function requireUser(context: RouterContext) {
 
 export async function loadProject(context: RouterContext, projectId: string) {
 	const [workspace, projects] = await Promise.all([
-		context.queryClient.ensureQueryData({
+		// fetchQuery, not ensureQueryData: a cached wid dies with its
+		// crush child (idle self-exit, api restart), and ensureQueryData
+		// hands the stale value back forever — the SSE self-heal's
+		// invalidate would keep resolving the dead id.
+		context.queryClient.fetchQuery({
 			queryKey: queryKeys.projectWorkspace(projectId),
 			queryFn: () => projectsClient.workspace(projectId),
 			staleTime: 0,
