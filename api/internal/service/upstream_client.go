@@ -25,8 +25,15 @@ var (
 // proxy's streaming Upstream: these calls are short JSON requests and get
 // a timeout, where the proxy must never time out an SSE stream.
 type CrushClient struct {
-	client   *http.Client
-	clientID string
+	client *http.Client
+	// initClient backs calls that may pay a cold child's lazy backend
+	// init (~40s on a large .crush db): the port binds and /v1/health
+	// answers instantly, but the first workspace-scoped request blocks
+	// until init completes — and cancelling it aborts init, so the next
+	// call starts it over. It must outlive init; the shared client's
+	// 10s ceiling is what turned every ensure into a 502 loop.
+	initClient *http.Client
+	clientID   string
 }
 
 type Workspace struct {
@@ -40,8 +47,9 @@ type AgentInfo struct {
 
 func NewCrushClient() *CrushClient {
 	return &CrushClient{
-		client:   &http.Client{Timeout: 10 * time.Second},
-		clientID: uuid.NewString(),
+		client:     &http.Client{Timeout: 10 * time.Second},
+		initClient: &http.Client{Timeout: 2 * time.Minute},
+		clientID:   uuid.NewString(),
 	}
 }
 
@@ -73,14 +81,14 @@ func (c *CrushClient) EnsureWorkspace(ctx context.Context, upstream, path string
 // endpoint answers "agent coordinator not initialized".
 func (c *CrushClient) EnsureAgent(ctx context.Context, upstream, workspaceID string) error {
 	var info AgentInfo
-	if err := c.call(ctx, upstream, http.MethodGet, "/v1/workspaces/"+workspaceID+"/agent", nil, &info); err != nil {
+	if err := c.call(ctx, c.initClient, upstream, http.MethodGet, "/v1/workspaces/"+workspaceID+"/agent", nil, &info); err != nil {
 		return err
 	}
 	if info.IsReady {
 		return nil
 	}
 	path := fmt.Sprintf("/v1/workspaces/%s/agent/init?client_id=%s", workspaceID, c.clientID)
-	return c.call(ctx, upstream, http.MethodPost, path, nil, nil)
+	return c.call(ctx, c.initClient, upstream, http.MethodPost, path, nil, nil)
 }
 
 // SetMainAgent applies the project's persisted agent choice to a live
@@ -89,7 +97,7 @@ func (c *CrushClient) EnsureAgent(ctx context.Context, upstream, workspaceID str
 // the stored choice replayed.
 func (c *CrushClient) SetMainAgent(ctx context.Context, upstream, workspaceID, agent string) error {
 	path := "/v1/workspaces/" + workspaceID + "/agent/main"
-	return c.call(ctx, upstream, http.MethodPost, path, map[string]string{"agent_id": agent}, nil)
+	return c.call(ctx, c.client, upstream, http.MethodPost, path, map[string]string{"agent_id": agent}, nil)
 }
 
 // SetPermissionSkip applies the project's persisted auto-approve
@@ -97,12 +105,12 @@ func (c *CrushClient) SetMainAgent(ctx context.Context, upstream, workspaceID, a
 // every freshly ensured workspace starts at "off" and needs it replayed.
 func (c *CrushClient) SetPermissionSkip(ctx context.Context, upstream, workspaceID string, skip bool) error {
 	path := "/v1/workspaces/" + workspaceID + "/permissions/skip"
-	return c.call(ctx, upstream, http.MethodPost, path, map[string]bool{"skip": skip}, nil)
+	return c.call(ctx, c.client, upstream, http.MethodPost, path, map[string]bool{"skip": skip}, nil)
 }
 
 func (c *CrushClient) listWorkspaces(ctx context.Context, upstream string) ([]Workspace, error) {
 	var workspaces []Workspace
-	if err := c.call(ctx, upstream, http.MethodGet, "/v1/workspaces", nil, &workspaces); err != nil {
+	if err := c.call(ctx, c.initClient, upstream, http.MethodGet, "/v1/workspaces", nil, &workspaces); err != nil {
 		return nil, err
 	}
 	return workspaces, nil
@@ -112,7 +120,7 @@ func (c *CrushClient) createWorkspace(ctx context.Context, upstream, path string
 	body := map[string]string{"path": path, "client_id": c.clientID}
 
 	var workspace Workspace
-	if err := c.call(ctx, upstream, http.MethodPost, "/v1/workspaces", body, &workspace); err != nil {
+	if err := c.call(ctx, c.initClient, upstream, http.MethodPost, "/v1/workspaces", body, &workspace); err != nil {
 		return "", err
 	}
 	if workspace.ID == "" {
@@ -121,7 +129,7 @@ func (c *CrushClient) createWorkspace(ctx context.Context, upstream, path string
 	return workspace.ID, nil
 }
 
-func (c *CrushClient) call(ctx context.Context, upstream, method, path string, body any, out any) error {
+func (c *CrushClient) call(ctx context.Context, client *http.Client, upstream, method, path string, body any, out any) error {
 	var reader io.Reader
 	if body != nil {
 		encoded, err := json.Marshal(body)
@@ -140,7 +148,7 @@ func (c *CrushClient) call(ctx context.Context, upstream, method, path string, b
 	}
 	req.Header.Set("Accept", "application/json")
 
-	resp, err := c.client.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		return fmt.Errorf("%w: %s", ErrUpstreamUnreachable, upstream)
 	}

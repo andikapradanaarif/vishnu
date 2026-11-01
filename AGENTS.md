@@ -103,6 +103,14 @@ slide forward on use, so revoking means deleting the row.
   both args and the compose fallback); the fork is the supported
   engine — an upstream binary is not a drop-in (missing endpoints,
   `crushrc` keys hard-fail).
+- Crush binds its port and answers `/v1/health` instantly, but the
+  project backend initializes lazily — the first workspace-scoped call
+  blocks ~40s on a large `.crush` db, and cancelling that call aborts
+  init so the next one starts over. Ensure-path calls (`CrushClient`
+  list/create/agent) use a 120s `initClient`, not the 10s default.
+- Servers self-exit on idle (`Server idle, shutting down`, ~120s) and
+  workspaces die with the process — the web re-resolves the workspace
+  every loader pass (`fetchQuery`, never a cached wid).
 - Pending prompts: server republishes pending permission/question
   requests on `POST …/current-session` (the web reports it on room
   mount); `GET …/sessions/{sid}/permissions/pending` is the truth
