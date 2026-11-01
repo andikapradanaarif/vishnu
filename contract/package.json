@@ -76,6 +76,11 @@
 			"types": "./dist/events/index.d.ts",
 			"import": "./dist/events/index.js",
 			"default": "./dist/events/index.js"
+		},
+		"./server": {
+			"types": "./dist/server/index.d.ts",
+			"import": "./dist/server/index.js",
+			"default": "./dist/server/index.js"
 		}
 	},
 	"scripts": {

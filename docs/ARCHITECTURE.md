@@ -229,7 +229,8 @@ src/
   paths.ts        all /v1 path templates ({id},{sid} placeholders)
   types.ts        shared wire types (Session, Message, PermissionRequest, …)
   <domain>/{sdk,index}.ts   agent, auth, config, events, permissions,
-                            projects, questions, sessions, users, workspaces
+                            projects, questions, server (GET /version),
+                            sessions, users, workspaces
 ```
 
 Built with `bun run build` (tsc declarations + bun build per entry);

@@ -10,6 +10,7 @@
  */
 import { buildPath } from "./client";
 
+export const v1Version = "/version";
 export const v1Workspaces = "/workspaces";
 export const v1WorkspaceById = "/workspaces/{id}";
 export const v1WorkspaceSessions = "/workspaces/{id}/sessions";

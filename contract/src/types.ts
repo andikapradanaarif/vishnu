@@ -46,6 +46,17 @@ export interface ErrorBody {
 	code?: string;
 }
 
+// ---------- Server ----------
+
+/** `GET /version` response — crush server build info (proto.VersionInfo). */
+export interface VersionInfo {
+	version: string;
+	commit: string;
+	build_id: string;
+	go_version: string;
+	platform: string;
+}
+
 export interface Todo {
 	content: string;
 	status: string;
