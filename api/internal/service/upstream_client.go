@@ -101,11 +101,17 @@ func (c *CrushClient) SetMainAgent(ctx context.Context, upstream, workspaceID, a
 }
 
 // SetPermissionSkip applies the project's persisted auto-approve
-// default to a live workspace. Crush keeps this flag in memory only, so
-// every freshly ensured workspace starts at "off" and needs it replayed.
+// default to a live workspace — v0.99.1 replaced the workspace-level
+// skip bool with a permission mode (yolo ⇄ normal), so the persisted
+// bool maps onto it. Crush keeps the mode in memory only, so every
+// freshly ensured workspace starts at "normal" and needs it replayed.
 func (c *CrushClient) SetPermissionSkip(ctx context.Context, upstream, workspaceID string, skip bool) error {
-	path := "/v1/workspaces/" + workspaceID + "/permissions/skip"
-	return c.call(ctx, c.client, upstream, http.MethodPost, path, map[string]bool{"skip": skip}, nil)
+	mode := "normal"
+	if skip {
+		mode = "yolo"
+	}
+	path := "/v1/workspaces/" + workspaceID + "/permissions/mode"
+	return c.call(ctx, c.client, upstream, http.MethodPost, path, map[string]string{"mode": mode}, nil)
 }
 
 func (c *CrushClient) listWorkspaces(ctx context.Context, upstream string) ([]Workspace, error) {

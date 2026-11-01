@@ -111,6 +111,12 @@ slide forward on use, so revoking means deleting the row.
 - Servers self-exit on idle (`Server idle, shutting down`, ~120s) and
   workspaces die with the process — the web re-resolves the workspace
   every loader pass (`fetchQuery`, never a cached wid).
+- Workspace permission level is a mode in v0.99.1, not a bool:
+  `POST …/permissions/mode` (`normal`|`yolo`|`sysadmin`) replaced
+  `/permissions/skip`; the current mode rides the workspace resource as
+  `permission_mode` (no dedicated GET). vishnu maps its persisted
+  `permission_skip` bool → yolo/normal. Session-scope
+  `/sessions/{sid}/permissions/skip` is unchanged.
 - Pending prompts: server republishes pending permission/question
   requests on `POST …/current-session` (the web reports it on room
   mount); `GET …/sessions/{sid}/permissions/pending` is the truth
