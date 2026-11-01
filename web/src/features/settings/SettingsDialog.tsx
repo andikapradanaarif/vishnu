@@ -60,6 +60,7 @@ export function SettingsDialog({
 						showLabels
 						agentClassName="w-full font-display"
 						modelClassName="w-full font-display"
+						effortClassName="w-full font-display"
 					/>
 				</div>
 			</section>

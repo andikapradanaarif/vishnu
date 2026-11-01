@@ -52,6 +52,7 @@ export function TopBar({
 				sid={sessionId}
 				agentClassName="hidden w-28 shrink-0 font-display sm:block sm:w-36 md:ml-auto"
 				modelClassName="hidden !w-auto min-w-0 font-display lg:block"
+				effortClassName="hidden !w-auto min-w-0 font-display xl:block"
 			/>
 
 			<button

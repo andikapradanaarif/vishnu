@@ -21,6 +21,20 @@ const AGENT_LABELS: Record<string, string> = {
     the session's model_override. */
 const INHERIT_MODEL = "__inherit__";
 
+/** Select value that writes `reasoning_effort: ""` — the session pin
+    falls back to the model's own default effort. Only offered when a
+    model override exists (crush TUI parity: a bare "default" pick
+    would pin the configured model for no effect). */
+const MODEL_DEFAULT_EFFORT = "__model_default__";
+
+const EFFORT_LABELS: Record<string, string> = {
+	low: "Low",
+	medium: "Medium",
+	high: "High",
+	xhigh: "Extra high",
+	max: "Max",
+};
+
 interface AgentModelControlsProps {
 	/** Project id — the agent choice is persisted on the project row. */
 	pid: string;
@@ -30,6 +44,7 @@ interface AgentModelControlsProps {
 	sid?: string;
 	agentClassName?: string;
 	modelClassName?: string;
+	effortClassName?: string;
 	/** Dialogs show field labels; the compact topbar uses placeholders. */
 	showLabels?: boolean;
 }
@@ -43,6 +58,7 @@ export function AgentModelControls({
 	sid,
 	agentClassName,
 	modelClassName,
+	effortClassName,
 	showLabels,
 }: AgentModelControlsProps) {
 	const { data: agentInfo } = useAgentInfo(wid);
@@ -87,6 +103,31 @@ export function AgentModelControls({
 	const effective = override ?? agentInfo?.model_cfg;
 	const currentModelValue = effective ? `${effective.provider}/${effective.model}` : undefined;
 
+	// Effort picker: gates on the effective model's catwalk entry —
+	// can_reason + declared levels, same as the TUI reasoning dialog.
+	const effortLevels = useMemo(() => {
+		if (!effective) return [];
+		const provider = providers?.find((p) => p.id === effective.provider);
+		const catwalk = provider?.models?.find((m) => m.id === effective.model);
+		if (!catwalk?.can_reason) return [];
+		return catwalk.reasoning_levels ?? [];
+	}, [providers, effective]);
+
+	const effortOptions = useMemo<SelectOption<string>[]>(() => {
+		const levels = effortLevels.map((v) => ({ value: v, label: EFFORT_LABELS[v] ?? v }));
+		// Revert entry clears the effort on the session pin — only when an
+		// override exists, else "default" would pin the configured model
+		// for no effect (crush TUI parity).
+		if (sid && override) {
+			return [{ value: MODEL_DEFAULT_EFFORT, label: "Model default" }, ...levels];
+		}
+		return levels;
+	}, [effortLevels, sid, override]);
+
+	const currentEffort = effective?.reasoning_effort ?? "";
+	const effortValue =
+		currentEffort === "" ? (sid && override ? MODEL_DEFAULT_EFFORT : undefined) : currentEffort;
+
 	const agentOptions = useMemo<SelectOption<string>[]>(() => {
 		const ids = Object.keys(config?.agents ?? {});
 		const list = ids.length > 0 ? ids : Object.keys(AGENT_LABELS);
@@ -110,6 +151,24 @@ export function AgentModelControls({
 		const model = rest.join("/");
 		if (!provider || !model) return;
 		setModel.mutate({ modelType: "large", model: { provider, model } });
+	};
+
+	const onEffortChange = (v: string) => {
+		const effort = v === MODEL_DEFAULT_EFFORT ? "" : v;
+		if (sid) {
+			if (!effective?.provider || !effective.model) return;
+			// Skip the write when the pick already resolves — persisting
+			// would only pin the configured model for no effect (TUI parity).
+			if (!override && effort === (agentInfo?.model_cfg?.reasoning_effort ?? "")) return;
+			setSessionModel.mutate({ ...effective, reasoning_effort: effort });
+			return;
+		}
+		const configured = agentInfo?.model_cfg;
+		if (!configured?.provider || !configured.model) return;
+		setModel.mutate({
+			modelType: "large",
+			model: { ...configured, reasoning_effort: effort },
+		});
 	};
 
 	const namePrefix = showLabels ? "settings" : "topbar";
@@ -140,6 +199,19 @@ export function AgentModelControls({
 				className={modelClassName}
 				isLoading={modelPending}
 			/>
+			{effortLevels.length > 0 && (
+				<Select
+					name={`${namePrefix}-effort`}
+					size="md"
+					label={showLabels ? (sid ? "Session effort" : "Default effort") : undefined}
+					placeholder={currentEffort ? "Effort" : "Effort · model default"}
+					value={effortValue}
+					options={effortOptions}
+					onChange={onEffortChange}
+					className={effortClassName}
+					isLoading={modelPending}
+				/>
+			)}
 		</>
 	);
 }

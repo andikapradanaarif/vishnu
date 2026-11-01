@@ -109,6 +109,13 @@ slide forward on use, so revoking means deleting the row.
   raise, not a resolution.
 - `.crush/` data dirs are locked per process — never share a project
   path between two crush processes.
+- Session effort: `reasoning_effort` rides inside the `SelectedModel`
+  posted to `POST …/sessions/{sid}/model` — pins per-session effort on
+  the model override (applies next run; `""` = model default). Offered
+  levels come from `reasoning_levels` + `can_reason` on
+  `GET …/providers`; a crushrc-declared model needs
+  `model add --reasoning-level` (fork #420) to advertise its own
+  vocabulary, since effort only applies when it's a declared level.
 
 ## Conventions
 
