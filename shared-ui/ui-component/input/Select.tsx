@@ -374,7 +374,10 @@ function SelectItem<T>(props: SelectItemProps<T>) {
 	return (
 		<div
 			onClick={() => {
-				if (!option?.disabled) {
+				// Group headers only toggle — a click bubbles up from the
+				// expandable row below and must not also select the group's
+				// own value (that would close the popover mid-navigation).
+				if (!option?.disabled && !hasSubMenu) {
 					handleSelect(option.value, option);
 				}
 			}}
