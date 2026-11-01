@@ -1,12 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { Icon } from "@iconify/react";
 import { Button } from "@vishnu/ui-component/button";
+import type { TextContent } from "@vishnu/api-contract";
 import {
 	useCancelRun,
 	useClearPrompts,
 	useCreateSession,
 	useInitProject,
+	useMessages,
 	useNeedsInit,
 	usePermissionsSkip,
 	useRunShell,
@@ -61,21 +63,75 @@ export function Composer({ wid, sid, busy }: ComposerProps) {
 	const { projectId } = useParams({ strict: false }) as { projectId?: string };
 	const areaRef = useRef<HTMLTextAreaElement>(null);
 
-	// The composer isn't remounted on session switches — drop per-session
-	// scratch state (draft, notices, shell output) so nothing from the
-	// previous session leaks into the next.
-	useEffect(() => {
-		setValue("");
-		setCmdMsg(null);
-		setShellOut(null);
-		setMenuDismissed(false);
-	}, [sid]);
+	// Drafts persist per session so switching rooms and back doesn't lose
+	// an in-progress message; every write path funnels through setDraft
+	// so storage always tracks what's in the box.
+	const draftKey = `vishnu:draft:${wid}:${sid}`;
+	const setDraft = (v: string) => {
+		setValue(v);
+		if (v) localStorage.setItem(draftKey, v);
+		else localStorage.removeItem(draftKey);
+	};
+
+	// Sent-prompt history for ArrowUp recall — steps back from the newest
+	// user text part; `null` while the box holds a fresh (non-browsed)
+	// draft. browsedDraft stashes the draft in progress when browsing
+	// begins so ArrowDown past the newest entry restores it.
+	const { data: messages } = useMessages(wid, sid);
+	const history = useMemo(() => {
+		const out: string[] = [];
+		for (const m of messages ?? []) {
+			if (m.role !== "user") continue;
+			for (const p of m.parts) {
+				if (p.type !== "text") continue;
+				const d = p.data as TextContent;
+				if (d.hidden) continue;
+				const text = d.text?.trim();
+				if (text) out.push(text);
+			}
+		}
+		return out;
+	}, [messages]);
+	const [historyIdx, setHistoryIdx] = useState<number | null>(null);
+	const browsedDraft = useRef("");
 
 	const autogrow = () => {
 		const el = areaRef.current;
 		if (!el) return;
 		el.style.height = "auto";
 		el.style.height = `${Math.min(el.scrollHeight, 200)}px`;
+	};
+
+	// The composer isn't remounted on session switches — swap in the new
+	// room's stored draft and drop the rest of the per-session scratch
+	// state (notices, shell output, browsing) so nothing leaks across.
+	useEffect(() => {
+		setValue(localStorage.getItem(draftKey) ?? "");
+		setCmdMsg(null);
+		setShellOut(null);
+		setMenuDismissed(false);
+		setHistoryIdx(null);
+		requestAnimationFrame(autogrow);
+	}, [draftKey]);
+
+	const recall = (dir: 1 | -1) => {
+		if (dir === 1) {
+			const next = historyIdx === null ? 0 : historyIdx + 1;
+			if (next >= history.length) return;
+			if (historyIdx === null) browsedDraft.current = value;
+			setHistoryIdx(next);
+			setDraft(history[history.length - 1 - next]);
+		} else {
+			if (historyIdx === null) return;
+			const next = historyIdx - 1;
+			setHistoryIdx(next < 0 ? null : next);
+			setDraft(next < 0 ? browsedDraft.current : history[history.length - 1 - next]);
+		}
+		requestAnimationFrame(() => {
+			const el = areaRef.current;
+			el?.setSelectionRange(el.value.length, el.value.length);
+			autogrow();
+		});
 	};
 
 	const cmdNotice = (ok: boolean, text: string) => setCmdMsg({ ok, text });
@@ -180,14 +236,14 @@ export function Composer({ wid, sid, busy }: ComposerProps) {
 
 	const pick = (cmd: SlashCommand) => {
 		if (cmd.takesArg) {
-			setValue(`/${cmd.name} `);
+			setDraft(`/${cmd.name} `);
 			requestAnimationFrame(() => {
 				autogrow();
 				areaRef.current?.focus();
 			});
 			return;
 		}
-		setValue("");
+		setDraft("");
 		setShellOut(null);
 		requestAnimationFrame(autogrow);
 		cmd.run("");
@@ -197,7 +253,7 @@ export function Composer({ wid, sid, busy }: ComposerProps) {
 		const m = prompt.match(/^\/(\S+)\s*(.*)$/s);
 		const cmd = m && commands.find((c) => c.name === m[1].toLowerCase());
 		if (!cmd) return false;
-		setValue("");
+		setDraft("");
 		setShellOut(null);
 		requestAnimationFrame(autogrow);
 		cmd.run(m![2]?.trim() ?? "");
@@ -208,15 +264,19 @@ export function Composer({ wid, sid, busy }: ComposerProps) {
 		const prompt = value.trim();
 		if (!prompt || sendPrompt.isPending) return;
 		setCmdMsg(null);
+		setHistoryIdx(null);
 		if (runSlash(prompt)) return;
-		setValue("");
+		setDraft("");
 		setShellOut(null);
 		requestAnimationFrame(autogrow);
-		sendPrompt.mutate({
-			session_id: sid,
-			prompt,
-			run_id: crypto.randomUUID(),
-		});
+		sendPrompt.mutate(
+			{
+				session_id: sid,
+				prompt,
+				run_id: crypto.randomUUID(),
+			},
+			{ onError: () => setDraft(prompt) },
+		);
 	};
 
 	return (
@@ -280,9 +340,10 @@ export function Composer({ wid, sid, busy }: ComposerProps) {
 						value={value}
 						placeholder={busy ? "agent is working…" : "message the agent…"}
 						onChange={(e) => {
-							setValue(e.target.value);
+							setDraft(e.target.value);
 							setMenuIdx(0);
 							setMenuDismissed(false);
+							setHistoryIdx(null);
 							autogrow();
 						}}
 						onKeyDown={(e) => {
@@ -307,6 +368,26 @@ export function Composer({ wid, sid, busy }: ComposerProps) {
 									pick(filtered[activeIdx]);
 									return;
 								}
+							}
+							// Readline-style recall: ArrowUp on the first line steps
+							// back through sent prompts, ArrowDown walks toward the
+							// draft that was in progress. Once browsing, arrows cycle
+							// unconditionally — caret is pinned to the end anyway.
+							if (e.key === "ArrowUp") {
+								const el = e.currentTarget;
+								const onFirstLine =
+									el.selectionStart === el.selectionEnd &&
+									!el.value.slice(0, el.selectionStart).includes("\n");
+								if (historyIdx !== null || (onFirstLine && history.length > 0)) {
+									e.preventDefault();
+									recall(1);
+								}
+								return;
+							}
+							if (e.key === "ArrowDown" && historyIdx !== null) {
+								e.preventDefault();
+								recall(-1);
+								return;
 							}
 							if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
 								e.preventDefault();
