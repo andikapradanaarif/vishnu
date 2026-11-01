@@ -51,6 +51,10 @@ for IMAGE in "$API_IMAGE" "$WEB_IMAGE"; do
     else
         docker pull "$IMAGE:latest"
     fi
+    # Print the resolved digest so a tag that didn't move (missing
+    # push, stale registry view) is visible instead of silently
+    # recreating onto the same image.
+    echo "  $IMAGE:latest -> $(docker image inspect --format '{{index .RepoDigests 0}}' "$IMAGE:latest" 2>/dev/null || echo '(not found)')"
 done
 echo "  Done."
 echo ""
