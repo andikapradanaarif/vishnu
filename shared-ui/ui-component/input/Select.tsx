@@ -209,8 +209,9 @@ export default function Select<T = string>({
 	}, [options, isSearchable, searchQuery]);
 
 	const handleSelect = (optionValue: T, option: SelectOption<T>) => {
-		// filteredOptions items are shallow clones (filterTree maps to `{...item, options: []}`),
-		// so resolve the consumer's original option to keep onChange's second arg reference-equal.
+		// filteredOptions items are shallow clones (filterTree maps via
+		// `{...item, options: children}`), so resolve the consumer's
+		// original option to keep onChange's second arg reference-equal.
 		const original = flattenOptions.find((o) => Object.is(o.value, optionValue));
 		onChange(optionValue, original ?? option);
 		setIsOpen(false);

@@ -41,57 +41,70 @@ describe("flatten", () => {
 });
 
 describe("filterTree", () => {
-	it("filters items by predicate, keeping matching parents and children", () => {
+	const mapNode = (node: TreeNode, children: TreeNode[]) => ({ ...node, children });
+
+	it("keeps ancestors with only the matching descendants", () => {
 		const result = filterTree(
 			tree,
 			(node) => node.children,
-			(node, children) => ({ ...node, children }),
-			(node) => node.name.includes("Child"),
+			mapNode,
+			(node) => node.name === "Child A",
 		);
-		const ids = result.map((n) => n.id);
-		// "Child A" and "Child B" match, plus grandchild is included as a child
-		expect(ids).toContain("2");
-		expect(ids).toContain("3");
+		// Root doesn't match but survives to carry Child A.
+		expect(result).toHaveLength(1);
+		expect(result[0].id).toBe("1");
+		expect(result[0].children?.map((n) => n.id)).toEqual(["2"]);
+		// Child A's own subtree is kept intact on a direct match.
+		expect(result[0].children?.[0].children?.map((n) => n.id)).toEqual(["4"]);
+	});
+
+	it("keeps the whole subtree when the parent matches", () => {
+		const result = filterTree(
+			tree,
+			(node) => node.children,
+			mapNode,
+			(node) => node.name === "Root",
+		);
+		expect(result).toHaveLength(1);
+		expect(result[0].children?.map((n) => n.id)).toEqual(["2", "3"]);
 	});
 
 	it("returns empty array for empty input", () => {
 		const result = filterTree(
 			[],
 			(node: TreeNode) => node.children,
-			(node, children) => ({ ...node, children }),
+			mapNode,
 			() => true,
 		);
 		expect(result).toEqual([]);
 	});
 
-	it("includes all nodes when predicate always true", () => {
+	it("returns the full tree when predicate always true", () => {
 		const result = filterTree(
 			tree,
 			(node) => node.children,
-			(node, children) => ({ ...node, children }),
+			mapNode,
 			() => true,
 		);
-		// All items should be included: root, child A, grandchild, child B, standalone
-		expect(result.length).toBe(5);
+		expect(result.map((n) => n.id)).toEqual(["1", "5"]);
+		expect(result[0].children?.map((n) => n.id)).toEqual(["2", "3"]);
 	});
 
 	it("excludes all nodes when predicate always false", () => {
 		const result = filterTree(
 			tree,
 			(node) => node.children,
-			(node, children) => ({ ...node, children }),
+			mapNode,
 			() => false,
 		);
-		// Parent nodes are excluded but children are still pushed
-		// The traverse function pushes mappedChildren regardless of predicate
-		expect(result.length).toBe(0);
+		expect(result).toEqual([]);
 	});
 
 	it("filters standalone nodes", () => {
 		const result = filterTree(
 			tree,
 			(node) => node.children,
-			(node, children) => ({ ...node, children }),
+			mapNode,
 			(node) => node.id === "5",
 		);
 		expect(result.map((n) => n.id)).toEqual(["5"]);

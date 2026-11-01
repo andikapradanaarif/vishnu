@@ -6,24 +6,19 @@ export function filterTree<T>(
 ): T[] {
 	const result: T[] = [];
 
-	function traverse(items: T[]) {
-		for (const item of items) {
-			const children = getChildren(item) || [];
-			const mappedChildren = traverse(children);
-			const mappedItem = mapFn(item, mappedChildren);
-
-			if (predicate(mappedItem)) {
-				result.push(mappedItem);
-			}
-
-			if (children.length > 0) {
-				result.push(...mappedChildren);
-			}
+	for (const item of items) {
+		if (predicate(item)) {
+			// The node itself matches — keep it with its whole subtree
+			// (a provider search shows every model in the group).
+			result.push(mapFn(item, getChildren(item) ?? []));
+			continue;
 		}
-		return [];
+		const mappedChildren = filterTree(getChildren(item) ?? [], getChildren, mapFn, predicate);
+		if (mappedChildren.length > 0) {
+			result.push(mapFn(item, mappedChildren));
+		}
 	}
 
-	traverse(items);
 	return result;
 }
 
