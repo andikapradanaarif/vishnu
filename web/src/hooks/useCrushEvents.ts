@@ -142,6 +142,11 @@ function dispatch(
 			if (!sid) break;
 			if (ev.type === "error" || ev.done) pendingStore.setBusy(sid, false);
 			else pendingStore.setBusy(sid, true);
+			// Provider auth failures name their provider so the UI can
+			// direct a re-login instead of showing a bare error.
+			if (ev.type === "error" && ev.provider_id) {
+				pendingStore.setReauth(sid, { provider: ev.provider_id, url: ev.aws_sso_url });
+			}
 			break;
 		}
 		case "permission_request":
@@ -164,6 +169,8 @@ function dispatch(
 		case "run_complete": {
 			const rc = payload as RunComplete;
 			pendingStore.setBusy(rc.session_id, false);
+			// A completed run is proof the provider credentials work again.
+			if (!rc.error) pendingStore.clearReauth(rc.session_id);
 			queryClient.invalidateQueries({
 				queryKey: queryKeys.messages(workspaceId, rc.session_id),
 			});
