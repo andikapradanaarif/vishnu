@@ -61,7 +61,9 @@ shell-capable agent must not be LAN-exposed), `DB_{HOST,PORT,NAME,USER,PASS}`
 `VISHNU_BOOTSTRAP_EMAIL` (upserted as an admin user at startup),
 `VISHNU_SESSION_TTL` (default `720h`), `VISHNU_PROJECTS_DIR` (clone
 destination, default `$VISHNU_DATA_DIR/projects`), `VISHNU_CRUSH_BIN`,
-`VISHNU_PORT_START` (default `9201`),
+`VISHNU_PORT_START` (default `9201`), `VISHNU_CRUSH_DETACH_GRACE`
+(seconds passed to children as `CRUSH_SERVER_DETACH_GRACE`, default
+`120`; set `10` for upstream's default),
 `BREVO_{API_KEY,API_URL,FROM_EMAIL,FROM_NAME}` (sign-in codes; when
 unconfigured the code is logged so local sign-in still works).
 
@@ -108,23 +110,60 @@ slide forward on use, so revoking means deleting the row.
   blocks ~40s on a large `.crush` db, and cancelling that call aborts
   init so the next one starts over. Ensure-path calls (`CrushClient`
   list/create/agent) use a 120s `initClient`, not the 10s default.
-- Servers self-exit on idle (`Server idle, shutting down`, ~120s) and
-  workspaces die with the process — the web re-resolves the workspace
-  every loader pass (`fetchQuery`, never a cached wid).
+- Servers self-exit on idle (`Server idle, shutting down`) — the timer
+  arms at listen now, `CRUSH_SERVER_IDLE_TIMEOUT` seconds (60 default),
+  and `/v1/health` answers 503 once closing (vishnu reads non-2xx as
+  down and respawns). Workspaces die with the process — the web
+  re-resolves the workspace every loader pass (`fetchQuery`, never a
+  cached wid).
 - Workspace permission level is a mode in v0.99.1, not a bool:
   `POST …/permissions/mode` (`normal`|`yolo`|`sysadmin`) replaced
   `/permissions/skip`; the current mode rides the workspace resource as
   `permission_mode` (no dedicated GET). vishnu maps its persisted
-  `permission_skip` bool → yolo/normal. Session-scope
-  `/sessions/{sid}/permissions/skip` is unchanged.
+  `permission_skip` bool → yolo/normal — note yolo changed in v0.101:
+  it now *refuses* dangerous commands; `sysadmin` keeps the old
+  approve-everything behavior. Session-scope
+  `/sessions/{sid}/permissions/skip` is unchanged; session-runtime
+  `POST …/sessions/{sid}/auto-approve` grants all future prompts like
+  `crush run` (not persisted — re-arm after restarts).
 - Pending prompts: server republishes pending permission/question
   requests on `POST …/current-session` (the web reports it on room
-  mount); `GET …/sessions/{sid}/permissions/pending` is the truth
-  source the web reconciles cards against on mount/focus/SSE reopen —
-  a `permission_notification` with `granted:false,denied:false` is a
-  raise, not a resolution.
+  mount and every SSE `onopen`); `GET …/sessions/{sid}/permissions/pending`
+  is the truth source the web reconciles cards against on
+  mount/focus/SSE reopen — a `permission_notification` with
+  `granted:false,denied:false` is a raise, not a resolution.
+- Question batches: `POST …/questions/cancel` takes an optional
+  `{batch_request_id}` body — without it the cancel is a no-op when
+  several batches are pending, so the web always sends it.
+- Skills: `GET …/skills` lists *visible* skills only; repo toggles ride
+  `GET/POST …/skills/disabled` + `GET …/skills/enabled`, the global
+  `options.disabled_skills` flag via `POST …/skills/config-disabled`.
+  Live changes arrive on `skills_event`.
+- New wire fields (v0.100/0.101, all additive): `sub_agent_report`
+  content parts `{label, output, failed, model}`, `model_name` on
+  messages, `provider_id` on agent error events (reauth surfacing —
+  the web banners it per session), `started_at_ms`/`finished_at_ms`
+  on tool_call/tool_result (per-tool elapsed in the transcript).
+- Cross-origin guard (v0.101+): TCP servers reject requests whose Host
+  isn't localhost/an IP literal/the listen addr, and any request whose
+  `Origin` host differs from the request Host — so the proxy strips
+  `Origin`, `Referer`, `Sec-Fetch-*` and `X-Forwarded-*` (browser
+  POSTs would otherwise 403). External projects must register their
+  upstream by IP literal or a hostname matching the server's `--host`.
+- Lagging event streams are closed by the server (a dropped event = a
+  dropped permission). EventSource auto-reconnects; the web re-POSTs
+  `current-session` on every `onopen` because pending *question*
+  batches are only re-delivered that way (permissions have a pending
+  GET; questions don't). A dropped `run_complete` is re-healed by the
+  sessions `is_busy` reconcile.
+- Unwatched runs are cancelled: when the last client viewing a session
+  detaches past `CRUSH_SERVER_DETACH_GRACE` (upstream 10s), its run is
+  cancelled — closing the tab mid-run now kills it. vishnu spawns
+  children with `VISHNU_CRUSH_DETACH_GRACE` (default 120s) so a
+  suspended tab doesn't abort work.
 - `.crush/` data dirs are locked per process — never share a project
-  path between two crush processes.
+  path between two crush processes. `CRUSH_DATA_DIR` can relocate the
+  per-project data dir (unused today).
 - Session effort: `reasoning_effort` rides inside the `SelectedModel`
   posted to `POST …/sessions/{sid}/model` — pins per-session effort on
   the model override (applies next run; `""` = model default). Offered
