@@ -102,6 +102,25 @@ var requestCredentials = map[string]bool{
 	"Authorization": true,
 }
 
+// browserMetadata are headers the browser sets to describe the page that
+// issued the request. The proxy is the crush server's actual client, so
+// they must not cross: crush's cross-origin guard compares Origin's host
+// against the upstream Host (127.0.0.1:port) and 403s every mutating
+// browser call when they differ. Referer and the Sec-Fetch-* family go
+// with it — they describe an origin that is not the upstream's.
+var browserMetadata = map[string]bool{
+	"Origin":            true,
+	"Referer":           true,
+	"Sec-Fetch-Dest":    true,
+	"Sec-Fetch-Mode":    true,
+	"Sec-Fetch-Site":    true,
+	"Sec-Fetch-User":    true,
+	"X-Forwarded-For":   true,
+	"X-Forwarded-Host":  true,
+	"X-Forwarded-Proto": true,
+	"X-Real-Ip":         true,
+}
+
 // copyHeader copies inbound request headers to the outbound request, dropping
 // hop-by-hop headers, the caller's credentials and Accept-Encoding (the
 // transport re-adds gzip itself and transparently decodes the response).
@@ -111,6 +130,8 @@ func copyHeader(dst, src http.Header) {
 		case hopByHopHeaders[http.CanonicalHeaderKey(key)]:
 			continue
 		case requestCredentials[http.CanonicalHeaderKey(key)]:
+			continue
+		case browserMetadata[http.CanonicalHeaderKey(key)]:
 			continue
 		case strings.EqualFold(key, "Accept-Encoding"):
 			continue
