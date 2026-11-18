@@ -97,6 +97,8 @@ export interface Message {
 	session_id: string;
 	parts: ContentPart[];
 	model: string;
+	/** Display name of the model that produced the message (persisted since v0.100). */
+	model_name?: string;
 	provider: string;
 	prism_model_id?: string;
 	prism_model_name?: string;
@@ -126,6 +128,8 @@ export interface ToolCall {
 	type?: string;
 	provider_executed?: boolean;
 	finished?: boolean;
+	/** Unix ms when the call started (v0.101+). */
+	started_at_ms?: number;
 }
 
 export interface ToolResult {
@@ -136,6 +140,8 @@ export interface ToolResult {
 	mime_type?: string;
 	metadata: string;
 	is_error: boolean;
+	/** Unix ms when the call finished (v0.101+). */
+	finished_at_ms?: number;
 }
 
 export interface Finish {
@@ -150,6 +156,15 @@ export interface ShellCommand {
 	output: string;
 }
 
+/** A finished subagent's report back into the parent's transcript (v0.101+). */
+export interface SubAgentReport {
+	/** The subagent's friendly name (e.g. "Ada"). */
+	label: string;
+	output: string;
+	failed?: boolean;
+	model?: string;
+}
+
 export type ContentPart =
 	| { type: "text"; data: TextContent }
 	| { type: "reasoning"; data: ReasoningContent }
@@ -157,6 +172,7 @@ export type ContentPart =
 	| { type: "tool_result"; data: ToolResult }
 	| { type: "finish"; data: Finish }
 	| { type: "shell_command"; data: ShellCommand }
+	| { type: "sub_agent_report"; data: SubAgentReport }
 	| { type: "image_url"; data: { url: string; detail?: string } }
 	| { type: "binary"; data: unknown }
 	| { type: string; data: unknown };
@@ -183,6 +199,8 @@ export interface AgentEvent {
 	message: Message;
 	error?: string;
 	run_id?: string;
+	/** Provider that needs reauthentication — set on error events (v0.101+). */
+	provider_id?: string;
 	session_id?: string;
 	session_title?: string;
 	progress?: string;
@@ -243,6 +261,10 @@ export interface CrushConfig {
 	agents?: Record<string, { name?: string; description?: string; model?: string }>;
 	models?: Partial<Record<SelectedModelType, SelectedModel>>;
 	recent_models?: Partial<Record<SelectedModelType, SelectedModel[]>>;
+	options?: {
+		/** Skill names disabled in the global config (all repos). */
+		disabled_skills?: string[];
+	};
 }
 
 // ---------- Permissions & questions ----------
@@ -328,6 +350,15 @@ export interface QuestionAnswer {
 	responses: QuestionResponseItem[];
 }
 
+/**
+ * Body for `POST /workspaces/{id}/questions/cancel`. Optional on the
+ * wire — without it crush cancels the only pending batch, and nothing
+ * when several are pending; always send it once a batch id is known.
+ */
+export interface QuestionCancel {
+	batch_request_id: string;
+}
+
 export interface QuestionNotification {
 	batch_id: string;
 	session_id: string;
@@ -356,6 +387,47 @@ export interface ShellCommandResponse {
 	exit_code: number;
 }
 
+// ---------- Skills ----------
+
+/** A visible skill (`GET /workspaces/{id}/skills`, proto.SkillInfo). */
+export interface SkillInfo {
+	id: string;
+	name: string;
+	description: string;
+	label: string;
+	source: string;
+	user_invocable: boolean;
+}
+
+/** `POST /workspaces/{id}/skills/read` response (proto.ReadSkillResponse). */
+export interface ReadSkillResponse {
+	/** base64-encoded raw file content on the wire. */
+	content: string;
+	result: { name: string; description: string };
+}
+
+/** Toggle body for the skills disabled/config-disabled endpoints. */
+export interface SkillSetDisabledRequest {
+	name: string;
+	disabled: boolean;
+}
+
+/** `skills_event` SSE payload. */
+export interface SkillsEvent {
+	states: SkillState[];
+}
+
+// ---------- Client presence ----------
+
+/**
+ * `client_session` SSE payload — which session another client of the
+ * same workspace is viewing. Powers "also viewing" indicators.
+ */
+export interface ClientSession {
+	client_id: string;
+	session_id: string;
+}
+
 // ---------- SSE event envelope ----------
 
 export type EventPayloadType =
@@ -364,6 +436,8 @@ export type EventPayloadType =
 	| "agent_event"
 	| "permission_request"
 	| "permission_notification"
+	| "permissions_skip_changed"
+	| "permission_mode_changed"
 	| "question_batch_request"
 	| "question_batch_notification"
 	| "run_complete"
@@ -372,7 +446,13 @@ export type EventPayloadType =
 	| "lsp_event"
 	| "mcp_event"
 	| "file"
-	| "skills_event";
+	| "skills_event"
+	| "client_session"
+	| "host_theme"
+	| "pinentry_prompt_request"
+	| "pinentry_prompt_notification"
+	| "ssh_prompt_request"
+	| "ssh_prompt_notification";
 
 export interface EventPayload {
 	type: EventPayloadType | string;

@@ -2,10 +2,11 @@ import { useEffect, useRef } from "react";
 import { Button } from "@vishnu/ui-component/button";
 import { EmptyState } from "@vishnu/ui-component/emptyState";
 import { useMessages, useSessions } from "@/hooks/queries";
-import { usePendingState } from "@/services/pendingStore";
+import { pendingStore, usePendingState } from "@/services/pendingStore";
 import { LoadingSpinner } from "@vishnu/ui-component/loadingAnimation";
 import { errorLabel } from "@/utils/errors";
-import type { Message } from "@vishnu/api-contract";
+import { descendantsOf } from "@/utils/sessions";
+import type { Message, ToolResult } from "@vishnu/api-contract";
 import { MessagePart } from "./MessageParts";
 import { TodoList } from "./TodoList";
 import { PermissionCard } from "@/features/prompts/PermissionCard";
@@ -19,13 +20,17 @@ interface ChatPaneProps {
 export function ChatPane({ wid, sid }: ChatPaneProps) {
 	const { data: messages, isLoading, error, refetch, isRefetching } = useMessages(wid, sid);
 	const { data: sessions } = useSessions(wid);
-	const { busy, permissions, questions, conn } = usePendingState();
+	const { busy, permissions, questions, conn, reauth: reauthBySid } = usePendingState();
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const pinned = useRef(true);
 	const hadMessages = useRef(false);
 
-	const sessionPermissions = permissions.filter((p) => p.session_id === sid);
-	const sessionQuestions = questions.filter((q) => q.session_id === sid);
+	// Prompts from this session's sub-agent sessions land here too —
+	// crush delivers them to the parent's viewers under the child's id.
+	const covered = descendantsOf(sessions ?? [], sid);
+	const sessionPermissions = permissions.filter((p) => covered.has(p.session_id));
+	const sessionQuestions = questions.filter((q) => covered.has(q.session_id));
+	const reauth = reauthBySid[sid];
 	const todos = sessions?.find((s) => s.id === sid)?.todos;
 	const doneCount = todos?.filter((t) => t.status === "completed").length ?? 0;
 
@@ -100,6 +105,37 @@ export function ChatPane({ wid, sid }: ChatPaneProps) {
 					/>
 				)}
 
+				{reauth && (
+					<div className="flex items-center gap-2 border border-danger-500/60 bg-danger-950/30 px-3 py-1.5 font-display text-xs text-danger-300">
+						<span className="min-w-0 flex-1">
+							provider <span className="font-mono">{reauth.provider}</span> needs reauthentication —
+							sign in on the agent host
+							{reauth.url && (
+								<>
+									{" "}
+									or open{" "}
+									<a
+										href={reauth.url}
+										target="_blank"
+										rel="noreferrer"
+										className="text-info-300 underline"
+									>
+										the verification page
+									</a>
+								</>
+							)}
+							.
+						</span>
+						<button
+							type="button"
+							onClick={() => pendingStore.clearReauth(sid)}
+							className="shrink-0 cursor-pointer font-display text-danger-400 hover:text-danger-300"
+						>
+							DISMISS
+						</button>
+					</div>
+				)}
+
 				{conn !== "open" && (
 					<div className="flex items-center justify-center gap-2 border border-dashed border-warning-500/50 bg-warning-950/20 px-3 py-1.5 font-display text-xs text-warning-400">
 						<LoadingSpinner size={12} className="text-warning-400" />
@@ -143,11 +179,21 @@ export function ChatPane({ wid, sid }: ChatPaneProps) {
 }
 
 function MessageView({ message }: { message: Message }) {
+	// tool_call parts carry started_at_ms; pairing them with their
+	// result's finished_at_ms yields the elapsed time on the call header.
+	const results = new Map<string, ToolResult>();
+	for (const p of message.parts) {
+		if (p.type === "tool_result") {
+			const r = p.data as ToolResult;
+			results.set(r.tool_call_id, r);
+		}
+	}
+
 	if (message.role === "user") {
 		return (
 			<div className="self-end max-w-[85%] border-2 border-pink-500/60 bg-pink-500/10 px-3.5 py-2">
 				{message.parts.map((p, i) => (
-					<MessagePart key={i} part={p} role={message.role} />
+					<MessagePart key={i} part={p} role={message.role} results={results} />
 				))}
 			</div>
 		);
@@ -156,7 +202,7 @@ function MessageView({ message }: { message: Message }) {
 	return (
 		<div className="flex flex-col gap-1.5">
 			{message.parts.map((p, i) => (
-				<MessagePart key={i} part={p} role={message.role} />
+				<MessagePart key={i} part={p} role={message.role} results={results} />
 			))}
 		</div>
 	);

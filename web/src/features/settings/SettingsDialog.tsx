@@ -2,13 +2,20 @@ import { Dialog } from "@vishnu/ui-component/dialog";
 import { Switch } from "@vishnu/ui-component";
 import { Button } from "@vishnu/ui-component/button";
 import {
+	useConfig,
 	useCrushVersion,
 	useSessions,
 	useSetProjectPermissionsSkip,
 	useSetSessionPermissionsSkip,
+	useSetSkillConfigDisabled,
+	useSetSkillDisabled,
+	useSkillRepoToggles,
+	useSkills,
 } from "../../hooks/queries";
 import { AgentModelControls } from "../topbar/AgentModelControls";
 import { errorLabel } from "../../utils/errors";
+import { clamp } from "../../utils/format";
+import type { SkillInfo } from "@vishnu/api-contract";
 
 interface SettingsDialogProps {
 	/** Project id — the workspace default is persisted on the project row. */
@@ -121,6 +128,8 @@ export function SettingsDialog({
 				{error && <p className="mt-1 font-display text-xs text-danger-400">{errorLabel(error)}</p>}
 			</section>
 
+			<SkillsSection wid={wid} />
+
 			{version && (
 				<p
 					className="mt-5 border-t-2 border-border pt-3 font-display text-xs text-on-surface-muted"
@@ -130,5 +139,84 @@ export function SettingsDialog({
 				</p>
 			)}
 		</Dialog>
+	);
+}
+
+/**
+ * Workspace skills: the switch is the repo-scoped override — a repo
+ * "enabled" override wins over a global (`options.disabled_skills`)
+ * disable, a repo disable hides an otherwise-visible skill. The text
+ * button flips the global flag for every repo.
+ */
+function SkillsSection({ wid }: { wid: string }) {
+	const skills = useSkills(wid);
+	const { disabled, enabled } = useSkillRepoToggles(wid);
+	const config = useConfig(wid);
+	const setDisabled = useSetSkillDisabled(wid);
+	const setConfigDisabled = useSetSkillConfigDisabled(wid);
+
+	const configDisabled = new Set(config.data?.options?.disabled_skills ?? []);
+	const repoDisabled = new Set(disabled.data ?? []);
+	const repoEnabled = new Set(enabled.data ?? []);
+
+	// The visible list only covers active skills — union it with every
+	// override list so a disabled skill still has a row to re-enable from.
+	const byName = new Map<string, { info?: SkillInfo }>();
+	for (const s of skills.data ?? []) byName.set(s.name, { info: s });
+	for (const name of [...repoDisabled, ...repoEnabled, ...configDisabled]) {
+		if (!byName.has(name)) byName.set(name, {});
+	}
+	if (byName.size === 0) return null;
+
+	const pending = setDisabled.isPending || setConfigDisabled.isPending;
+	const error = setDisabled.error ?? setConfigDisabled.error;
+
+	return (
+		<section className="mt-5 border-t-2 border-border pt-4">
+			<h3 className="font-display text-lg text-on-surface">Skills</h3>
+			<p className="mt-1 text-xs text-on-surface-muted">
+				Skills the agent can see in this repository. The switch is the repo override — it can
+				re-enable a globally disabled skill for this project alone.
+			</p>
+			<div className="mt-3 flex flex-col gap-2.5">
+				{[...byName.entries()].map(([name, { info }]) => {
+					const globallyOff = configDisabled.has(name);
+					const repoOn = !repoDisabled.has(name) && (!globallyOff || repoEnabled.has(name));
+					return (
+						<div key={name} className="flex items-start justify-between gap-3">
+							<div className="min-w-0">
+								<div className="font-display text-sm text-on-surface">{info?.label || name}</div>
+								{info?.description && (
+									<div className="text-[11px] text-on-surface-muted">
+										{clamp(info.description, 96)}
+									</div>
+								)}
+								<div className="mt-0.5 flex items-center gap-2 text-[11px] text-ghost">
+									{info?.source && <span>{info.source}</span>}
+									{globallyOff && <span className="text-warning-400">off globally</span>}
+									{!globallyOff && repoEnabled.has(name) && (
+										<span className="text-info-300">repo: on</span>
+									)}
+									<button
+										type="button"
+										disabled={pending}
+										onClick={() => setConfigDisabled.mutate({ name, disabled: !globallyOff })}
+										className="cursor-pointer underline decoration-dotted underline-offset-2 hover:text-on-surface"
+									>
+										{globallyOff ? "enable everywhere" : "disable everywhere"}
+									</button>
+								</div>
+							</div>
+							<Switch
+								name={`skill-${name}`}
+								checked={repoOn}
+								onChange={(value) => setDisabled.mutate({ name, disabled: !value })}
+							/>
+						</div>
+					);
+				})}
+			</div>
+			{error && <p className="mt-1 font-display text-xs text-danger-400">{errorLabel(error)}</p>}
+		</section>
 	);
 }

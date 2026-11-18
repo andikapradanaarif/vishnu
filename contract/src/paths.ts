@@ -39,8 +39,14 @@ export const v1WorkspaceSessionPermissionsSkip = "/workspaces/{id}/sessions/{sid
 export const v1WorkspaceSessionModel = "/workspaces/{id}/sessions/{sid}/model";
 export const v1WorkspacePermissionsGrant = "/workspaces/{id}/permissions/grant";
 export const v1WorkspacePermissionsMode = "/workspaces/{id}/permissions/mode";
+export const v1WorkspaceSessionAutoApprove = "/workspaces/{id}/sessions/{sid}/auto-approve";
 export const v1WorkspaceQuestionsAnswer = "/workspaces/{id}/questions/answer";
 export const v1WorkspaceQuestionsCancel = "/workspaces/{id}/questions/cancel";
+export const v1WorkspaceSkills = "/workspaces/{id}/skills";
+export const v1WorkspaceSkillsRead = "/workspaces/{id}/skills/read";
+export const v1WorkspaceSkillsDisabled = "/workspaces/{id}/skills/disabled";
+export const v1WorkspaceSkillsEnabled = "/workspaces/{id}/skills/enabled";
+export const v1WorkspaceSkillsConfigDisabled = "/workspaces/{id}/skills/config-disabled";
 
 // ---------- vishnu project routing ----------
 

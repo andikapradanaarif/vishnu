@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { useQueryClient, type QueryClient } from "@tanstack/react-query";
-import { eventsClient } from "@/services/api";
+import { eventsClient, sessionsClient } from "@/services/api";
 import { pendingStore } from "@/services/pendingStore";
 import type {
 	AgentEvent,
@@ -19,8 +19,13 @@ import { queryKeys, useSessions } from "@/hooks/queries";
 /**
  * Attaches the workspace SSE stream and fans events out to the query
  * cache + pending store. EventSource auto-reconnects on error.
+ *
+ * `sessionId` is the session this tab views: it is re-reported on every
+ * (re)open because crush drops a lagging client's stream, and pending
+ * question batches are only re-delivered to a client that re-registers
+ * its current session (permissions have a pending GET; questions don't).
  */
-export function useCrushEvents(workspaceId: string | undefined) {
+export function useCrushEvents(workspaceId: string | undefined, sessionId?: string) {
 	const queryClient = useQueryClient();
 	const router = useRouter();
 	const sessions = useSessions(workspaceId);
@@ -42,6 +47,12 @@ export function useCrushEvents(workspaceId: string | undefined) {
 		const es = new EventSource(eventsClient.url(workspaceId));
 		es.onopen = () => {
 			pendingStore.setConn("open");
+			// Re-report the viewed session — required after crush closed a
+			// lagging stream for pending question batches to be re-delivered.
+			// Best-effort: a not-yet-attached client is refused server-side.
+			if (sessionId) {
+				void sessionsClient.setCurrent(workspaceId, sessionId).catch(() => {});
+			}
 			// Catch up after a reconnect: runs continue server-side while
 			// the tab is suspended, so the stream alone may have missed
 			// messages.
@@ -89,7 +100,7 @@ export function useCrushEvents(workspaceId: string | undefined) {
 			es.close();
 			pendingStore.setConn("closed");
 		};
-	}, [workspaceId, queryClient]);
+	}, [workspaceId, sessionId, queryClient]);
 }
 
 function dispatch(
@@ -131,6 +142,11 @@ function dispatch(
 			if (!sid) break;
 			if (ev.type === "error" || ev.done) pendingStore.setBusy(sid, false);
 			else pendingStore.setBusy(sid, true);
+			// Provider auth failures name their provider so the UI can
+			// direct a re-login instead of showing a bare error.
+			if (ev.type === "error" && ev.provider_id) {
+				pendingStore.setReauth(sid, { provider: ev.provider_id, url: ev.aws_sso_url });
+			}
 			break;
 		}
 		case "permission_request":
@@ -153,12 +169,19 @@ function dispatch(
 		case "run_complete": {
 			const rc = payload as RunComplete;
 			pendingStore.setBusy(rc.session_id, false);
+			// A completed run is proof the provider credentials work again.
+			if (!rc.error) pendingStore.clearReauth(rc.session_id);
 			queryClient.invalidateQueries({
 				queryKey: queryKeys.messages(workspaceId, rc.session_id),
 			});
 			queryClient.invalidateQueries({ queryKey: queryKeys.sessions(workspaceId) });
 			break;
 		}
+		case "skills_event":
+			queryClient.invalidateQueries({ queryKey: queryKeys.skills(workspaceId) });
+			queryClient.invalidateQueries({ queryKey: queryKeys.skillsDisabled(workspaceId) });
+			queryClient.invalidateQueries({ queryKey: queryKeys.skillsEnabled(workspaceId) });
+			break;
 		case "config_changed":
 			queryClient.invalidateQueries({ queryKey: queryKeys.agent(workspaceId) });
 			queryClient.invalidateQueries({ queryKey: queryKeys.providers(workspaceId) });

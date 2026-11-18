@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { usePendingPermissions, useReportCurrentSession, useSessions } from "@/hooks/queries";
 import { pendingStore, usePendingState } from "@/services/pendingStore";
+import { descendantsOf } from "@/utils/sessions";
 import { ChatPane } from "@/features/chat/ChatPane";
 import { Composer } from "@/features/chat/Composer";
 
@@ -37,27 +38,4 @@ export function SessionView({ wid, sessionId }: SessionViewProps) {
 			<Composer wid={wid} sid={sessionId} busy={!!busy[sessionId]} />
 		</>
 	);
-}
-
-/**
- * Session ids the pending endpoint's response covers: the session
- * itself plus every transitive sub-agent session (it reports their
- * requests under their own session ids).
- */
-function descendantsOf(
-	sessions: { id: string; parent_session_id: string }[],
-	rootId: string,
-): ReadonlySet<string> {
-	const covered = new Set([rootId]);
-	let grew = true;
-	while (grew) {
-		grew = false;
-		for (const s of sessions) {
-			if (!covered.has(s.id) && covered.has(s.parent_session_id)) {
-				covered.add(s.id);
-				grew = true;
-			}
-		}
-	}
-	return covered;
 }

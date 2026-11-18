@@ -31,7 +31,7 @@ export function AppShell({ project, wid }: AppShellProps) {
 	// the settings dialog writes to, so prefer the fresher one.
 	const current = projects?.find((p) => p.id === project.id) ?? project;
 
-	useCrushEvents(wid);
+	useCrushEvents(wid, activeSessionId);
 
 	// If the URL points at a deleted session, fall back to the project home.
 	useEffect(() => {

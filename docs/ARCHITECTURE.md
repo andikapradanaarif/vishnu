@@ -99,6 +99,21 @@ that spawned it.
   forwards method/body/headers, streams the response back. SSE
   (`…/events`) uses `SendStreamWriter` with no upstream timeout;
   regular calls have a client timeout.
+- Header scrub on the way out: hop-by-hop + `Host`, caller credentials
+  (`Cookie`, `Authorization`), `Accept-Encoding`, and browser fetch
+  metadata (`Origin`, `Referer`, `Sec-Fetch-*`, `X-Forwarded-*`). The
+  last group is required by crush's cross-origin guard — it 403s a
+  request whose `Origin` host differs from the upstream Host, which is
+  every browser POST through a proxy.
+- Crush closes an SSE stream when the client falls behind (an event
+  drop = a possible dropped prompt). EventSource reconnects on its
+  own; the web re-POSTs `current-session` on `onopen` to re-arm
+  question-batch redelivery and revalidates messages/sessions/pending
+  permissions.
+- A session's run is cancelled when its last viewer detaches past
+  `CRUSH_SERVER_DETACH_GRACE` (upstream 10s; children get
+  `VISHNU_CRUSH_DETACH_GRACE`, default 120s, so tab sleeps don't abort
+  work). `/v1/health` answers 503 once the server commits to shutdown.
 - **Agent auto-init**: when a sessions-list request
   (`/v1/workspaces/{id}/sessions`) arrives, `ensureAgent` fires
   `EnsureAgent` in the background — throttled to once per 30s per
@@ -230,7 +245,7 @@ src/
   types.ts        shared wire types (Session, Message, PermissionRequest, …)
   <domain>/{sdk,index}.ts   agent, auth, config, events, permissions,
                             projects, questions, server (GET /version),
-                            sessions, users, workspaces
+                            sessions, skills, users, workspaces
 ```
 
 Built with `bun run build` (tsc declarations + bun build per entry);

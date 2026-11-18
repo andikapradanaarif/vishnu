@@ -3,6 +3,7 @@ import {
 	v1WorkspaceById,
 	v1WorkspacePermissionsGrant,
 	v1WorkspacePermissionsMode,
+	v1WorkspaceSessionAutoApprove,
 	v1WorkspaceSessionPermissionsPending,
 	v1WorkspaceSessionPermissionsSkip,
 } from "../paths";
@@ -89,6 +90,19 @@ export class PermissionsClient {
 				sid: sessionId,
 			}),
 			{ skip } satisfies PermissionSkipRequest,
+		);
+	}
+
+	/**
+	 * POST `/workspaces/{id}/sessions/{sid}/auto-approve` — grant every
+	 * permission request the session raises from now on, as `crush run`
+	 * does for its own session. Runtime-only (unlike the persisted skip
+	 * flag): the approval lasts while the workspace is hosted, so it
+	 * must be re-armed after a crush restart.
+	 */
+	autoApproveSession(workspaceId: string, sessionId: string): Promise<void> {
+		return this.api.post<void>(
+			buildPath(v1WorkspaceSessionAutoApprove, { id: workspaceId, sid: sessionId }),
 		);
 	}
 }

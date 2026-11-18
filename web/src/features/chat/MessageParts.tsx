@@ -1,4 +1,11 @@
-import type { ContentPart, Message, Todo, ToolCall, ToolResult } from "@vishnu/api-contract";
+import type {
+	ContentPart,
+	Message,
+	SubAgentReport,
+	Todo,
+	ToolCall,
+	ToolResult,
+} from "@vishnu/api-contract";
 import { clamp, prettyJson } from "@/utils/format";
 import { Markdown } from "./Markdown";
 import { TodoList } from "./TodoList";
@@ -14,8 +21,32 @@ function parsePlan(input: string): Todo[] | null {
 	}
 }
 
+/** Elapsed time between a tool call's start and its result's finish. */
+function elapsedMs(call: ToolCall, results?: ReadonlyMap<string, ToolResult>): number | null {
+	if (!call.started_at_ms) return null;
+	const end = results?.get(call.id)?.finished_at_ms;
+	if (!end || end < call.started_at_ms) return null;
+	return end - call.started_at_ms;
+}
+
+function formatElapsed(ms: number): string {
+	if (ms < 1000) return `${ms}ms`;
+	if (ms < 60_000) return `${(ms / 1000).toFixed(1)}s`;
+	const m = Math.floor(ms / 60_000);
+	return `${m}m ${Math.round((ms - m * 60_000) / 1000)}s`;
+}
+
 /** Renders one content part of a message in reading order. */
-export function MessagePart({ part, role }: { part: ContentPart; role: Message["role"] }) {
+export function MessagePart({
+	part,
+	role,
+	results,
+}: {
+	part: ContentPart;
+	role: Message["role"];
+	/** tool_call_id → result, for elapsed time on calls (v0.101+ fields). */
+	results?: ReadonlyMap<string, ToolResult>;
+}) {
 	switch (part.type) {
 		case "text": {
 			const { text, hidden } = part.data as { text: string; hidden?: boolean };
@@ -41,12 +72,18 @@ export function MessagePart({ part, role }: { part: ContentPart; role: Message["
 		case "tool_call": {
 			const call = part.data as ToolCall;
 			const plan = call.name === "todos" ? parsePlan(call.input) : null;
+			const elapsed = elapsedMs(call, results);
 			return (
 				<div className="border border-border bg-raised px-3 py-2">
 					<div className="flex items-center gap-1.5 font-display text-sm text-info-300">
 						<span className="font-mono">{call.name}</span>
 						{!call.finished && (
 							<span className="blink ml-auto font-display text-xs text-warning-400">running</span>
+						)}
+						{call.finished && elapsed !== null && (
+							<span className="ml-auto font-display text-xs text-ghost">
+								{formatElapsed(elapsed)}
+							</span>
 						)}
 					</div>
 					{plan && (
@@ -83,6 +120,38 @@ export function MessagePart({ part, role }: { part: ContentPart; role: Message["
 						{clamp(res.content, 6000)}
 					</pre>
 				</details>
+			);
+		}
+		case "sub_agent_report": {
+			const report = part.data as SubAgentReport;
+			return (
+				<div
+					className={`border px-3 py-2 ${
+						report.failed
+							? "border-danger-500/60 bg-danger-950/30"
+							: "border-violet-500/50 bg-violet-950/20"
+					}`}
+				>
+					<div className="flex items-center gap-1.5 font-display text-sm text-violet-300">
+						<span>{report.label || "subagent"}</span>
+						{report.model && (
+							<span className="truncate font-mono text-xs text-ghost">{report.model}</span>
+						)}
+						{report.failed && (
+							<span className="ml-auto font-display text-xs text-danger-400">failed</span>
+						)}
+					</div>
+					{report.output.trim() && (
+						<details className="mt-1" open={report.failed}>
+							<summary className="cursor-pointer font-display text-sm text-ghost select-none">
+								report
+							</summary>
+							<div className="mt-1 text-[13px]">
+								<Markdown>{report.output}</Markdown>
+							</div>
+						</details>
+					)}
+				</div>
 			);
 		}
 		case "shell_command": {

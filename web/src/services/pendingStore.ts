@@ -1,6 +1,13 @@
 import { useSyncExternalStore } from "react";
 import type { PermissionRequest, QuestionRequest } from "@vishnu/api-contract";
 
+/** A provider that reported it needs reauthentication for a session. */
+export interface ReauthNotice {
+	provider: string;
+	/** Verification URL when the flow exposes one (e.g. AWS SSO). */
+	url?: string;
+}
+
 /**
  * Tiny external store for SSE-driven UI state that doesn't belong in
  * the query cache: pending permission/question prompts, per-session
@@ -13,6 +20,8 @@ export interface PendingState {
 	permissions: PermissionRequest[];
 	questions: QuestionRequest[];
 	busy: Record<string, boolean>;
+	/** session_id → provider that needs reauthentication (agent_event errors). */
+	reauth: Record<string, ReauthNotice>;
 	conn: ConnState;
 }
 
@@ -20,6 +29,7 @@ let state: PendingState = {
 	permissions: [],
 	questions: [],
 	busy: {},
+	reauth: {},
 	conn: "connecting",
 };
 
@@ -103,8 +113,17 @@ export const pendingStore = {
 	setConn(conn: ConnState) {
 		set({ conn });
 	},
+	setReauth(sessionId: string, notice: ReauthNotice) {
+		set({ reauth: { ...state.reauth, [sessionId]: notice } });
+	},
+	clearReauth(sessionId: string) {
+		if (!(sessionId in state.reauth)) return;
+		const reauth = { ...state.reauth };
+		delete reauth[sessionId];
+		set({ reauth });
+	},
 	reset() {
-		set({ permissions: [], questions: [], busy: {}, conn: "connecting" });
+		set({ permissions: [], questions: [], busy: {}, reauth: {}, conn: "connecting" });
 	},
 };
 

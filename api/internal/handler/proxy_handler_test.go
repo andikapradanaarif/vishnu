@@ -206,6 +206,44 @@ func TestForwardDoesNotLeakSessionCredentialsUpstream(t *testing.T) {
 	}
 }
 
+// Crush's cross-origin guard 403s any request whose Origin host differs
+// from the upstream's (127.0.0.1:port) — the browser's fetch-metadata
+// headers must never cross the proxy.
+func TestForwardDoesNotLeakBrowserMetadataUpstream(t *testing.T) {
+	received := make(http.Header)
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/v1/health" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		received = r.Header
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer upstream.Close()
+
+	app := proxyApp(externalProject("a", upstream.URL, domain.ProjectStatusReady))
+
+	req := httptest.NewRequest("POST", "/p/a/v1/workspaces/w1/current-session?client_id=c1", strings.NewReader(`{"session_id":"s1"}`))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Origin", "https://vishnu.example.com")
+	req.Header.Set("Referer", "https://vishnu.example.com/projects/a")
+	req.Header.Set("Sec-Fetch-Site", "same-origin")
+	req.Header.Set("Sec-Fetch-Mode", "cors")
+	req.Header.Set("Sec-Fetch-Dest", "empty")
+
+	resp, err := app.Test(req)
+	if err != nil {
+		t.Fatalf("POST: %v", err)
+	}
+	defer func() { _ = resp.Body.Close() }()
+
+	for _, key := range []string{"Origin", "Referer", "Sec-Fetch-Site", "Sec-Fetch-Mode", "Sec-Fetch-Dest"} {
+		if got := received.Get(key); got != "" {
+			t.Fatalf("browser metadata %q reached the upstream: %q", key, got)
+		}
+	}
+}
+
 func TestForwardStreamsEventStreamsThrough(t *testing.T) {
 	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/event-stream")
