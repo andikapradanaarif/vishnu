@@ -167,10 +167,12 @@ slide forward on use, so revoking means deleting the row.
 - Session effort: `reasoning_effort` rides inside the `SelectedModel`
   posted to `POST …/sessions/{sid}/model` — pins per-session effort on
   the model override (applies next run; `""` = model default). Offered
-  levels come from the catwalk v3 `reasoning` object on
-  `GET …/providers` (`thinking: always|never|toggleable` +
-  `effort_levels: [{value, display}]`, set only for toggleable models);
-  catwalk v2 crushes sent flat `can_reason`/`reasoning_levels` instead.
+  levels come from `reasoning.effort_levels` on `GET …/providers` —
+  a stable dual-shape DTO (crush #533) emits the catwalk v3 object
+  (`thinking` + `[{value, display}]`, set only for toggleable models)
+  alongside derived v2 flat fields (`can_reason`, `reasoning_levels`,
+  `default_reasoning_effort`, `cost_per_1m_*`), frozen for compat; a
+  raw-v2 crush sends only the flat fields.
   A crushrc-declared model needs `model add --reasoning-level`
   (fork #420) to advertise its own vocabulary, since effort only
   applies when it's a declared level.

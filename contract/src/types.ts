@@ -229,10 +229,19 @@ export interface CatwalkModel {
 	capabilities?: { vision?: boolean; audio?: boolean };
 	max_attachments?: number;
 	options?: Record<string, unknown>;
-	/** catwalk v2 flat fields — older crush only. */
+	/**
+	 * v2 flat fields — the stable wire DTO (crush #533) derives them
+	 * from the v3 fields above and keeps them frozen for compatibility;
+	 * a raw-v2 crush sends only these.
+	 */
 	can_reason?: boolean;
 	reasoning_levels?: string[];
+	default_reasoning_effort?: string;
 	supports_attachments?: boolean;
+	cost_per_1m_in?: number;
+	cost_per_1m_out?: number;
+	cost_per_1m_in_cached?: number;
+	cost_per_1m_out_cached?: number;
 }
 
 export interface ProviderConfig {
