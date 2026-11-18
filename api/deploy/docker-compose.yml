@@ -38,7 +38,7 @@ services:
       context: ../..
       dockerfile: api/Dockerfile
       args:
-        CRUSH_VERSION: ${CRUSH_VERSION:-v0.99.1-fork.1-282-g759066ac}
+        CRUSH_VERSION: ${CRUSH_VERSION:-v0.101.0-fork-0-g759066ac}
     container_name: vishnu
     restart: unless-stopped
     env_file:

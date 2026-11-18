@@ -4,7 +4,7 @@
 # api-only image — the SPA ships in the separate vishnu-web nginx image.
 # Pinned fork commit + its `git describe` version — bump both together.
 ARG CRUSH_REF=759066acc9c0fd62dcb74bc8473e171dee9c11d2
-ARG CRUSH_VERSION=v0.99.1-fork.1-282-g759066ac
+ARG CRUSH_VERSION=v0.101.0-fork-0-g759066ac
 
 FROM golang:1.26-alpine AS api
 ENV GOTOOLCHAIN=local CGO_ENABLED=0
