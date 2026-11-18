@@ -10,5 +10,6 @@ export * from "./agent/index";
 export * from "./config/index";
 export * from "./permissions/index";
 export * from "./questions/index";
+export * from "./skills/index";
 export * from "./events/index";
 export * from "./server/index";

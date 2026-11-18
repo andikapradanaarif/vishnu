@@ -72,6 +72,11 @@
 			"import": "./dist/questions/index.js",
 			"default": "./dist/questions/index.js"
 		},
+		"./skills": {
+			"types": "./dist/skills/index.d.ts",
+			"import": "./dist/skills/index.js",
+			"default": "./dist/skills/index.js"
+		},
 		"./events": {
 			"types": "./dist/events/index.d.ts",
 			"import": "./dist/events/index.js",

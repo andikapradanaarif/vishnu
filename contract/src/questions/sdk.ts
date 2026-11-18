@@ -1,6 +1,6 @@
 import { buildPath, type ApiClient } from "../client";
 import { v1WorkspaceQuestionsAnswer, v1WorkspaceQuestionsCancel } from "../paths";
-import type { QuestionAnswer, ResolvedResponse } from "../types";
+import type { QuestionAnswer, QuestionCancel, ResolvedResponse } from "../types";
 
 /**
  * SDK client for the `/workspaces/{id}/questions` endpoints — the
@@ -21,10 +21,18 @@ export class QuestionsClient {
 		);
 	}
 
-	/** POST `/workspaces/{id}/questions/cancel` — dismiss the batch (no body). */
-	cancel(workspaceId: string): Promise<ResolvedResponse> {
+	/**
+	 * POST `/workspaces/{id}/questions/cancel` — dismiss a batch. Pass
+	 * `batchRequestId` (the QuestionRequest's `id`) whenever it is known:
+	 * a body-less cancel only resolves when exactly one batch is pending
+	 * and is a no-op when several are.
+	 */
+	cancel(workspaceId: string, batchRequestId?: string): Promise<ResolvedResponse> {
 		return this.api.post<ResolvedResponse>(
 			buildPath(v1WorkspaceQuestionsCancel, { id: workspaceId }),
+			batchRequestId === undefined
+				? undefined
+				: ({ batch_request_id: batchRequestId } satisfies QuestionCancel),
 		);
 	}
 }
