@@ -211,15 +211,37 @@ export interface AgentEvent {
 
 // ---------- Models & providers ----------
 
+/** catwalk v3 `reasoning` object — "always" | "never" | "toggleable". */
+export interface CatwalkReasoning {
+	thinking?: string;
+	effort_levels?: { value: string; display: string }[];
+	default_effort_level?: string;
+}
+
 export interface CatwalkModel {
 	id: string;
 	name: string;
 	provider?: string;
 	context_window?: number;
 	default_max_tokens?: number;
+	/** catwalk v3 wire shape (crush ≥ v0.101-era merge). */
+	reasoning?: CatwalkReasoning;
+	capabilities?: { vision?: boolean; audio?: boolean };
+	max_attachments?: number;
+	options?: Record<string, unknown>;
+	/**
+	 * v2 flat fields — the stable wire DTO (crush #533) derives them
+	 * from the v3 fields above and keeps them frozen for compatibility;
+	 * a raw-v2 crush sends only these.
+	 */
 	can_reason?: boolean;
 	reasoning_levels?: string[];
+	default_reasoning_effort?: string;
 	supports_attachments?: boolean;
+	cost_per_1m_in?: number;
+	cost_per_1m_out?: number;
+	cost_per_1m_in_cached?: number;
+	cost_per_1m_out_cached?: number;
 }
 
 export interface ProviderConfig {
