@@ -9,6 +9,7 @@ import { ProjectsClient } from "@vishnu/api-contract/projects";
 import { QuestionsClient } from "@vishnu/api-contract/questions";
 import { ServerClient } from "@vishnu/api-contract/server";
 import { SessionsClient } from "@vishnu/api-contract/sessions";
+import { SkillsClient } from "@vishnu/api-contract/skills";
 import { UsersClient } from "@vishnu/api-contract/users";
 import { WorkspacesClient } from "@vishnu/api-contract/workspaces";
 import { clientId } from "./clientId";
@@ -62,6 +63,7 @@ export let agentClient = new AgentClient(crushClient);
 export let configClient = new ConfigClient(crushClient);
 export let permissionsClient = new PermissionsClient(crushClient);
 export let questionsClient = new QuestionsClient(crushClient);
+export let skillsClient = new SkillsClient(crushClient);
 export let eventsClient = new EventsClient(crushClient);
 export let serverClient = new ServerClient(crushClient);
 
@@ -78,6 +80,7 @@ export function bindProject(pid: string | undefined): void {
 	configClient = new ConfigClient(crushClient);
 	permissionsClient = new PermissionsClient(crushClient);
 	questionsClient = new QuestionsClient(crushClient);
+	skillsClient = new SkillsClient(crushClient);
 	eventsClient = new EventsClient(crushClient);
 	serverClient = new ServerClient(crushClient);
 }

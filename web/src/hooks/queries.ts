@@ -8,6 +8,7 @@ import {
 	questionsClient,
 	serverClient,
 	sessionsClient,
+	skillsClient,
 	workspacesClient,
 } from "@/services/api";
 import { pendingStore } from "@/services/pendingStore";
@@ -34,6 +35,9 @@ export const queryKeys = {
 	agent: (wid: string) => ["agent", wid] as const,
 	providers: (wid: string) => ["providers", wid] as const,
 	config: (wid: string) => ["config", wid] as const,
+	skills: (wid: string) => ["skills", wid] as const,
+	skillsDisabled: (wid: string) => ["skills-disabled", wid] as const,
+	skillsEnabled: (wid: string) => ["skills-enabled", wid] as const,
 	permissionsSkip: (wid: string) => ["permissions-skip", wid] as const,
 	crushVersion: (pid: string) => ["crush-version", pid] as const,
 	pendingPermissions: (wid: string, sid?: string) =>
@@ -165,6 +169,67 @@ export function useConfig(wid: string | undefined) {
 		queryKey: queryKeys.config(wid ?? ""),
 		queryFn: () => configClient.get(wid!),
 		enabled: !!wid,
+	});
+}
+
+/** `GET /workspaces/{id}/skills` — the skills currently visible to the agent. */
+export function useSkills(wid: string | undefined) {
+	return useQuery({
+		queryKey: queryKeys.skills(wid ?? ""),
+		queryFn: () => skillsClient.list(wid!),
+		enabled: !!wid,
+	});
+}
+
+/** Repo-scoped skill overrides — names, not full SkillInfo records. */
+export function useSkillRepoToggles(wid: string | undefined) {
+	const disabled = useQuery({
+		queryKey: queryKeys.skillsDisabled(wid ?? ""),
+		queryFn: () => skillsClient.disabled(wid!),
+		enabled: !!wid,
+	});
+	const enabled = useQuery({
+		queryKey: queryKeys.skillsEnabled(wid ?? ""),
+		queryFn: () => skillsClient.enabled(wid!),
+		enabled: !!wid,
+	});
+	return { disabled, enabled };
+}
+
+/**
+ * `POST /workspaces/{id}/skills/disabled` — repo-scope a skill on/off.
+ * `disabled:false` re-enables: it lands in the repo's enabled-override
+ * list when the skill is config-disabled, otherwise it just clears a
+ * repo disable.
+ */
+export function useSetSkillDisabled(wid: string | undefined) {
+	const qc = useQueryClient();
+	return useMutation<void, Error, { name: string; disabled: boolean }>({
+		mutationKey: ["skills", "set-disabled"],
+		mutationFn: ({ name, disabled }) => skillsClient.setDisabled(wid!, name, disabled),
+		onSettled: () => {
+			qc.invalidateQueries({ queryKey: queryKeys.skills(wid!) });
+			qc.invalidateQueries({ queryKey: queryKeys.skillsDisabled(wid!) });
+			qc.invalidateQueries({ queryKey: queryKeys.skillsEnabled(wid!) });
+		},
+	});
+}
+
+/**
+ * `POST /workspaces/{id}/skills/config-disabled` — toggle a skill in the
+ * global config (`options.disabled_skills`), affecting every repo.
+ */
+export function useSetSkillConfigDisabled(wid: string | undefined) {
+	const qc = useQueryClient();
+	return useMutation<void, Error, { name: string; disabled: boolean }>({
+		mutationKey: ["skills", "set-config-disabled"],
+		mutationFn: ({ name, disabled }) => skillsClient.setConfigDisabled(wid!, name, disabled),
+		onSettled: () => {
+			qc.invalidateQueries({ queryKey: queryKeys.skills(wid!) });
+			qc.invalidateQueries({ queryKey: queryKeys.skillsDisabled(wid!) });
+			qc.invalidateQueries({ queryKey: queryKeys.skillsEnabled(wid!) });
+			qc.invalidateQueries({ queryKey: queryKeys.config(wid!) });
+		},
 	});
 }
 

@@ -177,6 +177,11 @@ function dispatch(
 			queryClient.invalidateQueries({ queryKey: queryKeys.sessions(workspaceId) });
 			break;
 		}
+		case "skills_event":
+			queryClient.invalidateQueries({ queryKey: queryKeys.skills(workspaceId) });
+			queryClient.invalidateQueries({ queryKey: queryKeys.skillsDisabled(workspaceId) });
+			queryClient.invalidateQueries({ queryKey: queryKeys.skillsEnabled(workspaceId) });
+			break;
 		case "config_changed":
 			queryClient.invalidateQueries({ queryKey: queryKeys.agent(workspaceId) });
 			queryClient.invalidateQueries({ queryKey: queryKeys.providers(workspaceId) });
