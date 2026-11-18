@@ -104,17 +104,26 @@ export function AgentModelControls({
 	const currentModelValue = effective ? `${effective.provider}/${effective.model}` : undefined;
 
 	// Effort picker: gates on the effective model's catwalk entry —
-	// can_reason + declared levels, same as the TUI reasoning dialog.
+	// declared reasoning levels, same as the TUI reasoning dialog.
+	// catwalk v3 nests them under reasoning.effort_levels (set only for
+	// toggleable-thinking models); v2 crushes send flat fields instead.
 	const effortLevels = useMemo(() => {
 		if (!effective) return [];
 		const provider = providers?.find((p) => p.id === effective.provider);
 		const catwalk = provider?.models?.find((m) => m.id === effective.model);
-		if (!catwalk?.can_reason) return [];
-		return catwalk.reasoning_levels ?? [];
+		const levels = catwalk?.reasoning
+			? (catwalk.reasoning.effort_levels ?? [])
+			: catwalk?.can_reason
+				? (catwalk.reasoning_levels ?? []).map((v) => ({
+						value: v,
+						display: EFFORT_LABELS[v] ?? v,
+					}))
+				: [];
+		return levels;
 	}, [providers, effective]);
 
 	const effortOptions = useMemo<SelectOption<string>[]>(() => {
-		const levels = effortLevels.map((v) => ({ value: v, label: EFFORT_LABELS[v] ?? v }));
+		const levels = effortLevels.map((l) => ({ value: l.value, label: l.display }));
 		// Revert entry clears the effort on the session pin — only when an
 		// override exists, else "default" would pin the configured model
 		// for no effect (crush TUI parity).
