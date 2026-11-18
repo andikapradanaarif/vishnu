@@ -296,7 +296,7 @@ export function useAnswerQuestions(wid: string | undefined) {
 export function useCancelQuestions(wid: string | undefined) {
 	return useMutation<ResolvedResponse, Error, string>({
 		mutationKey: ["questions", "cancel"],
-		mutationFn: () => questionsClient.cancel(wid!),
+		mutationFn: (batchId) => questionsClient.cancel(wid!, batchId),
 		onSuccess: (_d, batchId) => pendingStore.removeQuestion(batchId),
 	});
 }
