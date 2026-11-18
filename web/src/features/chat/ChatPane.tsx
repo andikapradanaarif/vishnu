@@ -6,7 +6,7 @@ import { usePendingState } from "@/services/pendingStore";
 import { LoadingSpinner } from "@vishnu/ui-component/loadingAnimation";
 import { errorLabel } from "@/utils/errors";
 import { descendantsOf } from "@/utils/sessions";
-import type { Message } from "@vishnu/api-contract";
+import type { Message, ToolResult } from "@vishnu/api-contract";
 import { MessagePart } from "./MessageParts";
 import { TodoList } from "./TodoList";
 import { PermissionCard } from "@/features/prompts/PermissionCard";
@@ -147,11 +147,21 @@ export function ChatPane({ wid, sid }: ChatPaneProps) {
 }
 
 function MessageView({ message }: { message: Message }) {
+	// tool_call parts carry started_at_ms; pairing them with their
+	// result's finished_at_ms yields the elapsed time on the call header.
+	const results = new Map<string, ToolResult>();
+	for (const p of message.parts) {
+		if (p.type === "tool_result") {
+			const r = p.data as ToolResult;
+			results.set(r.tool_call_id, r);
+		}
+	}
+
 	if (message.role === "user") {
 		return (
 			<div className="self-end max-w-[85%] border-2 border-pink-500/60 bg-pink-500/10 px-3.5 py-2">
 				{message.parts.map((p, i) => (
-					<MessagePart key={i} part={p} role={message.role} />
+					<MessagePart key={i} part={p} role={message.role} results={results} />
 				))}
 			</div>
 		);
@@ -160,7 +170,7 @@ function MessageView({ message }: { message: Message }) {
 	return (
 		<div className="flex flex-col gap-1.5">
 			{message.parts.map((p, i) => (
-				<MessagePart key={i} part={p} role={message.role} />
+				<MessagePart key={i} part={p} role={message.role} results={results} />
 			))}
 		</div>
 	);
