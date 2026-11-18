@@ -44,6 +44,12 @@ type Options struct {
 	HealthCacheTTL       time.Duration
 	StopTimeout          time.Duration
 	LogLines             int
+	// DetachGraceSeconds sets crush's CRUSH_SERVER_DETACH_GRACE — how
+	// long a disconnected client's claim (and the run it was watching)
+	// survives. The upstream 10s default kills a run after a laptop
+	// sleep or a flaky network hop; a browser UI needs a wider window.
+	// Set VISHNU_CRUSH_DETACH_GRACE=10 to match upstream exactly.
+	DetachGraceSeconds int
 }
 
 func LoadOptions() Options {
@@ -56,6 +62,7 @@ func LoadOptions() Options {
 		HealthCacheTTL:       3 * time.Second,
 		StopTimeout:          5 * time.Second,
 		LogLines:             1000,
+		DetachGraceSeconds:   getenvInt("VISHNU_CRUSH_DETACH_GRACE", 120),
 	}
 }
 
@@ -104,6 +111,9 @@ func NewManager(opts Options) *Manager {
 	}
 	if opts.LogLines == 0 {
 		opts.LogLines = defaults.LogLines
+	}
+	if opts.DetachGraceSeconds == 0 {
+		opts.DetachGraceSeconds = defaults.DetachGraceSeconds
 	}
 
 	return &Manager{
@@ -292,6 +302,12 @@ func (m *Manager) spawn(project domain.Project, e *entry) error {
 	cmd.Stdout = e.logs
 	cmd.Stderr = e.logs
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	if m.opts.DetachGraceSeconds > 0 {
+		cmd.Env = append(
+			os.Environ(),
+			fmt.Sprintf("CRUSH_SERVER_DETACH_GRACE=%d", m.opts.DetachGraceSeconds),
+		)
+	}
 
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("start crush server for %s: %w", project.Name, err)
