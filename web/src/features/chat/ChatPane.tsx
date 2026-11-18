@@ -5,6 +5,7 @@ import { useMessages, useSessions } from "@/hooks/queries";
 import { usePendingState } from "@/services/pendingStore";
 import { LoadingSpinner } from "@vishnu/ui-component/loadingAnimation";
 import { errorLabel } from "@/utils/errors";
+import { descendantsOf } from "@/utils/sessions";
 import type { Message } from "@vishnu/api-contract";
 import { MessagePart } from "./MessageParts";
 import { TodoList } from "./TodoList";
@@ -24,8 +25,11 @@ export function ChatPane({ wid, sid }: ChatPaneProps) {
 	const pinned = useRef(true);
 	const hadMessages = useRef(false);
 
-	const sessionPermissions = permissions.filter((p) => p.session_id === sid);
-	const sessionQuestions = questions.filter((q) => q.session_id === sid);
+	// Prompts from this session's sub-agent sessions land here too —
+	// crush delivers them to the parent's viewers under the child's id.
+	const covered = descendantsOf(sessions ?? [], sid);
+	const sessionPermissions = permissions.filter((p) => covered.has(p.session_id));
+	const sessionQuestions = questions.filter((q) => covered.has(q.session_id));
 	const todos = sessions?.find((s) => s.id === sid)?.todos;
 	const doneCount = todos?.filter((t) => t.status === "completed").length ?? 0;
 
